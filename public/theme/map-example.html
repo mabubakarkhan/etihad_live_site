@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps – working example (localhost)</title>
+    <style>
+        body { font-family: sans-serif; margin: 1rem; }
+        #map { height: 400px; width: 100%; }
+        .note { background: #f0f9ff; border: 1px solid #0ea5e9; padding: 0.75rem 1rem; margin-top: 1rem; border-radius: 6px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>Map example</h1>
+    <div id="map"></div>
+    <div class="note" id="note"></div>
+
+    <script>
+        // 1. Define the callback before loading the script. Google calls this when the API is ready.
+        function initMap() {
+            const location = { lat: 31.5204, lng: 74.3587 };
+
+            const mapEl = document.getElementById("map");
+            const mapOpts = {
+                zoom: 12,
+                center: location
+            };
+            // Advanced markers require mapId (use DEMO_MAP_ID for testing)
+            if (typeof google !== 'undefined' && google.maps && google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
+                mapOpts.mapId = 'DEMO_MAP_ID';
+            }
+            const map = new google.maps.Map(mapEl, mapOpts);
+
+            if (typeof google.maps.marker !== 'undefined' && google.maps.marker.AdvancedMarkerElement) {
+                new google.maps.marker.AdvancedMarkerElement({
+                    map: map,
+                    position: location,
+                    title: "Location"
+                });
+            } else {
+                new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    title: "Location"
+                });
+            }
+            document.getElementById('note').textContent = 'Map loaded. Using ' +
+                (google.maps.marker && google.maps.marker.AdvancedMarkerElement ? 'AdvancedMarkerElement' : 'Marker') + '.';
+        }
+        window.initMap = initMap;
+    </script>
+    <!-- 2. Load the API asynchronously. Replace YOUR_API_KEY with your key. For localhost, add this page URL to the key's HTTP referrers in Google Cloud Console. -->
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBt3RoiI1v2N6kG7KXfK-r3mFJk8r9zSvY&libraries=marker&callback=initMap">
+    </script>
+</body>
+</html>
