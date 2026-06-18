@@ -1,0 +1,46 @@
+/* Slick overrides — preserve Etihad homepage card slider design */
+
+.homepage-slick .slick-arrow,
+.homepage-slick .slick-dots {
+  display: none !important;
+}
+
+.dha-showcase__rail.homepage-slick-rail,
+.popular-listings__rail.homepage-slick-rail {
+  overflow: hidden;
+}
+
+.dha-showcase__cards.slick-initialized,
+.popular-listings--hot-offers .popular-listings__grid.slick-initialized,
+.popular-listings--dealers .popular-listings__grid.slick-initialized {
+  display: block;
+  width: 100%;
+  max-width: none;
+}
+
+.dha-showcase__cards.slick-initialized .slick-list,
+.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-list,
+.popular-listings--dealers .popular-listings__grid.slick-initialized .slick-list {
+  overflow: hidden;
+  margin: 0 -1.2rem;
+}
+
+.dha-showcase__cards.slick-initialized .slick-slide,
+.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-slide,
+.popular-listings--dealers .popular-listings__grid.slick-initialized .slick-slide {
+  height: auto;
+  padding: 0 1.2rem;
+}
+
+.dha-showcase__cards.slick-initialized .slick-slide > article,
+.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-slide > article,
+.popular-listings--dealers .popular-listings__grid.slick-initialized .slick-slide > article {
+  height: 100%;
+}
+
+.dha-showcase__cards.slick-initialized .slick-track,
+.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-track,
+.popular-listings--dealers .popular-listings__grid.slick-initialized .slick-track {
+  display: flex !important;
+  align-items: stretch;
+}

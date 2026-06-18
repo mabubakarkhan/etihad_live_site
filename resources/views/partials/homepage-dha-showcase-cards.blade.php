@@ -25,7 +25,7 @@
                     <img src="{{ $imageUrl }}" alt="{{ $phase->title }} preview" loading="lazy" />
                   </div>
                   <div class="dha-showcase__card-content">
-                    <span class="dha-showcase__card-index">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                    <span class="dha-showcase__card-index">{{ $phase->cardPhaseNumber() }}</span>
                     <span class="dha-showcase__tag">{{ $tag }}</span>
                     <h3 class="dha-showcase__card-title">
                       <a href="{{ route('dha.phase.show', $phase->slug) }}">{{ $phase->title }}</a>
