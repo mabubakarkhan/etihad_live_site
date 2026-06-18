@@ -1,15 +1,16 @@
-LIVE / DEPLOY — FIX "Class PDO not found"
+LIVE — folders to upload manually
 
-Upload to: public_html/new.etihadmarketing.co/public/
+=========================================
 
-1. public/.user.ini          (enables PDO + mbstring — wait 5 min after upload)
-2. config/session.php        (uses file sessions if PDO still missing)
+MAIN FOLDER (all images & uploads):
 
-Then open: https://new.etihadmarketing.co/
+storage/app/public/
 
-If still error: cPanel → Select PHP Version → Extensions
-→ enable: pdo, pdo_mysql, mbstring, mysqli
+Copy this entire folder from local → live, then open once:
+https://new.etihadmarketing.co/run-storage-fix?token=d5f15d4g1f2h5fg2ds
 
-Also keep uploaded:
-- public/index.php
-- public/hosting-polyfills.php
+Also uploads to live public/storage/ after run-storage-fix (auto copy).
+
+Code changes: app/ config/ routes/ resources/ public/theme/ public/index.php
+
+Do not upload: .env  vendor/
