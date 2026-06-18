@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('site_seo_settings', function (Blueprint $table) {
+        migration_create_table('site_seo_settings', function (Blueprint $table) {
             $table->id();
             $table->string('google_analytics_id', 40)->nullable();
             $table->string('google_tag_manager_id', 40)->nullable();
@@ -28,10 +28,12 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::table('site_seo_settings')->insert([
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        migration_seed_if_empty('site_seo_settings', function () {
+            DB::table('site_seo_settings')->insert([
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
     }
 
     public function down(): void

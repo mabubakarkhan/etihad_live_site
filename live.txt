@@ -90,3 +90,7 @@ Dynamic homepage sections:
 - Homepage → Dealers section (admin/homepage-dealers-section) — second listings strip; cards from dealers with Show on homepage
 - Homepage → Location section (admin/homepage-location-section) — map background, card photo, pin; text from Contact settings
 - Homepage CMS migrations (2026_06_17_*) skip create/seed when table or rows already exist — safe to re-run /run-migrations on live
+- /run-migrations uses SafeMigrationRunner: skips migrations when tables/columns already exist, records them in `migrations`, then continues
+- SafeMigrationRunner pre-marks create migrations when all their tables already exist (works even before updated migration files are uploaded)
+- Optional batching: /run-migrations?token=...&limit=15 — run 15 migrations per request, repeat until remaining=0
+- Deploy: upload app/Support/SafeMigrationRunner.php, app/Helpers/migration.php, updated routes/web.php + database/migrations, run `composer dump-autoload` on server if possible

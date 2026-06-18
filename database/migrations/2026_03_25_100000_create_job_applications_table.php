@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('job_applications', function (Blueprint $table) {
+        migration_create_table('job_applications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('career_id')->constrained('careers')->cascadeOnDelete();
             $table->string('name');

@@ -31,7 +31,8 @@
             "app/Helpers/icons.php",
             "app/Helpers/seo.php",
             "app/Helpers/contact.php",
-            "app/Helpers/homepage.php"
+            "app/Helpers/homepage.php",
+            "app/Helpers/migration.php"
         ]
     },
     "autoload-dev": {

@@ -21,7 +21,7 @@ use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\HomepageHeroSettingController;
 use App\Http\Controllers\HomepageDhaSectionController;
 use App\Http\Controllers\HomepageDealersSectionController;
-use App\Http\Controllers\HomepageLocationSectionController;
+use App\Support\SafeMigrationRunner;
 use App\Http\Controllers\HomepageChoiceController;
 use App\Http\Controllers\HomepageAchievementsController;
 use App\Http\Controllers\HomepageWhatSetsApartController;
@@ -107,12 +107,18 @@ Route::get('/run-migrations', function () {
         return response()->json(['success' => false, 'message' => 'Invalid or missing token.'], 403);
     }
     try {
-        Artisan::call('migrate', ['--force' => true]);
-        $output = Artisan::output();
+        $limit = max(0, (int) request()->query('limit', 0));
+        $result = SafeMigrationRunner::run($limit);
+        $log = $result['log'];
+        $remaining = $result['remaining'];
+
         return response()->json([
             'success' => true,
-            'message' => 'Migrations completed.',
-            'output' => $output,
+            'message' => $remaining > 0
+                ? "Migrations batch completed. {$remaining} still pending — open this URL again."
+                : 'Migrations completed.',
+            'remaining' => $remaining,
+            'output' => implode(PHP_EOL, $log),
         ]);
     } catch (\Throwable $e) {
         return response()->json([
