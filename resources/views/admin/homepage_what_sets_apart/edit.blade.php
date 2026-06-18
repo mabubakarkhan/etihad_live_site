@@ -29,7 +29,7 @@
                         <div class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">{{ session('status') }}</div>
                     @endif
 
-                    <form method="POST" action="{{ route('admin.homepage-what-sets-apart.update') }}" enctype="multipart/form-data" class="space-y-6 max-w-3xl" id="cards-form">
+                    <form method="POST" action="{{ route('admin.homepage-what-sets-apart.update') }}" class="space-y-6 max-w-3xl" id="homepage-form" data-homepage-form data-upload-url="{{ route('admin.homepage-media.upload') }}">
                         @csrf
                         @method('PUT')
 
@@ -88,15 +88,14 @@
                                     <div class="space-y-1.5">
                                         <label class="block text-slate-700 dark:text-slate-300">Icon image upload (optional)</label>
                                         <p class="text-xs text-slate-500 dark:text-slate-400">Recommended: <strong>128×128 px</strong> PNG or SVG — overrides SVG markup above when set.</p>
-                                        @if(!empty($card['icon_image']))
-                                            <div class="flex items-center gap-3 mb-2">
-                                                <img src="{{ asset('storage/' . $card['icon_image']) }}" alt="Icon preview" class="h-16 w-16 object-contain rounded border border-slate-200 dark:border-slate-600 bg-slate-900/40 p-2" />
-                                                <label class="inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
-                                                    <input type="checkbox" name="cards[{{ $index }}][remove_icon_image]" value="1" class="rounded border-slate-400" /> Remove uploaded icon
-                                                </label>
-                                            </div>
-                                        @endif
-                                        <input type="file" name="cards[{{ $index }}][icon_image]" accept="image/*,.svg" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5" />
+                                        @include('admin.partials.homepage_media_field', [
+                                            'name' => 'icon_image',
+                                            'path' => $card['icon_image'] ?? null,
+                                            'pathName' => 'cards[' . $index . '][icon_image_path]',
+                                            'removeName' => 'cards[' . $index . '][remove_icon_image]',
+                                            'accept' => 'image/*,.svg',
+                                            'previewClass' => 'h-16 w-16 object-contain rounded border border-slate-200 dark:border-slate-600 bg-slate-900/40 p-2',
+                                        ])
                                     </div>
                                 </div>
                             @endforeach
@@ -132,7 +131,12 @@
                 </div>
                 <div class="space-y-1.5">
                     <label class="block text-slate-700 dark:text-slate-300">Icon image upload (optional)</label>
-                    <input type="file" accept="image/*,.svg" class="card-icon-image block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5" />
+                    <div data-homepage-media-wrap data-remove-name="cards[0][remove_icon_image]" data-preview-class="h-16 w-16 object-contain rounded border border-slate-200 dark:border-slate-600 bg-slate-900/40 p-2">
+                        <input type="hidden" name="cards[0][icon_image_path]" value="" />
+                        <div data-homepage-media-preview class="hidden mb-3"></div>
+                        <input type="file" accept="image/*,.svg" class="homepage-media-upload card-icon-image block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5" data-upload-type="icon_image" data-path-name="cards[0][icon_image_path]" data-media-kind="image" />
+                        <p data-homepage-media-status class="mt-2 text-xs text-slate-500 dark:text-slate-400"></p>
+                    </div>
                 </div>
             </div>
         </template>
@@ -157,8 +161,12 @@
                             const el = row.querySelector(selector) || row.querySelector(`[name*="[${key}]"]`);
                             if (el) el.name = `cards[${index}][${key}]`;
                         });
-                        const file = row.querySelector('.card-icon-image') || row.querySelector('input[type="file"]');
-                        if (file) file.name = `cards[${index}][icon_image]`;
+                        const pathInput = row.querySelector('input[name*="[icon_image_path]"]');
+                        if (pathInput) pathInput.name = `cards[${index}][icon_image_path]`;
+                        const uploadInput = row.querySelector('.homepage-media-upload');
+                        if (uploadInput) uploadInput.setAttribute('data-path-name', `cards[${index}][icon_image_path]`);
+                        const mediaWrap = row.querySelector('[data-homepage-media-wrap]');
+                        if (mediaWrap) mediaWrap.setAttribute('data-remove-name', `cards[${index}][remove_icon_image]`);
                         const idInput = row.querySelector('input[name*="[id]"]');
                         if (idInput) idInput.name = `cards[${index}][id]`;
                         const removeIcon = row.querySelector('input[name*="[remove_icon_image]"]');
@@ -186,5 +194,6 @@
                 reindex();
             })();
         </script>
+        <script src="{{ asset('theme/js/admin-homepage-media.js') }}"></script>
     </body>
 </html>

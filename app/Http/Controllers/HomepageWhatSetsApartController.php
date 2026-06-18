@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HandlesHomepageMediaPaths;
 use App\Models\ActivityLog;
 use App\Models\HomepageWhatSetsApartCard;
 use App\Models\HomepageWhatSetsApartSetting;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class HomepageWhatSetsApartController extends Controller
 {
+    use HandlesHomepageMediaPaths;
+
     public function edit()
     {
         $setting = HomepageWhatSetsApartSetting::instance();
@@ -31,7 +34,7 @@ class HomepageWhatSetsApartController extends Controller
             'cards.*.title' => ['required', 'string', 'max:255'],
             'cards.*.description' => ['required', 'string', 'max:2000'],
             'cards.*.icon_svg' => ['nullable', 'string', 'max:10000'],
-            'cards.*.icon_image' => ['nullable', 'image', 'max:2048'],
+            'cards.*.icon_image_path' => ['nullable', 'string', 'max:500'],
             'cards.*.remove_icon_image' => ['nullable', 'boolean'],
         ]);
 
@@ -59,13 +62,14 @@ class HomepageWhatSetsApartController extends Controller
                 if ($request->boolean("cards.{$index}.remove_icon_image") && $card->icon_image) {
                     public_storage_delete($card->icon_image);
                     $card->icon_image = null;
-                }
-
-                if ($request->hasFile("cards.{$index}.icon_image")) {
-                    if ($card->icon_image) {
-                        public_storage_delete($card->icon_image);
+                } elseif ($request->filled("cards.{$index}.icon_image_path")) {
+                    $newPath = $request->input("cards.{$index}.icon_image_path");
+                    if ($this->isValidHomepageStoragePath($newPath)) {
+                        if ($card->icon_image && $card->icon_image !== $newPath) {
+                            public_storage_delete($card->icon_image);
+                        }
+                        $card->icon_image = $newPath;
                     }
-                    $card->icon_image = public_storage_store_upload($request->file("cards.{$index}.icon_image"), 'homepage-what-sets-apart');
                 }
 
                 $card->save();

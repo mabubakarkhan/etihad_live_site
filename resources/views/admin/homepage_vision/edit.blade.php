@@ -29,7 +29,7 @@
                         <div class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">{{ session('status') }}</div>
                     @endif
 
-                    <form method="POST" action="{{ route('admin.homepage-vision.update') }}" enctype="multipart/form-data" class="space-y-6 max-w-3xl">
+                    <form method="POST" action="{{ route('admin.homepage-vision.update') }}" class="space-y-6 max-w-3xl" id="homepage-form" data-homepage-form data-upload-url="{{ route('admin.homepage-media.upload') }}">
                         @csrf
                         @method('PUT')
 
@@ -61,16 +61,11 @@
                             <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">CEO photo</h2>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Recommended production size: <strong>400×544 px</strong> (portrait, ~3:4) — displays at <strong>~320×436 px</strong> on desktop (<code class="text-[11px]">object-fit: cover</code>).</p>
 
-                            @if($setting->ceo_image)
-                                <div class="mb-3">
-                                    <img src="{{ asset('storage/' . $setting->ceo_image) }}" alt="CEO preview" class="max-h-56 rounded-lg border border-slate-200 dark:border-slate-600 object-cover" />
-                                    <label class="mt-3 inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
-                                        <input type="checkbox" name="remove_ceo_image" value="1" class="rounded border-slate-400" /> Remove current photo
-                                    </label>
-                                </div>
-                            @endif
-
-                            <input type="file" name="ceo_image" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5" />
+                            @include('admin.partials.homepage_media_field', [
+                                'name' => 'ceo_image',
+                                'path' => $setting->ceo_image,
+                                'previewClass' => 'max-h-56 rounded-lg border border-slate-200 dark:border-slate-600 object-cover',
+                            ])
                         </div>
 
                         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg transition-colors space-y-4">
@@ -114,5 +109,6 @@
                 </section>
             </main>
         </div>
+        <script src="{{ asset('theme/js/admin-homepage-media.js') }}"></script>
     </body>
 </html>

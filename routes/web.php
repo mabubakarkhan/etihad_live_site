@@ -18,6 +18,8 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\ProjectTypeController;
 use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\HomepageLocationSectionController;
+use App\Http\Controllers\HomepageMediaController;
 use App\Http\Controllers\HomepageHeroSettingController;
 use App\Http\Controllers\HomepageDhaSectionController;
 use App\Http\Controllers\HomepageDealersSectionController;
@@ -1536,6 +1538,7 @@ Route::middleware('admin')->group(function () {
     Route::put('/admin/testimonials/{testimonial}', [TestimonialController::class, 'update'])->name('admin.testimonials.update');
     Route::delete('/admin/testimonials/{testimonial}', [TestimonialController::class, 'destroy'])->name('admin.testimonials.destroy');
 
+    Route::post('/admin/homepage-media/upload', [HomepageMediaController::class, 'upload'])->name('admin.homepage-media.upload');
     Route::get('/admin/homepage-hero', [HomepageHeroSettingController::class, 'edit'])->name('admin.homepage-hero.edit');
     Route::put('/admin/homepage-hero', [HomepageHeroSettingController::class, 'update'])->name('admin.homepage-hero.update');
     Route::get('/admin/homepage-vision', [HomepageVisionSettingController::class, 'edit'])->name('admin.homepage-vision.edit');

@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HandlesHomepageMediaPaths;
 use App\Models\ActivityLog;
 use App\Models\HomepageLocationSectionSetting;
 use Illuminate\Http\Request;
 
 class HomepageLocationSectionController extends Controller
 {
+    use HandlesHomepageMediaPaths;
+
     public function edit()
     {
         $setting = HomepageLocationSectionSetting::instance();
@@ -20,9 +23,9 @@ class HomepageLocationSectionController extends Controller
         $setting = HomepageLocationSectionSetting::instance();
 
         $request->validate([
-            'map_background_image' => ['nullable', 'image', 'max:8192'],
-            'card_image' => ['nullable', 'image', 'max:8192'],
-            'pin_image' => ['nullable', 'image', 'max:4096'],
+            'map_background_image_path' => ['nullable', 'string', 'max:500'],
+            'card_image_path' => ['nullable', 'string', 'max:500'],
+            'pin_image_path' => ['nullable', 'string', 'max:500'],
             'remove_map_background_image' => ['nullable', 'boolean'],
             'remove_card_image' => ['nullable', 'boolean'],
             'remove_pin_image' => ['nullable', 'boolean'],
@@ -33,17 +36,7 @@ class HomepageLocationSectionController extends Controller
             'card_image' => 'remove_card_image',
             'pin_image' => 'remove_pin_image',
         ] as $field => $removeFlag) {
-            if ($request->boolean($removeFlag) && $setting->{$field}) {
-                public_storage_delete($setting->{$field});
-                $setting->{$field} = null;
-            }
-
-            if ($request->hasFile($field)) {
-                if ($setting->{$field}) {
-                    public_storage_delete($setting->{$field});
-                }
-                $setting->{$field} = public_storage_store_upload($request->file($field), 'homepage-location');
-            }
+            $this->applyHomepageMediaPath($request, $setting, $field, $removeFlag);
         }
 
         $setting->save();

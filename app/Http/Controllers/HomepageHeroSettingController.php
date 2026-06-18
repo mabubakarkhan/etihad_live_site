@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HandlesHomepageMediaPaths;
 use App\Models\ActivityLog;
 use App\Models\HomepageHeroSetting;
 use Illuminate\Http\Request;
 
 class HomepageHeroSettingController extends Controller
 {
+    use HandlesHomepageMediaPaths;
+
     public function edit()
     {
         $setting = HomepageHeroSetting::instance();
@@ -19,22 +22,12 @@ class HomepageHeroSettingController extends Controller
     {
         $setting = HomepageHeroSetting::instance();
 
-        $validated = $request->validate([
-            'hero_image' => ['nullable', 'image', 'max:8192'],
+        $request->validate([
+            'hero_image_path' => ['nullable', 'string', 'max:500'],
             'remove_hero_image' => ['nullable', 'boolean'],
         ]);
 
-        if ($request->boolean('remove_hero_image') && $setting->hero_image) {
-            public_storage_delete($setting->hero_image);
-            $setting->hero_image = null;
-        }
-
-        if ($request->hasFile('hero_image')) {
-            if ($setting->hero_image) {
-                public_storage_delete($setting->hero_image);
-            }
-            $setting->hero_image = public_storage_store_upload($request->file('hero_image'), 'homepage-hero');
-        }
+        $this->applyHomepageMediaPath($request, $setting, 'hero_image');
 
         $setting->save();
 

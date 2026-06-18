@@ -29,7 +29,7 @@
                         <div class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">{{ session('status') }}</div>
                     @endif
 
-                    <form method="POST" action="{{ route('admin.homepage-about.update') }}" enctype="multipart/form-data" class="space-y-6 max-w-3xl">
+                    <form method="POST" action="{{ route('admin.homepage-about.update') }}" class="space-y-6 max-w-3xl" id="homepage-form" data-homepage-form data-upload-url="{{ route('admin.homepage-media.upload') }}">
                         @csrf
                         @method('PUT')
 
@@ -67,14 +67,12 @@
                             <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Showcase video</h2>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Bottom-left on desktop About screen; below content on mobile. Recommended production size: <strong>1280×720 px</strong> or <strong>1920×1080 px</strong> (16:9) — displays at <strong>~544×314 px</strong> (<code class="text-[11px]">object-fit: cover</code>). MP4 or WebM, max 100&nbsp;MB.</p>
 
-                            @if($setting->video)
-                                <video src="{{ asset('storage/' . $setting->video) }}" class="max-h-40 rounded-lg border border-slate-200 dark:border-slate-600" controls muted></video>
-                                <label class="mt-3 inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
-                                    <input type="checkbox" name="remove_video" value="1" class="rounded border-slate-400" /> Remove current video (fallback to default bundle)
-                                </label>
-                            @endif
-
-                            <input type="file" name="video" accept="video/mp4,video/webm" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" />
+                            @include('admin.partials.homepage_media_field', [
+                                'name' => 'video',
+                                'path' => $setting->video,
+                                'kind' => 'video',
+                                'accept' => 'video/mp4,video/webm',
+                            ])
                         </div>
 
                         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg transition-colors space-y-4">
@@ -95,28 +93,20 @@
                             <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Center image</h2>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Main portrait photo (center desktop / top mobile). Recommended production size: <strong>600×900 px</strong> (2:3 portrait) — displays at <strong>~475×720 px</strong> on mobile (<code class="text-[11px]">object-fit: cover</code>).</p>
 
-                            @if($setting->center_image)
-                                <img src="{{ asset('storage/' . $setting->center_image) }}" alt="Center image preview" class="max-h-48 rounded-lg border border-slate-200 dark:border-slate-600 object-cover" />
-                                <label class="mt-3 inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
-                                    <input type="checkbox" name="remove_center_image" value="1" class="rounded border-slate-400" /> Remove current image
-                                </label>
-                            @endif
-
-                            <input type="file" name="center_image" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5" />
+                            @include('admin.partials.homepage_media_field', [
+                                'name' => 'center_image',
+                                'path' => $setting->center_image,
+                            ])
                         </div>
 
                         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg transition-colors space-y-4">
                             <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Secondary image</h2>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Scroll / vision-state image (desktop center stack + mobile bottom). Recommended production size: <strong>345×440 px</strong> (portrait) — displays at <strong>~345×400 px</strong> (<code class="text-[11px]">object-fit: cover</code>).</p>
 
-                            @if($setting->secondary_image)
-                                <img src="{{ asset('storage/' . $setting->secondary_image) }}" alt="Secondary image preview" class="max-h-48 rounded-lg border border-slate-200 dark:border-slate-600 object-cover" />
-                                <label class="mt-3 inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
-                                    <input type="checkbox" name="remove_secondary_image" value="1" class="rounded border-slate-400" /> Remove current image
-                                </label>
-                            @endif
-
-                            <input type="file" name="secondary_image" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5" />
+                            @include('admin.partials.homepage_media_field', [
+                                'name' => 'secondary_image',
+                                'path' => $setting->secondary_image,
+                            ])
                         </div>
 
                         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg transition-colors space-y-4">
@@ -197,5 +187,6 @@
                 </section>
             </main>
         </div>
+        <script src="{{ asset('theme/js/admin-homepage-media.js') }}"></script>
     </body>
 </html>

@@ -12,8 +12,10 @@ if (! function_exists('homepage_asset_url')) {
         if ($storagePath !== '') {
             $relativePath = ltrim($storagePath, '/');
 
-            if (public_storage_exists($relativePath)) {
-                return url('storage/' . $relativePath);
+            $resolvedUrl = public_storage_url($relativePath);
+
+            if ($resolvedUrl !== null) {
+                return $resolvedUrl;
             }
         }
 

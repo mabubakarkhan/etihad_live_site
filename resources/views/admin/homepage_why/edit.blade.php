@@ -29,7 +29,7 @@
                         <div class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">{{ session('status') }}</div>
                     @endif
 
-                    <form method="POST" action="{{ route('admin.homepage-why.update') }}" enctype="multipart/form-data" class="space-y-6 max-w-3xl">
+                    <form method="POST" action="{{ route('admin.homepage-why.update') }}" class="space-y-6 max-w-3xl" id="homepage-form" data-homepage-form data-upload-url="{{ route('admin.homepage-media.upload') }}">
                         @csrf
                         @method('PUT')
 
@@ -103,16 +103,11 @@
                                     </p>
                                 </div>
 
-                                @if($setting->{$field})
-                                    <div>
-                                        <img src="{{ asset('storage/' . $setting->{$field}) }}" alt="{{ $meta['label'] }} preview" class="max-h-40 rounded-lg border border-slate-200 dark:border-slate-600 object-cover" />
-                                        <label class="mt-3 inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
-                                            <input type="checkbox" name="remove_{{ $field }}" value="1" class="rounded border-slate-400" /> Remove current image (fallback to default bundle)
-                                        </label>
-                                    </div>
-                                @endif
-
-                                <input type="file" name="{{ $field }}" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" />
+                                @include('admin.partials.homepage_media_field', [
+                                    'name' => $field,
+                                    'path' => $setting->{$field},
+                                    'previewClass' => 'max-h-40 rounded-lg border border-slate-200 dark:border-slate-600 object-cover',
+                                ])
                             </div>
                         @endforeach
 
@@ -123,5 +118,6 @@
                 </section>
             </main>
         </div>
+        <script src="{{ asset('theme/js/admin-homepage-media.js') }}"></script>
     </body>
 </html>

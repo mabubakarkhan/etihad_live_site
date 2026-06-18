@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HandlesHomepageMediaPaths;
 use App\Models\ActivityLog;
 use App\Models\HomepageAboutSetting;
 use Illuminate\Http\Request;
 
 class HomepageAboutSettingController extends Controller
 {
+    use HandlesHomepageMediaPaths;
+
     public function edit()
     {
         $setting = HomepageAboutSetting::instance();
@@ -39,47 +42,27 @@ class HomepageAboutSettingController extends Controller
             'cta_url' => ['nullable', 'string', 'max:2048'],
             'affiliated_text' => ['required', 'string', 'max:255'],
             'affiliated_url' => ['nullable', 'string', 'max:2048'],
-            'video' => ['nullable', 'file', 'mimetypes:video/mp4,video/webm', 'max:102400'],
-            'center_image' => ['nullable', 'image', 'max:8192'],
-            'secondary_image' => ['nullable', 'image', 'max:8192'],
+            'video_path' => ['nullable', 'string', 'max:500'],
+            'center_image_path' => ['nullable', 'string', 'max:500'],
+            'secondary_image_path' => ['nullable', 'string', 'max:500'],
             'remove_video' => ['nullable', 'boolean'],
             'remove_center_image' => ['nullable', 'boolean'],
             'remove_secondary_image' => ['nullable', 'boolean'],
         ]);
 
         $setting->fill(collect($validated)->except([
-            'video',
-            'center_image',
-            'secondary_image',
+            'video_path',
+            'center_image_path',
+            'secondary_image_path',
             'remove_video',
             'remove_center_image',
             'remove_secondary_image',
         ])->all());
 
-        if ($request->boolean('remove_video') && $setting->video) {
-            public_storage_delete($setting->video);
-            $setting->video = null;
-        }
-
-        if ($request->hasFile('video')) {
-            if ($setting->video) {
-                public_storage_delete($setting->video);
-            }
-            $setting->video = public_storage_store_upload($request->file('video'), 'homepage-about');
-        }
+        $this->applyHomepageMediaPath($request, $setting, 'video', 'remove_video');
 
         foreach (['center_image' => 'remove_center_image', 'secondary_image' => 'remove_secondary_image'] as $column => $removeFlag) {
-            if ($request->boolean($removeFlag) && $setting->{$column}) {
-                public_storage_delete($setting->{$column});
-                $setting->{$column} = null;
-            }
-
-            if ($request->hasFile($column)) {
-                if ($setting->{$column}) {
-                    public_storage_delete($setting->{$column});
-                }
-                $setting->{$column} = public_storage_store_upload($request->file($column), 'homepage-about');
-            }
+            $this->applyHomepageMediaPath($request, $setting, $column, $removeFlag);
         }
 
         $setting->save();

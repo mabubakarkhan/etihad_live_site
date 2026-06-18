@@ -29,7 +29,7 @@
                         <div class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">{{ session('status') }}</div>
                     @endif
 
-                    <form method="POST" action="{{ route('admin.homepage-location-section.update') }}" enctype="multipart/form-data" class="space-y-6 max-w-2xl">
+                    <form method="POST" action="{{ route('admin.homepage-location-section.update') }}" class="space-y-6 max-w-2xl" id="homepage-form" data-homepage-form data-upload-url="{{ route('admin.homepage-media.upload') }}">
                         @csrf
                         @method('PUT')
 
@@ -44,43 +44,31 @@
                         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg transition-colors space-y-4">
                             <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Map background</h2>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Wide cityscape behind the location card. Recommended: landscape, at least <strong>1920×1080 px</strong>.</p>
-                            @if($setting->map_background_image)
-                                <div class="mb-2">
-                                    <img src="{{ asset('storage/' . $setting->map_background_image) }}" alt="" class="max-h-40 w-full rounded-lg object-cover border border-slate-200 dark:border-slate-700" />
-                                    <label class="mt-2 inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
-                                        <input type="checkbox" name="remove_map_background_image" value="1" class="rounded border-slate-400" /> Remove (use default bundle image)
-                                    </label>
-                                </div>
-                            @endif
-                            <input type="file" name="map_background_image" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" />
+                            @include('admin.partials.homepage_media_field', [
+                                'name' => 'map_background_image',
+                                'path' => $setting->map_background_image,
+                                'previewClass' => 'max-h-40 w-full rounded-lg object-cover border border-slate-200 dark:border-slate-700',
+                            ])
                         </div>
 
                         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg transition-colors space-y-4">
                             <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Card photo</h2>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Interior/office image at the top of the white location card. Recommended: <strong>800×600 px</strong> or similar landscape.</p>
-                            @if($setting->card_image)
-                                <div class="mb-2">
-                                    <img src="{{ asset('storage/' . $setting->card_image) }}" alt="" class="max-h-40 w-full rounded-lg object-cover border border-slate-200 dark:border-slate-700" />
-                                    <label class="mt-2 inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
-                                        <input type="checkbox" name="remove_card_image" value="1" class="rounded border-slate-400" /> Remove (use default bundle image)
-                                    </label>
-                                </div>
-                            @endif
-                            <input type="file" name="card_image" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" />
+                            @include('admin.partials.homepage_media_field', [
+                                'name' => 'card_image',
+                                'path' => $setting->card_image,
+                                'previewClass' => 'max-h-40 w-full rounded-lg object-cover border border-slate-200 dark:border-slate-700',
+                            ])
                         </div>
 
                         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg transition-colors space-y-4">
                             <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Map pin</h2>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Teal pin overlay on the map background. Recommended: PNG with transparency, about <strong>120×160 px</strong>.</p>
-                            @if($setting->pin_image)
-                                <div class="mb-2 flex items-center gap-3">
-                                    <img src="{{ asset('storage/' . $setting->pin_image) }}" alt="" class="h-20 w-auto rounded border border-slate-200 dark:border-slate-700 bg-slate-900/20" />
-                                    <label class="inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
-                                        <input type="checkbox" name="remove_pin_image" value="1" class="rounded border-slate-400" /> Remove (use default bundle pin)
-                                    </label>
-                                </div>
-                            @endif
-                            <input type="file" name="pin_image" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" />
+                            @include('admin.partials.homepage_media_field', [
+                                'name' => 'pin_image',
+                                'path' => $setting->pin_image,
+                                'previewClass' => 'h-20 w-auto rounded border border-slate-200 dark:border-slate-700 bg-slate-900/20',
+                            ])
                         </div>
 
                         <div class="pt-2">
@@ -90,5 +78,6 @@
                 </section>
             </main>
         </div>
+        <script src="{{ asset('theme/js/admin-homepage-media.js') }}"></script>
     </body>
 </html>

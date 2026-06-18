@@ -29,7 +29,7 @@
                         <div class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">{{ session('status') }}</div>
                     @endif
 
-                    <form method="POST" action="{{ route('admin.homepage-choice.update') }}" enctype="multipart/form-data" class="space-y-6 max-w-3xl" id="choice-form">
+                    <form method="POST" action="{{ route('admin.homepage-choice.update') }}" class="space-y-6 max-w-3xl" id="homepage-form" data-homepage-form data-upload-url="{{ route('admin.homepage-media.upload') }}">
                         @csrf
                         @method('PUT')
 
@@ -44,23 +44,19 @@
                             <div class="space-y-3">
                                 <div>
                                     <label class="block text-slate-700 dark:text-slate-300 text-sm mb-1.5">Landscape background</label>
-                                    @if($setting->background_image)
-                                        <img src="{{ asset('storage/' . $setting->background_image) }}" alt="Background preview" class="max-h-40 w-full rounded-lg border border-slate-200 dark:border-slate-600 object-cover mb-2" />
-                                        <label class="inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
-                                            <input type="checkbox" name="remove_background_image" value="1" class="rounded border-slate-400" /> Remove (use static default)
-                                        </label>
-                                    @endif
-                                    <input type="file" name="background_image" accept="image/*" class="mt-2 block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5" />
+                                    @include('admin.partials.homepage_media_field', [
+                                        'name' => 'background_image',
+                                        'path' => $setting->background_image,
+                                        'previewClass' => 'max-h-40 w-full rounded-lg border border-slate-200 dark:border-slate-600 object-cover',
+                                    ])
                                 </div>
                                 <div>
                                     <label class="block text-slate-700 dark:text-slate-300 text-sm mb-1.5">Portrait background (optional)</label>
-                                    @if($setting->background_image_portrait)
-                                        <img src="{{ asset('storage/' . $setting->background_image_portrait) }}" alt="Portrait background preview" class="max-h-40 w-full rounded-lg border border-slate-200 dark:border-slate-600 object-cover mb-2" />
-                                        <label class="inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
-                                            <input type="checkbox" name="remove_background_image_portrait" value="1" class="rounded border-slate-400" /> Remove portrait image
-                                        </label>
-                                    @endif
-                                    <input type="file" name="background_image_portrait" accept="image/*" class="mt-2 block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5" />
+                                    @include('admin.partials.homepage_media_field', [
+                                        'name' => 'background_image_portrait',
+                                        'path' => $setting->background_image_portrait,
+                                        'previewClass' => 'max-h-40 w-full rounded-lg border border-slate-200 dark:border-slate-600 object-cover',
+                                    ])
                                 </div>
                             </div>
                         </div>
@@ -203,5 +199,6 @@
                 reindex();
             })();
         </script>
+        <script src="{{ asset('theme/js/admin-homepage-media.js') }}"></script>
     </body>
 </html>
