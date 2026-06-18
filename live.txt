@@ -6,11 +6,15 @@ MAIN FOLDER (all images & uploads):
 
 storage/app/public/
 
-Copy this entire folder from local → live, then open once:
-https://new.etihadmarketing.co/run-storage-fix?token=d5f15d4g1f2h5fg2ds
+Copy local → live, then open ONCE:
 
-Also uploads to live public/storage/ after run-storage-fix (auto copy).
+https://new.etihadmarketing.co/fix-storage.php?token=etihad-storage-fix
 
-Code changes: app/ config/ routes/ resources/ public/theme/ public/index.php
+(Upload public/fix-storage.php first. Delete it after success.)
+
+Note: run-storage-fix needs token from LIVE .env MIGRATION_RUN_TOKEN
+— server.txt token may not match new.etihadmarketing.co
+
+Code: app/ config/ routes/ resources/ public/theme/ public/index.php
 
 Do not upload: .env  vendor/
