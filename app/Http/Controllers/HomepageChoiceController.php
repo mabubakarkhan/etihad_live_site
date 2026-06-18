@@ -7,7 +7,6 @@ use App\Models\HomepageChoiceSetting;
 use App\Models\HomepageChoiceSlide;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class HomepageChoiceController extends Controller
 {
@@ -46,27 +45,27 @@ class HomepageChoiceController extends Controller
         ])->all());
 
         if ($request->boolean('remove_background_image') && $setting->background_image) {
-            Storage::disk('public')->delete($setting->background_image);
+            public_storage_delete($setting->background_image);
             $setting->background_image = null;
         }
 
         if ($request->boolean('remove_background_image_portrait') && $setting->background_image_portrait) {
-            Storage::disk('public')->delete($setting->background_image_portrait);
+            public_storage_delete($setting->background_image_portrait);
             $setting->background_image_portrait = null;
         }
 
         if ($request->hasFile('background_image')) {
             if ($setting->background_image) {
-                Storage::disk('public')->delete($setting->background_image);
+                public_storage_delete($setting->background_image);
             }
-            $setting->background_image = $request->file('background_image')->store('homepage-choice', 'public');
+            $setting->background_image = public_storage_store_upload($request->file('background_image'), 'homepage-choice');
         }
 
         if ($request->hasFile('background_image_portrait')) {
             if ($setting->background_image_portrait) {
-                Storage::disk('public')->delete($setting->background_image_portrait);
+                public_storage_delete($setting->background_image_portrait);
             }
-            $setting->background_image_portrait = $request->file('background_image_portrait')->store('homepage-choice', 'public');
+            $setting->background_image_portrait = public_storage_store_upload($request->file('background_image_portrait'), 'homepage-choice');
         }
 
         $setting->save();

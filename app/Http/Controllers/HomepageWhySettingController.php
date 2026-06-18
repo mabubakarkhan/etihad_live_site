@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\HomepageWhySetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class HomepageWhySettingController extends Controller
 {
@@ -55,15 +54,15 @@ class HomepageWhySettingController extends Controller
 
         foreach ($imageFields as $column => $removeFlag) {
             if ($request->boolean($removeFlag) && $setting->{$column}) {
-                Storage::disk('public')->delete($setting->{$column});
+                public_storage_delete($setting->{$column});
                 $setting->{$column} = null;
             }
 
             if ($request->hasFile($column)) {
                 if ($setting->{$column}) {
-                    Storage::disk('public')->delete($setting->{$column});
+                    public_storage_delete($setting->{$column});
                 }
-                $setting->{$column} = $request->file($column)->store('homepage-why', 'public');
+                $setting->{$column} = public_storage_store_upload($request->file($column), 'homepage-why');
             }
         }
 

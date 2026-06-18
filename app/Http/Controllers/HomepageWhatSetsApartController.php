@@ -7,7 +7,6 @@ use App\Models\HomepageWhatSetsApartCard;
 use App\Models\HomepageWhatSetsApartSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class HomepageWhatSetsApartController extends Controller
 {
@@ -58,15 +57,15 @@ class HomepageWhatSetsApartController extends Controller
                 ]);
 
                 if ($request->boolean("cards.{$index}.remove_icon_image") && $card->icon_image) {
-                    Storage::disk('public')->delete($card->icon_image);
+                    public_storage_delete($card->icon_image);
                     $card->icon_image = null;
                 }
 
                 if ($request->hasFile("cards.{$index}.icon_image")) {
                     if ($card->icon_image) {
-                        Storage::disk('public')->delete($card->icon_image);
+                        public_storage_delete($card->icon_image);
                     }
-                    $card->icon_image = $request->file("cards.{$index}.icon_image")->store('homepage-what-sets-apart', 'public');
+                    $card->icon_image = public_storage_store_upload($request->file("cards.{$index}.icon_image"), 'homepage-what-sets-apart');
                 }
 
                 $card->save();
@@ -79,7 +78,7 @@ class HomepageWhatSetsApartController extends Controller
 
             foreach ($cardsToDelete as $card) {
                 if ($card->icon_image) {
-                    Storage::disk('public')->delete($card->icon_image);
+                    public_storage_delete($card->icon_image);
                 }
                 $card->delete();
             }

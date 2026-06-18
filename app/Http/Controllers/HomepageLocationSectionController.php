@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\HomepageLocationSectionSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class HomepageLocationSectionController extends Controller
 {
@@ -35,15 +34,15 @@ class HomepageLocationSectionController extends Controller
             'pin_image' => 'remove_pin_image',
         ] as $field => $removeFlag) {
             if ($request->boolean($removeFlag) && $setting->{$field}) {
-                Storage::disk('public')->delete($setting->{$field});
+                public_storage_delete($setting->{$field});
                 $setting->{$field} = null;
             }
 
             if ($request->hasFile($field)) {
                 if ($setting->{$field}) {
-                    Storage::disk('public')->delete($setting->{$field});
+                    public_storage_delete($setting->{$field});
                 }
-                $setting->{$field} = $request->file($field)->store('homepage-location', 'public');
+                $setting->{$field} = public_storage_store_upload($request->file($field), 'homepage-location');
             }
         }
 

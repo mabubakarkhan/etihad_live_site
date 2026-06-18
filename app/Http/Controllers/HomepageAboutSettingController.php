@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\HomepageAboutSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class HomepageAboutSettingController extends Controller
 {
@@ -58,28 +57,28 @@ class HomepageAboutSettingController extends Controller
         ])->all());
 
         if ($request->boolean('remove_video') && $setting->video) {
-            Storage::disk('public')->delete($setting->video);
+            public_storage_delete($setting->video);
             $setting->video = null;
         }
 
         if ($request->hasFile('video')) {
             if ($setting->video) {
-                Storage::disk('public')->delete($setting->video);
+                public_storage_delete($setting->video);
             }
-            $setting->video = $request->file('video')->store('homepage-about', 'public');
+            $setting->video = public_storage_store_upload($request->file('video'), 'homepage-about');
         }
 
         foreach (['center_image' => 'remove_center_image', 'secondary_image' => 'remove_secondary_image'] as $column => $removeFlag) {
             if ($request->boolean($removeFlag) && $setting->{$column}) {
-                Storage::disk('public')->delete($setting->{$column});
+                public_storage_delete($setting->{$column});
                 $setting->{$column} = null;
             }
 
             if ($request->hasFile($column)) {
                 if ($setting->{$column}) {
-                    Storage::disk('public')->delete($setting->{$column});
+                    public_storage_delete($setting->{$column});
                 }
-                $setting->{$column} = $request->file($column)->store('homepage-about', 'public');
+                $setting->{$column} = public_storage_store_upload($request->file($column), 'homepage-about');
             }
         }
 

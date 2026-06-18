@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\HomepageHeroSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class HomepageHeroSettingController extends Controller
 {
@@ -26,15 +25,15 @@ class HomepageHeroSettingController extends Controller
         ]);
 
         if ($request->boolean('remove_hero_image') && $setting->hero_image) {
-            Storage::disk('public')->delete($setting->hero_image);
+            public_storage_delete($setting->hero_image);
             $setting->hero_image = null;
         }
 
         if ($request->hasFile('hero_image')) {
             if ($setting->hero_image) {
-                Storage::disk('public')->delete($setting->hero_image);
+                public_storage_delete($setting->hero_image);
             }
-            $setting->hero_image = $request->file('hero_image')->store('homepage-hero', 'public');
+            $setting->hero_image = public_storage_store_upload($request->file('hero_image'), 'homepage-hero');
         }
 
         $setting->save();

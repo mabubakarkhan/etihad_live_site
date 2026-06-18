@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Storage;
-
 if (! function_exists('homepage_asset_url')) {
     /**
      * Resolve a homepage CMS image/video path to a public URL.
@@ -14,7 +12,7 @@ if (! function_exists('homepage_asset_url')) {
         if ($storagePath !== '') {
             $relativePath = ltrim($storagePath, '/');
 
-            if (Storage::disk('public')->exists($relativePath)) {
+            if (public_storage_exists($relativePath)) {
                 return url('storage/' . $relativePath);
             }
         }

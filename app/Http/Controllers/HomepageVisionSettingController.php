@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\HomepageVisionSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class HomepageVisionSettingController extends Controller
 {
@@ -36,15 +35,15 @@ class HomepageVisionSettingController extends Controller
         $setting->fill(collect($validated)->except(['ceo_image', 'remove_ceo_image'])->all());
 
         if ($request->boolean('remove_ceo_image') && $setting->ceo_image) {
-            Storage::disk('public')->delete($setting->ceo_image);
+            public_storage_delete($setting->ceo_image);
             $setting->ceo_image = null;
         }
 
         if ($request->hasFile('ceo_image')) {
             if ($setting->ceo_image) {
-                Storage::disk('public')->delete($setting->ceo_image);
+                public_storage_delete($setting->ceo_image);
             }
-            $setting->ceo_image = $request->file('ceo_image')->store('homepage-vision', 'public');
+            $setting->ceo_image = public_storage_store_upload($request->file('ceo_image'), 'homepage-vision');
         }
 
         $setting->save();

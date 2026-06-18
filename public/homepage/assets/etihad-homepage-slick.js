@@ -201,7 +201,10 @@
     );
 
     bindControls(section, $slider, '[data-dealers-prev]', '[data-dealers-next]');
-    $slider.slick('setPosition');
+
+    window.setTimeout(function () {
+      $slider.slick('setPosition');
+    }, 100);
 
     if (!prefersReducedMotion) {
       section.querySelectorAll('.popular-listings__card').forEach(function (card) {
@@ -286,6 +289,10 @@
       if (!isVisible) {
         $slider.slick('slickPause');
       }
+
+      window.setTimeout(function () {
+        $slider.slick('setPosition');
+      }, 100);
     });
   }
 
