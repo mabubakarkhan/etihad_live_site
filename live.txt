@@ -1,48 +1,13 @@
-LIVE / DEPLOY — HTTP 500 debug kit (temporary files — delete after fix)
+LIVE / DEPLOY — FIX HTTP 500
 
-=========================================
-
-UPLOAD ORDER:
-
-1) public/test.php           -> https://new.etihadmarketing.co/test.php
-2) public/db-test.php        -> https://new.etihadmarketing.co/db-test.php
-3) public/etihad-diag.php    -> https://new.etihadmarketing.co/etihad-diag.php
-4) public/index.php          -> replaces live index (shows exact boot error)
-
-Optional: public/ping.php    -> quick PHP OK check
-
-AFTER FIX:
-- Set $ETIHAD_LIVE_DEBUG = false in public/index.php
-  OR re-upload public/index.php.production-backup as public/index.php
-- DELETE: test.php, db-test.php, etihad-diag.php, ping.php
-- DELETE via FTP if present:
-    bootstrap/cache/config.php
-    bootstrap/cache/routes-v7.php
-    bootstrap/cache/services.php
-    bootstrap/cache/packages.php
-
-DO NOT modify .env on server.
-
-
-
-— Debug / boot files —
+Upload ONLY this file to your server (replace the old one):
 
 public/index.php
 
-public/index.php.production-backup
+If still 500, also upload:
 
-public/test.php
+bootstrap/hosting-polyfills.php
 
-public/db-test.php
+(or public/hosting-polyfills.php as backup)
 
-public/etihad-diag.php
-
-public/ping.php
-
-
-
-— Likely fix files (after you see the error) —
-
-routes/web.php
-
-app/Helpers/price.php
+Cause: mbstring PHP extension was disabled on new.etihadmarketing.co
