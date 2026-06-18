@@ -1,7 +1,22 @@
 {{-- Single property card for More Properties section (grid or slider) --}}
-@php $p = $p ?? []; $listingBase = $listing_base ?? url('/listing'); @endphp
-<div class="listing-item {{ $p['filter_class'] ?? '' }}">
-    <div class="geodir-category-listing">
+@php
+    $p = $p ?? [];
+    $listingBase = $listing_base ?? url('/listing');
+    $cs = \App\Models\ContactSetting::instance();
+    $waRaw = trim((string) ($cs->whatsapp ?? '')) ?: trim((string) ($cs->phone ?? ''));
+    $waNumber = $waRaw !== '' ? preg_replace('/\D/', '', $waRaw) : '';
+    $waText = urlencode('Hi, I am interested in ' . ($p['title'] ?? 'this property'));
+    $waUrl = $waNumber !== '' ? 'https://wa.me/' . $waNumber . '?text=' . $waText : ($p['detail_url'] ?? '#');
+    $dealerName = trim((string) ($p['dealer_name'] ?? ''));
+    $dealerImageUrl = trim((string) ($p['dealer_image_url'] ?? ''));
+    $dealerUrl = trim((string) ($p['dealer_url'] ?? ''));
+    if ($dealerUrl === '' && !empty($p['dealer_slug'])) {
+        $dealerUrl = route('dealer.show', $p['dealer_slug']);
+    }
+    $showDealerAvatar = $dealerName !== '' && $dealerImageUrl !== '';
+@endphp
+<div class="listing-item etihad-property-card-item">
+    <div class="geodir-category-listing etihad-property-card">
         <div class="geodir-category-img">
             <a href="{{ $p['detail_url'] ?? '#' }}" class="geodir-category-img_item">
                 <div class="bg" style="background-image:url({{ $p['featured_image_url'] ?? '' }})"></div>
@@ -31,24 +46,29 @@
             <div class="geodir-category-listing_media-list">
                 <span><i class="fas fa-camera"></i> {{ $p['photo_count'] ?? 0 }}</span>
             </div>
-        </div>
-        <div class="geodir-category-content">
-            <h3><a href="{{ $p['detail_url'] ?? '#' }}">{{ $p['title'] ?? '' }}</a></h3>
-            <div class="geodir-category-content_price">{{ $p['price'] ?? '' }}</div>
-            @if(!empty($p['excerpt']))
-            <p>{{ $p['excerpt'] }}</p>
+            @if($showDealerAvatar)
+            @if($dealerUrl !== '')
+            <a href="{{ $dealerUrl }}" class="listing-card-dealer-avatar" aria-label="{{ $dealerName }}">
+                <img src="{{ $dealerImageUrl }}" alt="{{ $dealerName }}" loading="lazy" decoding="async">
+                <span class="listing-card-dealer-tooltip">{{ $dealerName }}</span>
+            </a>
+            @else
+            <span class="listing-card-dealer-avatar" title="{{ $dealerName }}">
+                <img src="{{ $dealerImageUrl }}" alt="{{ $dealerName }}" loading="lazy" decoding="async">
+            </span>
             @endif
-            <div class="geodir-category-content-details">
-                <ul>
-                    <li><i class="fa-light fa-bed"></i><span>{{ $p['bedrooms'] ?? 0 }}</span></li>
-                    <li><i class="fa-light fa-bath"></i><span>{{ $p['bathrooms'] ?? 0 }}</span></li>
-                    <li><i class="fa-light fa-utensils"></i><span>{{ $p['kitchen'] ?? 0 }}</span></li>
-                </ul>
-            </div>
+            @endif
         </div>
-        <div class="geodir-category-footer">
-            <span class="gcf-company"><img src="{{ $p['dealer_image_url'] ?? asset('theme/images/avatar/1.jpg') }}" alt=""><span>By {{ $p['dealer_name'] ?? 'Etihad Marketing' }}</span></span>
-            <a href="{{ $p['detail_url'] ?? '#' }}" class="gid_link"><span>View Details</span> <i class="fa-solid fa-caret-right"></i></a>
+        <div class="etihad-property-card-body">
+            <h3 class="listing-card-title"><a href="{{ $p['detail_url'] ?? '#' }}">{{ $p['title'] ?? '' }}</a></h3>
+            <div class="listing-card-meta-row">
+                <div class="geodir-category-content_price listing-card-meta-price">{{ $p['price'] ?? '' }}</div>
+                <a href="{{ $p['detail_url'] ?? '#' }}" class="listing-card-view-details gid_link"><span>View Details</span> <i class="fa-solid fa-caret-right"></i></a>
+            </div>
+            <a href="{{ $waUrl }}" class="portal-project-card-wa" target="_blank" rel="noopener noreferrer">
+                <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+                <span>Register Interest</span>
+            </a>
         </div>
     </div>
 </div>

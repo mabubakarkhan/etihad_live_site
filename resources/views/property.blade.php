@@ -77,139 +77,19 @@
 
 @section('title', $metaTitle)
 
+@push('meta')
+@include('partials.seo-meta', ['seo' => [
+    'title' => $metaTitle,
+    'description' => $metaDesc,
+    'keywords' => seo_str($property->meta_keywords ?? ''),
+    'canonical' => $canonicalUrl,
+    'image' => $featuredUrl,
+    'type' => 'website',
+]])
+@endpush
+
 @push('styles')
-<meta name="description" content="{{ $metaDesc }}">
-<link rel="canonical" href="{{ $canonicalUrl }}">
-<meta property="og:title" content="{{ $metaTitle }}">
-<meta property="og:description" content="{{ $metaDesc }}">
-<meta property="og:url" content="{{ $canonicalUrl }}">
-<meta property="og:image" content="{{ $featuredUrl }}">
-<meta property="og:type" content="website">
-<style>
-.property-description { text-align: left; }
-.property-description img { max-width: 100%; height: auto; }
-.boxed-content-item .property-description { text-align: left; }
-.banner-widget-wrap .banner-widget_content h5 { text-align: center; }
-/* Section headings: match theme from listing-single.html */
-.boxed-content-title.section-heading-wrap { padding: 20px 50px; }
-.boxed-content-title.section-heading-wrap h2,
-.boxed-content-title.section-heading-wrap h3 { font-size: 1.15rem; font-weight: 700; color: #1f2937; margin: 0; }
-/* Features & Nearby: each section with tag-style items (no bullets, no icons) */
-.features-block { margin-bottom: 1.5rem; }
-.features-block:last-child { margin-bottom: 0; }
-.features-block-title { font-size: 1rem; font-weight: 700; color: #374151; margin: 0 0 10px 0; }
-.features-block-tags { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; list-style: none; padding: 0; }
-.features-block-tag { display: inline-block; padding: 10px 18px; background: #fff; border: 1px solid #e8e8e8; border-radius: 999px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); font-size: 14px; color: #374151; }
-/* Property Amenities pills + description (white pills, orange icon + text) */
-.property-amenities-pills { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 0; }
-.property-amenity-pill { display: inline-flex; align-items: center; gap: 10px; padding: 12px 20px; background: #fff; border: 1px solid #e8e8e8; border-radius: 999px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); font-size: 14px; }
-.property-amenity-pill .property-amenity-icon { width: 22px; height: 22px; flex-shrink: 0; }
-.property-amenity-pill .property-amenity-title { color: var(--main-color, #EE7838); font-weight: 600; }
-.property-amenities-pills .property-amenity-pill img.property-amenity-icon { filter: invert(48%) sepia(79%) saturate(1200%) hue-rotate(350deg) brightness(98%) contrast(95%); }
-.amenities-description { text-align: left; font-size: 15px; line-height: 1.6; color: #4b5563; }
-.property-amenities-pills + .amenities-description { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid #eee; }
-.amenities-description p { margin-bottom: 0.75em; }
-.amenities-description p:last-child { margin-bottom: 0; }
-.amenities-description img { max-width: 100%; height: auto; }
-.banner-widget-wrap .banner-widget_content h5 { text-align: center; }
-.property-video-embed { max-width: 100%; }
-.property-video-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-.property-video-gallery-wrap { max-width: 100%; }
-/* Property Gallery: match listing-single2.html (no tabs), asymmetric grid, no overlap */
-#property-image-gallery .gallery-items { overflow: hidden; }
-#property-image-gallery .gallery-items::after { content: ''; display: table; clear: both; }
-#property-image-gallery .gallery-item,
-#property-image-gallery .gallery-item-second { box-sizing: border-box; }
-#property-image-gallery .gallery-item .grid-item-holder { width: 100%; }
-#property-image-gallery .gallery-item img { width: 100%; height: auto; display: block; }
-.map-container .single-map-container,
-.map-container #singleMap { width: 100%; height: 100%; min-height: 400px; }
-/* Contact (replaces Share): same column layout, icon links */
-.property-contact-title { font-size: 9px; }
-.property-contact-wrap { display: inline-block; border: 1px solid #eee; border-radius: 4px; overflow: hidden; vertical-align: top; }
-.property-contact-wrap .property-contact-link { display: block; width: 42px; height: 42px; line-height: 42px; text-align: center; border-top: 1px solid #eee; color: #666; font-size: 1.1em; transition: color .2s, background .2s; }
-.property-contact-wrap .property-contact-link:first-child { border-top: none; }
-.property-contact-wrap .property-contact-link:hover { color: var(--main-color, #EE7838); background: #fafafa; }
-.property-contacts-item { padding: 19px 10px 15px 10px; }
-/* Property request form: loading & submitted state */
-.property-request-message { margin-bottom: 12px; padding: 10px 12px; border-radius: 6px; font-size: 14px; }
-.property-request-message.error { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-.property-request-message.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-#property-request-btn.is-loading { opacity: 0.7; pointer-events: none; }
-.property-request-submitted { padding: 10px 0; }
-.property-request-success-text { margin-bottom: 12px; font-weight: 600; color: #166534; }
-.property-request-summary { margin-bottom: 16px; padding: 12px; background: #f8fafc; border-radius: 8px; font-size: 14px; color: #334155; }
-.property-request-summary p { margin: 4px 0; }
-.property-request-again-btn { background: #334155 !important; color: #fff !important; }
-.pp-single-opt-wrap { margin-top: 1.5rem; }
-.pp-single-opt-links ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-.pp-single-opt-links a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px; border: 1px solid #e5e7eb; background: #fff; color: #374151; text-decoration: none; font-size: 14px; transition: border-color .2s, color .2s; }
-.pp-single-opt-links a:hover { border-color: var(--main-color, #EE7838); color: var(--main-color, #EE7838); }
-.pp-single-opt-links a i { color: var(--main-color, #EE7838); }
-/* Wishlist: top (like-btn) + cards; saved state = filled heart */
-.like-btn.wishlist-btn { cursor: pointer; border: none; background: transparent; padding: 0; }
-/* Property header icons (heart + email): force single row alignment */
-.list-single-opt_header .hero-opt-btnns { width: auto; display: flex; align-items: center; gap: 10px; }
-.list-single-opt_header .hero-opt-btnns a { float: none; margin-bottom: 0; }
-/* Make wishlist heart button match the circular email icon (hero-opt-btnns a) */
-.hero-opt-btnns .like-btn.wishlist-btn {
-    width: 46px;
-    height: 46px;
-    line-height: 46px;
-    border-radius: 50%;
-    box-shadow: 0px 0px 0px 8px rgba(255,255,255,0.2);
-    background: #fff;
-    transition: all .2s ease-in-out;
-    margin-bottom: 0;
-    display: block;
-    text-align: center;
-    outline: 0;
-}
-.hero-opt-btnns .like-btn.wishlist-btn:hover { box-shadow: 0px 0px 0px 0px rgba(255,255,255,0.2); }
-.hero-opt-btnns .like-btn.wishlist-btn:focus,
-.hero-opt-btnns .like-btn.wishlist-btn:focus-visible { outline: 0; }
-.hero-opt-btnns .like-btn.wishlist-btn .wishlist-icon {
-    line-height: 46px;
-    font-size: 1.3em;
-    font-weight: 400;
-    transition: color .2s;
-    color: #94a3b8;
-}
-.hero-opt-btnns .like-btn.wishlist-btn.wishlist-saved .wishlist-icon {
-    font-weight: 900;
-    color: var(--main-color, #EE7838);
-}
-.like-btn.wishlist-btn .wishlist-icon { transition: color .2s; color: #94a3b8; }
-.like-btn.wishlist-btn.wishlist-saved .wishlist-icon { font-weight: 900; color: var(--main-color, #EE7838); }
-#more-properties-section .geodir_save-btn.wishlist-btn .wishlist-icon { transition: color .2s; color: #94a3b8; font-weight: 400; }
-#more-properties-section .geodir_save-btn.wishlist-btn.wishlist-saved .wishlist-icon { font-weight: 900; color: var(--main-color, #EE7838); }
-/* Related properties: remove default button border/outline (keep shadow) */
-#more-properties-section .geodir_save-btn.wishlist-btn { border: 0 !important; outline: 0 !important; }
-#more-properties-section .geodir_save-btn.wishlist-btn:focus,
-#more-properties-section .geodir_save-btn.wishlist-btn:focus-visible { outline: 0 !important; box-shadow: 0px 0px 0px 8px rgba(255,255,255,0.2) !important; }
-/* More properties: slider nav/dots alignment (reference listing-single.html) */
-.more-properties-carousel-wrap .ss-carousel-pagination_wrap { position: absolute; bottom: -1px; left: 40px; z-index: 10; background: #fff; padding: 0 30px; height: 40px; line-height: 40px; border-radius: 20px 20px 0 0; border: 1px solid #eee; border-bottom: 1px solid #fff; }
-.more-properties-carousel-wrap .ss-carousel-button-wrap { position: absolute; bottom: 14px; right: 40px; z-index: 5; }
-/* Property detail: full page scroll to end (main in flow, no inner scroll cutoff) */
-.property-detail-main { position: relative !important; height: auto !important; min-height: 100vh; overflow: visible !important; }
-.property-detail-main .wrapper { overflow: visible !important; }
-body:has(.property-detail-main) { height: auto !important; min-height: 100vh; }
-html:has(.property-detail-main) { height: auto !important; min-height: 100%; }
-body.property-video-modal-open { overflow: hidden; }
-html.property-video-modal-open { overflow: hidden; }
-.property-video-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px; }
-.property-video-modal-overlay.is-open { display: flex; }
-.property-video-modal-inner { position: relative; width: 100%; max-width: 900px; background: #000; border-radius: 12px; overflow: hidden; z-index: 100000; }
-.property-video-modal-close { position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; border: 0; background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; cursor: pointer; z-index: 10; font-size: 20px; line-height: 1; }
-.property-video-modal-close:hover { background: rgba(0,0,0,0.9); }
-.property-video-modal-inner iframe { width: 100%; height: 0; padding-bottom: 56.25%; position: relative; display: block; border: 0; }
-.property-video-modal-inner iframe { height: 100%; min-height: 400px; padding-bottom: 0; }
-.property-lazy-wrap { position: relative; background: #f0f0f0; min-height: 120px; }
-.property-lazy-wrap .property-lazy-loader { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #f0f0f0; }
-.property-lazy-wrap.loaded .property-lazy-loader { display: none; }
-.property-lazy-loader::after { content: ''; width: 36px; height: 36px; border: 3px solid #e0e0e0; border-top-color: var(--main-color, #EE7838); border-radius: 50%; animation: property-lazy-spin 0.8s linear infinite; }
-@keyframes property-lazy-spin { to { transform: rotate(360deg); } }
-</style>
+<link rel="stylesheet" href="{{ asset('theme/css/pages/property-page.css') }}">
 @endpush
 
 @section('content')
@@ -220,7 +100,7 @@ html.property-video-modal-open { overflow: hidden; }
     <div class="property-video-modal-overlay" id="featured-video-modal" aria-hidden="true">
         <div class="property-video-modal-inner">
             <button type="button" class="property-video-modal-close" id="featured-video-close" aria-label="Close">&times;</button>
-            <iframe id="featured-video-iframe" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;min-height:400px;height:400px;border:0;"></iframe>
+            <iframe id="featured-video-iframe" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
     </div>
     @endif
@@ -246,7 +126,7 @@ html.property-video-modal-open { overflow: hidden; }
                         <div class="swiper-container">
                             <div class="swiper-wrapper">
                                 @foreach($carouselImages as $img)
-                                <div class="swiper-slide hov_zoom property-lazy-wrap" style="position:relative;">
+                                <div class="swiper-slide hov_zoom property-lazy-wrap">
                                     <div class="property-lazy-loader"></div>
                                     <img class="property-lazy-img" data-src="{{ $img['url'] }}" alt="{{ $img['alt'] }}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" loading="lazy">
                                     <a href="{{ $img['url'] }}" class="box-media-zoom popup-image"><i class="fal fa-search"></i></a>
@@ -306,6 +186,12 @@ html.property-video-modal-open { overflow: hidden; }
                                             @if($cs->youtube)
                                             <a href="{{ $cs->youtube }}" target="_blank" rel="noopener" class="property-contact-link tolt" title="YouTube" data-microtip-position="right" data-tooltip="YouTube"><i class="fa-brands fa-youtube"></i></a>
                                             @endif
+                                            @if($cs->twitter)
+                                            <a href="{{ $cs->twitter }}" target="_blank" rel="noopener" class="property-contact-link tolt" title="Twitter (X)" data-microtip-position="right" data-tooltip="Twitter (X)"><i class="fa-brands fa-x-twitter"></i></a>
+                                            @endif
+                                            @if($cs->tiktok)
+                                            <a href="{{ $cs->tiktok }}" target="_blank" rel="noopener" class="property-contact-link tolt" title="TikTok" data-microtip-position="right" data-tooltip="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="list-single-opt_header hsc_flat_bci">
@@ -328,17 +214,11 @@ html.property-video-modal-open { overflow: hidden; }
                                         <div class="boxed-content-item">
                                             <div class="hero-section-title_container hsc_flat">
                                                 <div class="hero-section-title">
-                                                    <h2>{{ $property->title }}</h2>
+                                                    <h1>{{ $property->title }}</h1>
                                                     @if($fullAddress)
                                                         <h4><i class="fa-solid fa-location-dot"></i> <span>{{ $fullAddress }}</span></h4>
                                                     @endif
-                                                    <div class="property-single-header-price"><strong>Price:</strong> <span class="pshp_item">
-                                                        @if($property->price_string)
-                                                            {{ $property->price_string }}@if($property->price_digits !== null && $property->price_digits !== '') <span>{{ config('app.currency', 'PKR') }} {{ number_format((float) $property->price_digits, 2) }}</span>@endif
-                                                        @else
-                                                            {{ $priceFormatted }}
-                                                        @endif
-                                                    </span></div>
+                                                    <div class="property-single-header-price"><strong>Price:</strong> <span class="pshp_item">{{ $priceFormatted }}</span></div>
                                                 </div>
                                                 <div class="hero-section-opt">
                                                     <div class="property-single-header-date author_avatar_ps">
@@ -426,7 +306,7 @@ html.property-video-modal-open { overflow: hidden; }
                                                 @if($title !== '' || $iconName !== '')
                                                 <span class="property-amenity-pill">
                                                     @if($iconName)
-                                                        <img src="https://api.iconify.design/heroicons-outline/{{ $iconName }}.svg?height=22" alt="" class="property-amenity-icon" loading="lazy" onerror="this.style.display='none'">
+                                                        <img src="{{ iconify_url($iconName, 22) }}" alt="" class="property-amenity-icon" loading="lazy" onerror="this.style.display='none'">
                                                     @endif
                                                     <span class="property-amenity-title">{{ $title }}</span>
                                                 </span>
@@ -456,13 +336,8 @@ html.property-video-modal-open { overflow: hidden; }
 
                                     {{-- Features & Nearby: each has its own section like Property Amenities (simple data, no icons) --}}
                                     @php
-                                        $featuresSections = [
-                                            'features' => 'Features',
-                                            'location_accessibility' => 'Location accessibility',
-                                            'nearest_hospitals' => 'Nearest hospitals',
-                                            'nearest_markets' => 'Nearest markets',
-                                            'nearest_restaurants' => 'Nearest restaurants / cafes / bakeries',
-                                        ];
+                                        // Hidden on request: Features/Nearby sections on property detail page.
+                                        $featuresSections = [];
                                     @endphp
                                     @foreach($featuresSections as $key => $label)
                                         @php $items = $property->$key ?? []; $items = is_array($items) ? array_filter(array_map('trim', $items)) : []; @endphp
@@ -489,8 +364,8 @@ html.property-video-modal-open { overflow: hidden; }
                                             <h3>Property Location</h3>
                                         </div>
                                         <div class="boxed-content-item">
-                                            <div class="map-container mapC_vis" style="position:relative; min-height: 400px;">
-                                                <div id="singleMap" class="single-map-container fs-wrapper" style="width:100%; height:400px; min-height:400px;"
+                                            <div class="map-container mapC_vis">
+                                                <div id="singleMap" class="single-map-container fs-wrapper"
                                                     data-latitude="{{ $property->latitude }}"
                                                     data-longitude="{{ $property->longitude }}"
                                                     data-mapTitle="Property Location"
@@ -503,7 +378,7 @@ html.property-video-modal-open { overflow: hidden; }
                                     @endif
 
                                     {{-- Property Gallery (listing-single2 design, no tabs) - inside main column --}}
-                                    <div id="property-image-gallery" class="boxed-content" style="scroll-margin-top: 100px;">
+                                    <div id="property-image-gallery" class="boxed-content etihad-scroll-anchor">
                                         <div class="boxed-content-title">
                                             <h3>Property Gallery</h3>
                                         </div>
@@ -512,7 +387,7 @@ html.property-video-modal-open { overflow: hidden; }
                                                 <div class="gallery-items gisp grid-small-pad list-single-gallery three-coulms lightgallery">
                                         @foreach($carouselImages as $idx => $img)
                                         <div class="gallery-item{{ $idx === 1 ? ' gallery-item-second' : '' }}">
-                                            <div class="grid-item-holder hovzoom property-lazy-wrap" style="position:relative;">
+                                            <div class="grid-item-holder hovzoom property-lazy-wrap">
                                                 <div class="property-lazy-loader"></div>
                                                 <img class="property-lazy-img" data-src="{{ $img['url'] }}" alt="{{ $img['alt'] }}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" loading="lazy">
                                                 <a href="{{ $img['url'] }}" class="gal-link popup-image"><i class="fa fa-search"></i></a>
@@ -527,17 +402,17 @@ html.property-video-modal-open { overflow: hidden; }
                                     </div>
 
                                     {{-- Video Gallery (YouTube / embeds) - inside main column --}}
-                                    <div id="property-video-gallery" class="boxed-content" style="scroll-margin-top: 100px;">
+                                    <div id="property-video-gallery" class="boxed-content etihad-scroll-anchor">
                                         <div class="boxed-content-title">
                                             <h3>Video Gallery</h3>
                                         </div>
                                         <div class="boxed-content-item">
                                             @if(!empty($videoGalleryUrls))
-                                                <div class="property-video-gallery-wrap" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                                                <div class="property-video-gallery-wrap">
                                                     @foreach($videoGalleryUrls as $embedUrl)
-                                                    <div class="property-video-embed property-lazy-wrap" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; background: #111;">
+                                                    <div class="property-video-embed property-lazy-wrap">
                                                         <div class="property-lazy-loader"></div>
-                                                        <iframe data-src="{{ $embedUrl }}" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"></iframe>
+                                                        <iframe data-src="{{ $embedUrl }}" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                                                     </div>
                                                     @endforeach
                                                 </div>
@@ -641,11 +516,11 @@ html.property-video-modal-open { overflow: hidden; }
                                                                 <div class="cs-intputwrap">
                                                                     <textarea name="message" placeholder="Message" rows="3"></textarea>
                                                                 </div>
-                                                                <div class="property-request-message" id="property-request-message" style="display:none;"></div>
+                                                                <div class="property-request-message etihad-is-hidden" id="property-request-message"></div>
                                                                 <button type="submit" class="commentssubmit commentssubmit_fw" id="property-request-btn">Send Request</button>
                                                             </form>
                                                         </div>
-                                                        <div class="property-request-submitted" id="property-request-submitted" style="display:none;">
+                                                        <div class="property-request-submitted etihad-is-hidden" id="property-request-submitted">
                                                             <p class="property-request-success-text">Your request has been sent successfully.</p>
                                                             <div class="property-request-summary" id="property-request-summary"></div>
                                                             <button type="button" class="commentssubmit commentssubmit_fw property-request-again-btn" id="property-request-again-btn">Request Again</button>
@@ -669,16 +544,16 @@ html.property-video-modal-open { overflow: hidden; }
                             </div>
                             @if(!$useSlider)
                             {{-- Static grid when 1–3 properties (no slider, no loop duplication) --}}
-                            <div class="more-properties-grid row" style="margin-top: 60px; row-gap: 30px;">
+                            <div class="more-properties-grid row etihad-related-grid">
                                 @foreach($morePropertiesData as $p)
-                                <div class="col-lg-4 col-md-4 col-sm-6" style="margin-bottom: 24px;">
+                                <div class="col-lg-4 col-md-4 col-sm-6">
                                     @include('partials.property-card', ['p' => $p, 'listing_base' => $listingBase])
                                 </div>
                                 @endforeach
                             </div>
                             @else
                             {{-- Slider only when more than 3 properties; custom init with loop: false --}}
-                            <div class="single-carousel-wrap more-properties-carousel-wrap" style="padding-bottom: 60px;">
+                            <div class="single-carousel-wrap more-properties-carousel-wrap etihad-carousel-pad">
                                 <div class="more-properties-carousel">
                                     <div class="swiper-container" id="more-properties-swiper">
                                         <div class="swiper-wrapper">
@@ -713,8 +588,8 @@ html.property-video-modal-open { overflow: hidden; }
 
                 <div class="to_top-btn-wrap">
                     <div class="to-top to-top_btn"><span>Back to top</span> <i class="fa-solid fa-arrow-up"></i></div>
-                    <div class="svg-corner svg-corner_white" style="top:0;left:-40px;transform:rotate(-90deg)"></div>
-                    <div class="svg-corner svg-corner_white" style="top:0;right:-40px;transform:rotate(-180deg)"></div>
+                    <div class="svg-corner svg-corner_white hero-corner-tl"></div>
+                    <div class="svg-corner svg-corner_white hero-corner-tr"></div>
                 </div>
             </div>
         </div>
@@ -798,8 +673,8 @@ html.property-video-modal-open { overflow: hidden; }
     }
     function showSubmitted(data) {
         if (!data) data = {};
-        if (formWrap) formWrap.style.display = 'none';
-        if (submittedEl) submittedEl.style.display = 'block';
+        if (formWrap) formWrap.classList.add('etihad-is-hidden');
+        if (submittedEl) submittedEl.classList.remove('etihad-is-hidden');
         if (summaryEl) {
             var html = '';
             if (data.name) html += '<p><strong>Name:</strong> ' + escapeHtml(data.name) + '</p>';
@@ -810,9 +685,9 @@ html.property-video-modal-open { overflow: hidden; }
         }
     }
     function showForm() {
-        if (formWrap) formWrap.style.display = '';
-        if (submittedEl) submittedEl.style.display = 'none';
-        if (messageEl) { messageEl.style.display = 'none'; messageEl.className = 'property-request-message'; messageEl.textContent = ''; }
+        if (formWrap) formWrap.classList.remove('etihad-is-hidden');
+        if (submittedEl) submittedEl.classList.add('etihad-is-hidden');
+        if (messageEl) { messageEl.classList.add('etihad-is-hidden'); messageEl.className = 'property-request-message etihad-is-hidden'; messageEl.textContent = ''; }
     }
     function escapeHtml(s) {
         var d = document.createElement('div');
@@ -832,7 +707,7 @@ html.property-video-modal-open { overflow: hidden; }
             var fd = new FormData(formEl);
             btnEl.classList.add('is-loading');
             btnEl.disabled = true;
-            if (messageEl) { messageEl.style.display = 'none'; messageEl.className = 'property-request-message'; messageEl.textContent = ''; }
+            if (messageEl) { messageEl.classList.add('etihad-is-hidden'); messageEl.className = 'property-request-message etihad-is-hidden'; messageEl.textContent = ''; }
 
             fetch(formEl.action, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } })
                 .then(function(r) { return r.json().then(function(j) { return { ok: r.ok, json: j }; }); })
@@ -852,7 +727,7 @@ html.property-video-modal-open { overflow: hidden; }
                         if (messageEl) {
                             messageEl.textContent = msg;
                             messageEl.className = 'property-request-message error';
-                            messageEl.style.display = 'block';
+                            messageEl.classList.remove('etihad-is-hidden');
                         }
                     }
                 })
@@ -862,7 +737,7 @@ html.property-video-modal-open { overflow: hidden; }
                     if (messageEl) {
                         messageEl.textContent = 'Something went wrong. Please try again.';
                         messageEl.className = 'property-request-message error';
-                        messageEl.style.display = 'block';
+                        messageEl.classList.remove('etihad-is-hidden');
                     }
                 });
         });
@@ -900,7 +775,7 @@ html.property-video-modal-open { overflow: hidden; }
 })();
 </script>
 @if($property->latitude && $property->longitude)
-@php $googleMapsKey = config('app.google_maps_api_key') ?: 'AIzaSyDwJSRi0zFjDemECmFl9JtRj1FY7TiTRRo'; @endphp
+@php $googleMapsKey = config('app.google_maps_api_key') ?: 'AIzaSyAYrLB-ltxWv32OFEF6c07B376JNrDyOIA'; @endphp
 <script>
 window.initPropertyMap = function() {
     var el = document.getElementById('singleMap');
@@ -910,7 +785,7 @@ window.initPropertyMap = function() {
     var title = el.getAttribute('data-infotitle') || '';
     var text = el.getAttribute('data-infotext') || '';
     var center = { lat: lat, lng: lng };
-    var map = new google.maps.Map(el, {
+    var mapOpts = {
         zoom: 14,
         center: center,
         scrollwheel: false,
@@ -918,8 +793,12 @@ window.initPropertyMap = function() {
         fullscreenControl: true,
         mapTypeControl: false,
         streetViewControl: true
-    });
-    var marker = new google.maps.Marker({ position: center, map: map });
+    };
+    if (window.EtihadMap) EtihadMap.applyToMapOptions(mapOpts);
+    var map = new google.maps.Map(el, mapOpts);
+    var marker = window.EtihadMap
+        ? EtihadMap.createMarker({ position: center, map: map })
+        : new google.maps.Marker({ position: center, map: map });
     if (title || text) {
         var info = new google.maps.InfoWindow({
             content: '<div class="info-window-content"><h3>' + (title || '') + '</h3><p>' + (text || '') + '</p></div>'

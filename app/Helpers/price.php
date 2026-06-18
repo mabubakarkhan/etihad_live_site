@@ -1,5 +1,17 @@
 <?php
 
+if (! function_exists('clean_price_string')) {
+    /** Remove literal "rupees" from stored price text (site uses PKR currency code). */
+    function clean_price_string(?string $priceString): string
+    {
+        if ($priceString === null || $priceString === '') {
+            return '';
+        }
+
+        return trim(preg_replace('/\s*rupees\s*/i', ' ', $priceString));
+    }
+}
+
 if (! function_exists('format_price')) {
     /**
      * Format price for display using site currency (PKR).
@@ -13,7 +25,8 @@ if (! function_exists('format_price')) {
             return $currency . ' ' . number_format((float) $priceDigits, 2);
         }
 
-        if ($priceString !== null && $priceString !== '') {
+        $priceString = clean_price_string($priceString);
+        if ($priceString !== '') {
             return $currency . ' ' . $priceString;
         }
 

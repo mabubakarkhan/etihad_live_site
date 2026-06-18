@@ -41,6 +41,7 @@
                     @if (session('status'))
                         <div class="mb-4 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">{{ session('status') }}</div>
                     @endif
+                    <div id="form-success-top" class="mb-4 hidden rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-800 dark:text-emerald-200" role="status"></div>
                     <div id="form-errors-top" class="mb-4 hidden rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-800 dark:text-rose-200" role="alert">
                         <p class="font-medium mb-1">Please fix the following:</p>
                         <ul id="form-errors-list" class="list-disc list-inside space-y-0.5"></ul>
@@ -55,6 +56,7 @@
                                 'description' => ['tab' => 'tab-basic', 'name' => 'Basic'],
                                 'status' => ['tab' => 'tab-status', 'name' => 'Status'],
                                 'featured_image' => ['tab' => 'tab-featured-image', 'name' => 'Featured image'],
+                                'featured_image_path' => ['tab' => 'tab-featured-image', 'name' => 'Featured image'],
                                 'state' => ['tab' => 'tab-address', 'name' => 'Address'],
                                 'city' => ['tab' => 'tab-address', 'name' => 'Address'],
                                 'address' => ['tab' => 'tab-address', 'name' => 'Address'],
@@ -94,7 +96,9 @@
                             </ul>
                         </div>
                     @endif
-                    <form method="POST" action="{{ route($routePrefix . '.update', $property) }}" enctype="multipart/form-data" id="property-form">
+                    <form method="POST" action="{{ route($routePrefix . '.update', $property) }}" id="property-form"
+                        data-upload-url="{{ route($routePrefix . '.upload-media') }}"
+                        data-property-id="{{ $property->id }}">
                         @csrf
                         @method('PUT')
                         <div class="mb-6 flex flex-wrap items-center gap-3">
@@ -106,6 +110,7 @@
                 </section>
             </main>
         </div>
+        <script src="{{ asset('theme/js/admin-property-media.js') }}"></script>
         @include('admin.properties._form_scripts')
     </body>
 </html>

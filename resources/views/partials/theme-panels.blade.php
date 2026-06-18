@@ -28,8 +28,8 @@
                     <div class="main-register_contacts-wrap">
                         <h4>Have a question?</h4>
                         <a href="#">Get in Touch</a>
-                        <div class="svg-corner svg-corner_white" style="bottom:0;left: -39px;"></div>
-                        <div class="svg-corner svg-corner_white" style="bottom:0;right: -39px;transform: rotate(90deg)"></div>
+                        <div class="svg-corner svg-corner_white hero-corner-bl"></div>
+                        <div class="svg-corner svg-corner_white hero-corner-br"></div>
                     </div>
                     <div class="main-register_bg-dec"></div>
                 </div>

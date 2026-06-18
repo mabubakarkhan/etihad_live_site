@@ -10,6 +10,7 @@
                     <ul class="no-list-style">
                         <li><a href="{{ route('portal') }}">Home</a></li>
                         <li><a href="{{ url('/listing') }}">Listing</a></li>
+                        <li><a href="{{ route('dha.index') }}">DHA</a></li>
                         <li><a href="{{ url('/projects') }}">Projects</a></li>
                         <li><a href="{{ route('team') }}">Our Team</a></li>
                     </ul>
@@ -20,9 +21,6 @@
                 <div class="nav-button">
                     <span></span><span></span><span></span>
                 </div>
-            </div>
-            <div class="wish_btn swl_btn tolt" data-microtip-position="bottom" data-tooltip="Wishlist">
-                <div class="wish_btn-item"><i class="fa-thin fa-heart"></i><span class="wish_count">{{ $wishlistCount ?? 0 }}</span></div>
             </div>
             @php
                 $cs = \App\Models\ContactSetting::instance();
@@ -41,15 +39,6 @@
             <a href="https://wa.me/{{ $headerWhatsappClean }}" target="_blank" rel="noopener" class="show-reg-form header-call-now" style="margin-right: 10px;">
                 <i class="fa-brands fa-whatsapp"></i>
                 <span>{{ $headerWhatsappRaw }}</span>
-            </a>
-            @endif
-            @php
-                $headerEmail = isset($cs) && !empty($cs->email) ? trim($cs->email) : '';
-            @endphp
-            @if($headerEmail !== '')
-            <a href="mailto:{{ $headerEmail }}" class="show-reg-form header-call-now" style="margin-right: 10px;">
-                <i class="fa-solid fa-envelope"></i>
-                <span>{{ $headerEmail }}</span>
             </a>
             @endif
             <!-- header-search-wrap -->

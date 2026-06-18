@@ -20,6 +20,7 @@ class Property extends Model
     protected $fillable = [
         'title',
         'slug',
+        'sort_order',
         'status',
         'dealer_id',
         'purpose',
@@ -30,6 +31,7 @@ class Property extends Model
         'address',
         'short_address',
         'town',
+        'dha_phase_id',
         'latitude',
         'longitude',
         'google_map',
@@ -90,6 +92,11 @@ class Property extends Model
         return $this->belongsTo(Dealer::class, 'dealer_id');
     }
 
+    public function dhaPhase(): BelongsTo
+    {
+        return $this->belongsTo(DhaPhase::class, 'dha_phase_id');
+    }
+
     public function isOwnListing(): bool
     {
         return $this->dealer_id === 0;
@@ -100,11 +107,19 @@ class Property extends Model
         return $query->where('status', self::STATUS_ACTIVE);
     }
 
+    public function scopeFrontOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderByDesc('id');
+    }
+
     public static function booted(): void
     {
         static::creating(function (Property $property) {
             if (empty($property->slug)) {
                 $property->slug = Str::slug($property->title);
+            }
+            if (!$property->sort_order) {
+                $property->sort_order = (int) static::max('sort_order') + 1;
             }
         });
     }

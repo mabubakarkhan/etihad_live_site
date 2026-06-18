@@ -27,7 +27,9 @@
         },
         "files": [
             "app/Helpers/admin.php",
-            "app/Helpers/price.php"
+            "app/Helpers/price.php",
+            "app/Helpers/icons.php",
+            "app/Helpers/seo.php"
         ]
     },
     "autoload-dev": {

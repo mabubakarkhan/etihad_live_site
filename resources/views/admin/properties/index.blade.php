@@ -35,21 +35,24 @@
                         <a href="{{ route('admin.profile.show') }}" class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition">My profile</a>
                         @if(isset($filterDealer) && $filterDealer)
                             <a href="{{ route('admin.dealers.index') }}" class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition">Dealers</a>
+                            <a href="{{ route('admin.sort-order.index', ['tab' => 'listings']) }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-violet-500/50 text-violet-700 dark:text-violet-300 hover:bg-violet-500/10 transition">Sort order</a>
                             <a href="{{ route($routePrefix . '.create', ['dealer' => $filterDealer->id]) }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition shadow shadow-emerald-500/40">Add listing ({{ $filterDealer->name }})</a>
                         @else
+                            <a href="{{ route('admin.sort-order.index', ['tab' => 'listings']) }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-violet-500/50 text-violet-700 dark:text-violet-300 hover:bg-violet-500/10 transition">Sort order</a>
                             <a href="{{ route($routePrefix . '.create') }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition shadow shadow-emerald-500/40">Add listing</a>
                         @endif
                         <form method="POST" action="{{ route('admin.logout') }}" class="inline-flex">@csrf<button type="submit" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition">Logout</button></form>
                     </div>
                 </header>
                 <section class="px-6 md:px-8 py-6 md:py-8 space-y-4">
+                    @php use App\Support\PropertyEditSections; @endphp
                     @if (session('status'))
                         <div class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">{{ session('status') }}</div>
                     @endif
                     {{-- Filters --}}
                     @php
                         $listingIndexParams = array_filter(['dealer' => isset($filterDealer) && $filterDealer ? $filterDealer->id : null]);
-                        $hasFilters = !empty($filterStatus) || !empty($filterProjectType) || !empty($filterPropertyType) || !empty($filterPurpose);
+                        $hasFilters = !empty($filterStatus) || !empty($filterProjectType) || !empty($filterPropertyType) || !empty($filterPurpose) || !empty($filterDhaPhase);
                     @endphp
                     <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-lg overflow-hidden transition-colors">
                         <form method="GET" action="{{ route($routePrefix . '.index', $listingIndexParams) }}" class="p-4 flex flex-wrap items-end gap-4">
@@ -66,6 +69,17 @@
                                     <option value="close" {{ ($filterStatus ?? '') === 'close' ? 'selected' : '' }}>Close</option>
                                 </select>
                             </div>
+                            @if(isset($dhaPhases) && $dhaPhases->isNotEmpty())
+                            <div class="space-y-1">
+                                <label for="filter-dha-phase" class="block text-xs font-medium text-slate-500 dark:text-slate-400">DHA Phase</label>
+                                <select id="filter-dha-phase" name="dha_phase" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 min-w-[140px]">
+                                    <option value="">All</option>
+                                    @foreach($dhaPhases as $dp)
+                                        <option value="{{ $dp->id }}" {{ (string)($filterDhaPhase ?? '') === (string)$dp->id ? 'selected' : '' }}>{{ $dp->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @endif
                             <div class="space-y-1">
                                 <label for="filter-purpose" class="block text-xs font-medium text-slate-500 dark:text-slate-400">Purpose</label>
                                 <select id="filter-purpose" name="purpose" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 min-w-[100px]">
@@ -113,6 +127,7 @@
                                     <th class="px-4 py-2 text-left">Purpose</th>
                                     <th class="px-4 py-2 text-left">Price</th>
                                     <th class="px-4 py-2 text-left">Location</th>
+                                    <th class="px-4 py-2 text-left min-w-[180px]">Sections</th>
                                     <th class="px-4 py-2 text-left">Actions</th>
                                 </tr>
                             </thead>
@@ -177,7 +192,19 @@
                                             <a href="{{ route($routePrefix . '.index', $purposeQ) }}" class="capitalize hover:underline text-sky-600 dark:text-sky-400">{{ $purposeVal }}</a>
                                         </td>
                                         <td class="px-4 py-2 text-slate-600 dark:text-slate-400">{{ $p->price_string ?? $p->price_digits ?? '—' }}</td>
-                                        <td class="px-4 py-2 text-slate-600 dark:text-slate-400">{{ $p->city ?? '—' }}, {{ $p->state ?? '—' }}</td>
+                                        <td class="px-4 py-2 text-slate-600 dark:text-slate-400">
+                                            {{ $p->city ?? '—' }}, {{ $p->state ?? '—' }}
+                                            @if($p->dhaPhase)
+                                                <br><a href="{{ route('admin.dha-phases.edit', $p->dhaPhase) }}" class="text-violet-600 dark:text-violet-400 hover:underline text-xs">{{ $p->dhaPhase->title }}</a>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-2">
+                                            <div class="flex flex-wrap gap-1 max-w-xs">
+                                                @foreach(PropertyEditSections::all() as $slug => $meta)
+                                                    <a href="{{ route($routePrefix . '.edit-section', [$p, $slug]) }}" class="text-[10px] leading-tight px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">{{ $meta['label'] }}</a>
+                                                @endforeach
+                                            </div>
+                                        </td>
                                         <td class="px-4 py-2 text-left">
                                             <a href="{{ route($routePrefix . '.preview', $p) }}" target="_blank" rel="noopener noreferrer" class="text-[11px] px-2 py-1 rounded border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">View</a>
                                             <a href="{{ route('property.show', $p->slug) }}" target="_blank" rel="noopener noreferrer" class="text-[11px] px-2 py-1 rounded border border-sky-400 dark:border-sky-600 text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-sky-900/30 bg-sky-50/80 dark:bg-sky-900/20">Live</a>
@@ -187,7 +214,7 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <tr data-empty><td colspan="9" class="px-4 py-6 text-center text-sm text-slate-500">No listings yet. <a href="{{ (isset($filterDealer) && $filterDealer) ? route($routePrefix . '.create', ['dealer' => $filterDealer->id]) : route($routePrefix . '.create') }}" class="text-emerald-600 dark:text-emerald-400">Add one</a>.</td></tr>
+                                    <tr data-empty><td colspan="10" class="px-4 py-6 text-center text-sm text-slate-500">No listings yet. <a href="{{ (isset($filterDealer) && $filterDealer) ? route($routePrefix . '.create', ['dealer' => $filterDealer->id]) : route($routePrefix . '.create') }}" class="text-emerald-600 dark:text-emerald-400">Add one</a>.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>

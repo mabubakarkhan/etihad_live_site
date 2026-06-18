@@ -331,6 +331,7 @@ blockquote p {
 	padding: 10px;
     text-transform: uppercase;
     font-weight: 600;
+    font-size: 15px;
     line-height: 25px;
     letter-spacing: 0px;
     color: #000;
@@ -430,6 +431,7 @@ nav li ul a:before , nav li ul a:after {
 	position: relative;
 	float: right;
 	font-weight: 600;
+	font-size: 15px;
 	margin-right: 50px;
 	padding: 0 24px;
 	border: 1px solid #eee;

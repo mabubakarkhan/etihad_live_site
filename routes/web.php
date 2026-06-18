@@ -2,7 +2,10 @@
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\QueryException;
 use App\Models\Property;
 use App\Models\ProjectType;
 use App\Models\City;
@@ -15,12 +18,20 @@ use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\ProjectTypeController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\PortalHeroSlideController;
+use App\Http\Controllers\PortalAdController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\DealerController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\ListingSortController;
+use App\Http\Controllers\DhaSettingController;
+use App\Http\Controllers\DhaPhaseController;
+use App\Models\DhaSetting;
+use App\Models\DhaPhase;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ContactSettingsController;
+use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\SellRentLeadController;
 use App\Http\Controllers\PropertyRequestController;
 use App\Http\Controllers\CmsPageController;
 use App\Http\Controllers\CareerController;
@@ -28,12 +39,33 @@ use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\AdminNotificationController;
 use App\Models\PropertyRequest;
 use App\Models\PortalHeroSlide;
+use App\Models\PortalAd;
 use App\Models\Partner;
 use App\Models\Testimonial;
 use App\Models\Project;
 use App\Models\VisitorDailyCount;
 use App\Models\CmsPage;
 use App\Models\Dealer;
+use App\Models\ContactSetting;
+use App\Models\SellRentPageSetting;
+
+if (!function_exists('db_safe')) {
+    /**
+     * Execute DB read safely and return a fallback if table/engine is broken.
+     */
+    function db_safe(string $label, callable $callback, mixed $fallback = null): mixed
+    {
+        try {
+            return $callback();
+        } catch (QueryException $e) {
+            Log::warning("DB safe fallback used: {$label}", [
+                'error' => $e->getMessage(),
+            ]);
+
+            return $fallback;
+        }
+    }
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -66,24 +98,87 @@ Route::get('/run-migrations', function () {
     }
 })->name('run-migrations');
 
+/*
+|--------------------------------------------------------------------------
+| Repair public storage via browser (shared hosting helper)
+|--------------------------------------------------------------------------
+| Visit: /run-storage-fix?token=YOUR_SECRET_TOKEN
+| It attempts storage:link. If symlink is unavailable, it mirrors files
+| from storage/app/public to public/storage.
+*/
+Route::get('/run-storage-fix', function () {
+    $token = config('app.migration_run_token') ?: env('MIGRATION_RUN_TOKEN');
+    $requestToken = request()->query('token');
+    if (!$token || $requestToken !== $token) {
+        return response()->json(['success' => false, 'message' => 'Invalid or missing token.'], 403);
+    }
+
+    $source = storage_path('app/public');
+    $target = public_path('storage');
+    $linked = false;
+    $copied = 0;
+    $errors = [];
+
+    try {
+        Artisan::call('storage:link');
+    } catch (\Throwable $e) {
+        $errors[] = 'storage:link failed: ' . $e->getMessage();
+    }
+
+    if (is_link($target)) {
+        $linked = true;
+    } else {
+        try {
+            $fs = app(Filesystem::class);
+            if (!is_dir($target)) {
+                $fs->ensureDirectoryExists($target, 0755, true);
+            }
+            if (is_dir($source)) {
+                foreach ($fs->allFiles($source) as $file) {
+                    $from = $file->getPathname();
+                    $relative = ltrim(str_replace($source, '', $from), DIRECTORY_SEPARATOR);
+                    $to = $target . DIRECTORY_SEPARATOR . $relative;
+                    $fs->ensureDirectoryExists(dirname($to), 0755, true);
+                    if (!file_exists($to)) {
+                        $fs->copy($from, $to);
+                        $copied++;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            $errors[] = 'mirror failed: ' . $e->getMessage();
+        }
+    }
+
+    return response()->json([
+        'success' => empty($errors),
+        'linked' => $linked,
+        'copied_files' => $copied,
+        'public_storage_path' => $target,
+        'source_path' => $source,
+        'errors' => $errors,
+    ], empty($errors) ? 200 : 500);
+})->name('run-storage-fix');
+
 Route::get('/', function () {
-    $cmsPage = CmsPage::findBySlug('home');
+    $cmsPage = db_safe('home.cms_page', fn () => CmsPage::findBySlug('home'));
     return view('index', compact('cmsPage'));
 });
 
 Route::get('/portal', function () {
-    $projectTypes = ProjectType::orderBy('name')->get(['id', 'name', 'slug']);
-    $lahoreCityId = City::whereRaw('LOWER(name) = ?', ['lahore'])->value('id');
+    $projectTypes = db_safe('portal.project_types', fn () => ProjectType::orderBy('name')->get(['id', 'name', 'slug']), collect());
+    $lahoreCityId = db_safe('portal.lahore_city', fn () => City::whereRaw('LOWER(name) = ?', ['lahore'])->value('id'));
+    $dhaPhases = db_safe('portal.dha_phases', fn () => DhaPhase::active()->frontOrdered()->get(['id', 'title', 'slug', 'featured_image', 'card_image', 'sort_order']), collect());
 
-    $hotPropertyCards = Property::query()
-        ->with(['projectTypes:id,name', 'dealer:id,name,profile_pic'])
+    $hotPropertyCards = db_safe('portal.hot_properties', fn () => Property::query()
+        ->with(['projectTypes:id,name', 'dealer:id,name,profile_pic,slug'])
         ->where('is_hot', true)
         ->where('dealer_id', '!=', 0)
         ->whereHas('dealer', function ($q) {
             $q->where('status', Dealer::STATUS_ACTIVE);
         })
         ->active()
-        ->orderByDesc('id')
+        ->frontOrdered()
         ->limit(12)
         ->get()
         ->map(function (Property $p) {
@@ -112,52 +207,183 @@ Route::get('/portal', function () {
                 'dealer_image_url' => $p->dealer && $p->dealer->profile_pic
                     ? url('storage/' . ltrim($p->dealer->profile_pic, '/'))
                     : asset('theme/images/avatar/1.jpg'),
+                'dealer_url' => $p->dealer?->profileUrl(),
                 'excerpt' => $p->description ? \Illuminate\Support\Str::limit(strip_tags($p->description), 120) : '',
                 'purpose' => $p->purpose,
                 'filter_class' => $filterClass,
             ];
-        });
+        }), collect());
 
-    $portalCarouselProjects = Project::query()
+    $portalCarouselProjects = db_safe('portal.carousel_projects', fn () => Project::query()
+        ->with(['projectTypes:id,name,slug'])
         ->active()
         ->whereNotNull('homepage_listing_image')
         ->where('homepage_listing_image', '!=', '')
-        ->orderByDesc('id')
+        ->frontOrdered()
         ->limit(12)
-        ->get(['id', 'title', 'slug', 'city', 'homepage_listing_image']);
+        ->get([
+            'id', 'title', 'slug', 'city', 'state', 'price', 'launch_year',
+            'short_address', 'full_address', 'featured_image', 'homepage_listing_image',
+            'pricing_place_cards',
+        ]), collect());
 
-    $portalPartners = Partner::query()
+    $portalMapProperties = db_safe('portal.map_properties', fn () => Property::query()
+        ->with(['projectTypes:id,name', 'dealer:id,status'])
+        ->where('dealer_id', '!=', 0)
+        ->whereHas('dealer', function ($q) {
+            $q->where('status', Dealer::STATUS_ACTIVE);
+        })
+        ->active()
+        ->whereNotNull('latitude')
+        ->whereNotNull('longitude')
+        ->frontOrdered()
+        ->limit(200)
+        ->get()
+        ->map(function (Property $p) {
+            return [
+                'id' => $p->id,
+                'title' => $p->title,
+                'detail_url' => route('property.show', $p->slug),
+                'short_address' => $p->short_address,
+                'address' => $p->address,
+                'town' => $p->town,
+                'city' => $p->city,
+                'state' => $p->state,
+                'purpose_label' => $p->purpose === Property::PURPOSE_RENT ? 'Rent' : 'Sale',
+                'project_type_names' => $p->projectTypes->pluck('name')->values()->all(),
+                'price' => format_price($p->price_digits, $p->price_string),
+                'latitude' => $p->latitude,
+                'longitude' => $p->longitude,
+            ];
+        }), collect());
+
+    $portalDealers = db_safe('portal.dealers_strip', fn () => Dealer::query()
+        ->active()
+        ->whereNotNull('slug')
+        ->where('slug', '!=', '')
+        ->orderBy('name', 'asc')
+        ->limit(24)
+        ->get(['id', 'name', 'slug', 'profile_pic']), collect());
+
+    $portalPopularDealers = db_safe('portal.popular_dealers', fn () => Dealer::query()
+        ->active()
+        ->where('show_homepage', true)
+        ->whereNotNull('slug')
+        ->where('slug', '!=', '')
+        ->withCount('properties')
+        ->orderBy('name', 'asc')
+        ->limit(4)
+        ->get(['id', 'name', 'slug', 'profile_pic', 'info_detail', 'view_count']), collect());
+
+    $portalHomepageAdDealers = db_safe('portal.homepage_ad_dealers', fn () => Dealer::query()
+        ->active()
+        ->where('show_homepage_ad', true)
+        ->whereNotNull('profile_pic')
+        ->where('profile_pic', '!=', '')
+        ->orderBy('name', 'asc')
+        ->limit(5)
+        ->get(['id', 'name', 'profile_pic']), collect());
+
+    $portalPartners = db_safe('portal.partners', fn () => Partner::query()
         ->whereNotNull('image')
         ->where('image', '!=', '')
         ->orderBy('id')
-        ->get(['id', 'title', 'image']);
+        ->get(['id', 'title', 'image']), collect());
 
-    $portalTestimonials = Testimonial::query()
+    $portalTestimonials = db_safe('portal.testimonials', fn () => Testimonial::query()
         ->whereNotNull('image')
         ->where('image', '!=', '')
         ->whereNotNull('comment')
         ->where('comment', '!=', '')
         ->orderBy('id')
-        ->get(['id', 'name', 'image', 'comment', 'city']);
+        ->get(['id', 'name', 'image', 'comment', 'city']), collect());
 
-    $portalHeroSlides = PortalHeroSlide::query()
+    $portalHeroSlides = db_safe('portal.hero_slides', fn () => PortalHeroSlide::query()
         ->active()
         ->whereNotNull('image')
         ->where('image', '!=', '')
         ->orderBy('sort_order')
         ->orderBy('id')
-        ->get(['id', 'image']);
+        ->get(['id', 'image']), collect());
 
-    return view('portal', compact('projectTypes', 'lahoreCityId', 'hotPropertyCards', 'portalCarouselProjects', 'portalPartners', 'portalTestimonials', 'portalHeroSlides'));
+    $portalAds = db_safe('portal.ads', fn () => PortalAd::query()
+        ->active()
+        ->whereIn('slug', ['properties', 'dealers'])
+        ->orderBy('sort_order')
+        ->orderBy('id')
+        ->get(['id', 'slug', 'title', 'image']), collect());
+
+    $cmsPage = db_safe('portal.cms_page', fn () => CmsPage::findBySlug('home'));
+
+    return view('portal', compact('projectTypes', 'lahoreCityId', 'dhaPhases', 'hotPropertyCards', 'portalCarouselProjects', 'portalMapProperties', 'portalDealers', 'portalPopularDealers', 'portalHomepageAdDealers', 'portalPartners', 'portalTestimonials', 'portalHeroSlides', 'portalAds', 'cmsPage'));
 })->name('portal');
 
 Route::get('/listing', function () {
-    $projectTypes = ProjectType::orderBy('name')->get(['id', 'name', 'slug']);
-    $cmsPage = CmsPage::findBySlug('listing');
-    $lahoreCityId = City::whereRaw('LOWER(name) = ?', ['lahore'])->value('id');
+    $projectTypes = db_safe('listing.project_types', fn () => ProjectType::orderBy('name')->get(['id', 'name', 'slug']), collect());
+    $cmsPage = db_safe('listing.cms_page', fn () => CmsPage::findBySlug('listing'));
+    $lahoreCityId = db_safe('listing.lahore_city', fn () => City::whereRaw('LOWER(name) = ?', ['lahore'])->value('id'));
+    $dhaPhases = db_safe('listing.dha_phases', fn () => DhaPhase::active()->frontOrdered()->get(['id', 'title', 'slug']), collect());
+    $dhaPhaseUrls = $dhaPhases->mapWithKeys(fn ($p) => [(string) $p->id => route('dha.phase.show', $p->slug)])->all();
     // Front: “Listing” URL shows dealer listings only (own listings stay admin-only).
-    return view('listing', ['projectTypes' => $projectTypes, 'cmsPage' => $cmsPage, 'lahoreCityId' => $lahoreCityId]);
+    return view('listing', ['projectTypes' => $projectTypes, 'cmsPage' => $cmsPage, 'lahoreCityId' => $lahoreCityId, 'dhaPhases' => $dhaPhases, 'dhaPhaseUrls' => $dhaPhaseUrls]);
 })->name('listing');
+
+Route::get('/dha', function () {
+    $dha = db_safe('dha.settings', fn () => DhaSetting::instance());
+    if (!$dha || $dha->status !== DhaSetting::STATUS_ACTIVE) {
+        abort(404);
+    }
+    $phases = db_safe('dha.phases', fn () => DhaPhase::active()->frontOrdered()->get(), collect());
+
+    return view('dha', compact('dha', 'phases'));
+})->name('dha.index');
+
+Route::get('/dha/{phase:slug}', function (DhaPhase $phase) {
+    if ($phase->status !== DhaPhase::STATUS_ACTIVE) {
+        abort(404);
+    }
+    $phase->load(['projectTypes:id,name,slug']);
+    $projectTypes = db_safe('dha_phase.project_types', fn () => ProjectType::orderBy('name')->get(['id', 'name', 'slug']), collect());
+    $dhaPhases = db_safe('dha_phase.dha_phases', fn () => DhaPhase::active()->frontOrdered()->get(['id', 'title', 'slug']), collect());
+    $lahoreCityId = db_safe('dha_phase.lahore_city', fn () => City::whereRaw('LOWER(name) = ?', ['lahore'])->value('id'));
+    $dhaPhaseUrls = $dhaPhases->mapWithKeys(fn ($p) => [(string) $p->id => route('dha.phase.show', $p->slug)])->all();
+    $hasPhaseListings = db_safe(
+        'dha_phase.' . $phase->id . '.listings',
+        fn () => Property::query()
+            ->where('dha_phase_id', $phase->id)
+            ->where('dealer_id', '!=', 0)
+            ->whereHas('dealer', function ($q) {
+                $q->where('status', Dealer::STATUS_ACTIVE);
+            })
+            ->active()
+            ->exists(),
+        false
+    );
+
+    return view('dha-phase', compact('phase', 'projectTypes', 'dhaPhases', 'lahoreCityId', 'dhaPhaseUrls', 'hasPhaseListings'));
+})->name('dha.phase.show');
+
+Route::get('/dha/{phase:slug}/map', function (DhaPhase $phase) {
+    if ($phase->status !== DhaPhase::STATUS_ACTIVE || ! $phase->showMapButton()) {
+        abort(404);
+    }
+
+    return view('dha-phase-map', compact('phase'));
+})->name('dha.phase.map');
+
+Route::get('/dha/{phase:slug}/vr-tour', function (DhaPhase $phase) {
+    if ($phase->status !== DhaPhase::STATUS_ACTIVE || ! $phase->hasVrTour()) {
+        abort(404);
+    }
+    $vrTourUrl = $phase->vrTourUrl();
+    if ($vrTourUrl !== null && ! preg_match('/^https?:\/\//i', $vrTourUrl)) {
+        $vrTourUrl = 'https://' . $vrTourUrl;
+    }
+    $contactSettings = ContactSetting::instance();
+    $overlayPhone = is_string($contactSettings->phone ?? null) ? trim((string) $contactSettings->phone) : '';
+
+    return view('dha-phase-vr-tour', compact('phase', 'vrTourUrl', 'overlayPhone'));
+})->name('dha.phase.vr-tour');
 
 Route::get('/listing/dealers', function () {
     $q = request()->getQueryString();
@@ -170,15 +396,25 @@ Route::get('/projects', function () {
     $projectTypeSlug = request('project_type');
     $projectType = null;
     if ($projectTypeSlug && is_string($projectTypeSlug)) {
-        $projectType = ProjectType::where('slug', $projectTypeSlug)->orWhere('id', $projectTypeSlug)->first();
+        $projectType = db_safe(
+            'projects.project_type_filter',
+            fn () => ProjectType::where('slug', $projectTypeSlug)->orWhere('id', $projectTypeSlug)->first()
+        );
     }
-    $query = Project::with('projectTypes')->active()->orderByDesc('id');
+    $query = db_safe('projects.query', fn () => Project::with('projectTypes')->active()->frontOrdered());
+    if (!$query) {
+        $projects = collect();
+        $pageHeading = 'Our Projects';
+        $pageSubheading = 'Browse our featured projects.';
+        $cmsPage = db_safe('projects.cms_page', fn () => CmsPage::findBySlug('projects'));
+        return view('projects', compact('projects', 'pageHeading', 'pageSubheading', 'cmsPage'));
+    }
     if ($projectType) {
         $query->whereHas('projectTypes', function ($q) use ($projectType) {
             $q->where('project_types.id', $projectType->id);
         });
     }
-    $projects = $query->get();
+    $projects = db_safe('projects.get', fn () => $query->get(), collect());
     if ($projectType) {
         $pageHeading = $projectType->name . ' Projects';
         $pageSubheading = 'Browse our ' . $projectType->name . ' projects.';
@@ -186,38 +422,93 @@ Route::get('/projects', function () {
         $pageHeading = 'Our Projects';
         $pageSubheading = 'Browse our featured projects.';
     }
-    $cmsPage = CmsPage::findBySlug('projects');
+    $cmsPage = db_safe('projects.cms_page', fn () => CmsPage::findBySlug('projects'));
     return view('projects', compact('projects', 'pageHeading', 'pageSubheading', 'cmsPage'));
 })->name('projects');
 
+Route::get('/contact-us', function () {
+    $cmsPage = db_safe('contact.cms_page', fn () => CmsPage::findBySlug('contact-us') ?: CmsPage::findBySlug('contact'));
+    $cs = ContactSetting::instance();
+    return view('contact', compact('cmsPage', 'cs'));
+})->name('contact-us');
+Route::post('/contact-us/submit', [ContactMessageController::class, 'store'])->name('contact-us.submit');
+
+Route::get('/sell-or-rent-property', function () {
+    $cmsPage = db_safe('sell.cms_page', fn () => CmsPage::findBySlug('sell-or-rent-property'));
+    if (! $cmsPage) {
+        abort(404);
+    }
+    $pageSettings = db_safe('sell.page_settings', fn () => SellRentPageSetting::instance());
+    if (! $pageSettings) {
+        abort(404);
+    }
+    $dhaPhases = db_safe('sell.dha_phases', fn () => DhaPhase::active()->frontOrdered()->get(['title']), collect());
+
+    return view('sell-property', compact('cmsPage', 'pageSettings', 'dhaPhases'));
+})->name('sell-property');
+Route::post('/sell-or-rent-property/submit', [SellRentLeadController::class, 'store'])->name('sell-rent-lead.store');
+
+Route::get('/terms-of-use', function () {
+    $cmsPage = db_safe('terms.cms_page', fn () => CmsPage::findBySlug('terms-of-use'));
+    if (!$cmsPage) {
+        abort(404);
+    }
+    return view('legal-page', compact('cmsPage'));
+})->name('terms-of-use');
+
+Route::get('/privacy-policy', function () {
+    $cmsPage = db_safe('privacy.cms_page', fn () => CmsPage::findBySlug('privacy-policy'));
+    if (!$cmsPage) {
+        abort(404);
+    }
+    return view('legal-page', compact('cmsPage'));
+})->name('privacy-policy');
+
 Route::get('/our-team', function () {
-    $cmsPage = CmsPage::find(9);
-    $dealers = Dealer::active()
+    $cmsPage = db_safe('team.cms_page', fn () => CmsPage::findSafe(9));
+    $dealers = db_safe('team.dealers', fn () => Dealer::active()
         ->withCount('properties')
         ->orderBy('name')
-        ->get();
+        ->get(), collect());
     return view('team', compact('cmsPage', 'dealers'));
 })->name('team');
 
 Route::get('/our-team/{slug}', function ($slug) {
     $dealer = Dealer::where('slug', $slug)->active()->firstOrFail();
     $dealer->loadCount('properties');
-    $properties = $dealer->properties()->with('projectTypes')->active()->orderByDesc('id')->get();
+    $properties = $dealer->properties()->with('projectTypes')->active()->frontOrdered()->get();
     $cs = \App\Models\ContactSetting::instance();
     return view('dealer', compact('dealer', 'properties', 'cs'));
 })->name('dealer.show');
 
 Route::get('/careers', function () {
-    $cmsPage = CmsPage::findBySlug('careers');
-    $jobs = \App\Models\Career::active()->orderByDesc('sort_order')->orderByDesc('id')->get();
+    $cmsPage = db_safe('careers.cms_page', fn () => CmsPage::findBySlug('careers'));
+    $jobs = db_safe('careers.jobs', fn () => \App\Models\Career::active()->orderByDesc('sort_order')->orderByDesc('id')->get(), collect());
     return view('careers.index', compact('cmsPage', 'jobs'));
 })->name('careers.index');
 
 Route::get('/careers/job/{slug}', function ($slug) {
-    $career = \App\Models\Career::where('slug', $slug)->active()->firstOrFail();
-    $cmsPage = CmsPage::findBySlug('careers');
+    $career = db_safe('careers.job.find', fn () => \App\Models\Career::where('slug', $slug)->active()->firstOrFail());
+    if (!$career) {
+        abort(404);
+    }
+    $cmsPage = db_safe('careers.job.cms_page', fn () => CmsPage::findBySlug('careers'));
     return view('careers.job', compact('career', 'cmsPage'));
 })->name('careers.job');
+
+Route::get('/project/vr-tour/{project}', function (Project $project) {
+    $project = Project::query()->whereKey($project->id)->active()->firstOrFail();
+    $vrTourUrl = is_string($project->vr_tour_url) ? trim($project->vr_tour_url) : '';
+    if ($vrTourUrl === '') {
+        abort(404);
+    }
+    if (!preg_match('/^https?:\/\//i', $vrTourUrl)) {
+        $vrTourUrl = 'https://' . $vrTourUrl;
+    }
+    $contactSettings = ContactSetting::instance();
+    $overlayPhone = is_string($contactSettings->phone ?? null) ? trim((string) $contactSettings->phone) : '';
+    return view('project-vr-tour', compact('project', 'vrTourUrl', 'overlayPhone'));
+})->name('project.vr-tour');
 
 Route::post('/careers/job/{slug}/apply', function (Request $request, string $slug) {
     $career = \App\Models\Career::where('slug', $slug)->active()->firstOrFail();
@@ -278,8 +569,18 @@ Route::get('/project/{slug}', function ($slug) {
     $daily->increment('count');
     $daily->increment('count_projects');
     $project->increment('view_count');
-    return view('project', compact('project'));
+    return view('project-new', compact('project'));
 })->name('project.show');
+
+Route::get('/project-new/{slug}', function ($slug) {
+    $project = Project::with('projectTypes')->where('slug', $slug)->active()->firstOrFail();
+    return view('project-new', compact('project'));
+})->name('project.new.show');
+
+Route::get('/project-old/{slug}', function ($slug) {
+    $project = Project::with('projectTypes')->where('slug', $slug)->active()->firstOrFail();
+    return view('project', compact('project'));
+})->name('project.old.show');
 
 Route::post('/project/request-info', function (Request $request) {
     $validated = $request->validate([
@@ -287,6 +588,8 @@ Route::post('/project/request-info', function (Request $request) {
         'name' => 'required|string|max:255',
         'phone' => 'nullable|string|max:50',
         'email' => 'nullable|email|max:255',
+        'property_type' => 'nullable|string|max:120',
+        'budget' => 'nullable|string|max:120',
         'message' => 'nullable|string|max:5000',
     ]);
     $req = PropertyRequest::create([
@@ -297,6 +600,8 @@ Route::post('/project/request-info', function (Request $request) {
         'name' => $validated['name'],
         'phone' => $validated['phone'] ?? null,
         'email' => $validated['email'] ?? null,
+        'property_type' => $validated['property_type'] ?? null,
+        'budget' => $validated['budget'] ?? null,
         'message' => $validated['message'] ?? null,
     ]);
     \App\Models\AdminNotification::notify(
@@ -426,6 +731,7 @@ Route::get('/property/{slug}', function ($slug) {
             'kitchen' => $p->kitchen ?? 0,
             'dealer_name' => $dealerName,
             'dealer_image_url' => $dealerImageUrl,
+            'dealer_url' => $p->dealer?->profileUrl(),
             'photo_count' => $photoCount,
         ];
     })->values()->all();
@@ -583,8 +889,7 @@ Route::get('/api/listing/own', function (Request $request) {
     $query = Property::query()
         ->with('projectTypes:id,name,slug')
         ->where('dealer_id', 0)
-        ->active()
-        ->orderByDesc('id');
+        ->active();
 
     if ($request->filled('address') && is_string($request->address)) {
         $addressInput = trim($request->address);
@@ -626,6 +931,10 @@ Route::get('/api/listing/own', function (Request $request) {
         }
     }
 
+    if ($request->filled('dha_phase') && is_numeric($request->dha_phase)) {
+        $query->where('dha_phase_id', (int) $request->dha_phase);
+    }
+
     $priceMin = $request->input('price_min');
     $priceMax = $request->input('price_max');
     if ($priceMin !== null && $priceMin !== '' && is_numeric($priceMin)) {
@@ -656,13 +965,13 @@ Route::get('/api/listing/own', function (Request $request) {
     if ($sort === 'price_asc') {
         $query->orderByRaw('CASE WHEN price_digits IS NULL THEN 1 ELSE 0 END')
             ->orderBy('price_digits', 'asc')
-            ->orderByDesc('id');
+            ->orderBy('sort_order');
     } elseif ($sort === 'price_desc') {
         $query->orderByRaw('CASE WHEN price_digits IS NULL THEN 1 ELSE 0 END')
             ->orderBy('price_digits', 'desc')
-            ->orderByDesc('id');
+            ->orderBy('sort_order');
     } else {
-        $query->orderByDesc('id');
+        $query->frontOrdered();
     }
 
     $properties = $query->get();
@@ -705,13 +1014,12 @@ Route::get('/api/listing/own', function (Request $request) {
 
 Route::get('/api/listing/dealers', function (Request $request) {
     $query = Property::query()
-        ->with(['projectTypes:id,name,slug', 'dealer:id,name,profile_pic'])
+        ->with(['projectTypes:id,name,slug', 'dealer:id,name,profile_pic,slug'])
         ->where('dealer_id', '!=', 0)
         ->whereHas('dealer', function ($q) {
             $q->where('status', \App\Models\Dealer::STATUS_ACTIVE);
         })
-        ->active()
-        ->orderByDesc('id');
+        ->active();
 
     if ($request->filled('address') && is_string($request->address)) {
         $addressInput = trim($request->address);
@@ -753,6 +1061,10 @@ Route::get('/api/listing/dealers', function (Request $request) {
         }
     }
 
+    if ($request->filled('dha_phase') && is_numeric($request->dha_phase)) {
+        $query->where('dha_phase_id', (int) $request->dha_phase);
+    }
+
     $priceMin = $request->input('price_min');
     $priceMax = $request->input('price_max');
     if ($priceMin !== null && $priceMin !== '' && is_numeric($priceMin)) {
@@ -783,13 +1095,13 @@ Route::get('/api/listing/dealers', function (Request $request) {
     if ($sort === 'price_asc') {
         $query->orderByRaw('CASE WHEN price_digits IS NULL THEN 1 ELSE 0 END')
             ->orderBy('price_digits', 'asc')
-            ->orderByDesc('id');
+            ->orderBy('sort_order');
     } elseif ($sort === 'price_desc') {
         $query->orderByRaw('CASE WHEN price_digits IS NULL THEN 1 ELSE 0 END')
             ->orderBy('price_digits', 'desc')
-            ->orderByDesc('id');
+            ->orderBy('sort_order');
     } else {
-        $query->orderByDesc('id');
+        $query->frontOrdered();
     }
 
     $properties = $query->get();
@@ -831,6 +1143,7 @@ Route::get('/api/listing/dealers', function (Request $request) {
             'purpose_label' => $purposeLabel,
             'dealer_name' => $dealerName,
             'dealer_image_url' => $dealerImageUrl,
+            'dealer_url' => $p->dealer?->profileUrl(),
         ];
     });
 
@@ -884,11 +1197,31 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/portal-hero/{portal_hero_slide}/edit', [PortalHeroSlideController::class, 'edit'])->name('admin.portal-hero.edit');
     Route::put('/admin/portal-hero/{portal_hero_slide}', [PortalHeroSlideController::class, 'update'])->name('admin.portal-hero.update');
     Route::delete('/admin/portal-hero/{portal_hero_slide}', [PortalHeroSlideController::class, 'destroy'])->name('admin.portal-hero.destroy');
+    Route::get('/admin/portal-ads', [PortalAdController::class, 'edit'])->name('admin.portal-ads.edit');
+    Route::put('/admin/portal-ads', [PortalAdController::class, 'update'])->name('admin.portal-ads.update');
+
+    Route::get('/admin/sort-order', [ListingSortController::class, 'index'])->name('admin.sort-order.index');
+    Route::post('/admin/sort-order', [ListingSortController::class, 'update'])->name('admin.sort-order.update');
+
+    Route::get('/admin/dha', [DhaSettingController::class, 'edit'])->name('admin.dha.edit');
+    Route::put('/admin/dha', [DhaSettingController::class, 'update'])->name('admin.dha.update');
+    Route::post('/admin/dha/upload-media', [DhaSettingController::class, 'uploadMedia'])->name('admin.dha.upload-media');
+    Route::get('/admin/dha-phases', [DhaPhaseController::class, 'index'])->name('admin.dha-phases.index');
+    Route::get('/admin/dha-phases/create', [DhaPhaseController::class, 'create'])->name('admin.dha-phases.create');
+    Route::post('/admin/dha-phases', [DhaPhaseController::class, 'store'])->name('admin.dha-phases.store');
+    Route::post('/admin/dha-phases/upload-media', [DhaPhaseController::class, 'uploadMedia'])->name('admin.dha-phases.upload-media');
+    Route::get('/admin/dha-phases/{dhaPhase}/edit', [DhaPhaseController::class, 'edit'])->name('admin.dha-phases.edit');
+    Route::put('/admin/dha-phases/{dhaPhase}', [DhaPhaseController::class, 'update'])->name('admin.dha-phases.update');
+    Route::delete('/admin/dha-phases/{dhaPhase}', [DhaPhaseController::class, 'destroy'])->name('admin.dha-phases.destroy');
 
     Route::get('/admin/projects', [ProjectController::class, 'index'])->name('admin.projects.index');
     Route::get('/admin/projects/create', [ProjectController::class, 'create'])->name('admin.projects.create');
     Route::post('/admin/projects', [ProjectController::class, 'store'])->name('admin.projects.store');
+    Route::post('/admin/projects/upload-media', [ProjectController::class, 'uploadMedia'])->name('admin.projects.upload-media');
     Route::get('/admin/projects/{project}/preview', [ProjectController::class, 'preview'])->name('admin.projects.preview');
+    Route::get('/admin/projects/{project}/edit-section/{section}', [ProjectController::class, 'editSection'])->name('admin.projects.edit-section');
+    Route::get('/admin/projects/{project}/edit-section/{section}/load', [ProjectController::class, 'loadSection'])->name('admin.projects.edit-section.load');
+    Route::patch('/admin/projects/{project}/sections/{section}', [ProjectController::class, 'updateSection'])->name('admin.projects.sections.update');
     Route::get('/admin/projects/{project}/edit', [ProjectController::class, 'edit'])->name('admin.projects.edit');
     Route::put('/admin/projects/{project}', [ProjectController::class, 'update'])->name('admin.projects.update');
     Route::delete('/admin/projects/{project}', [ProjectController::class, 'destroy'])->name('admin.projects.destroy');
@@ -904,7 +1237,11 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/own-listings', [PropertyController::class, 'indexOwn'])->name('admin.own-listings.index');
     Route::get('/admin/own-listings/create', [PropertyController::class, 'createOwn'])->name('admin.own-listings.create');
     Route::post('/admin/own-listings', [PropertyController::class, 'storeOwn'])->name('admin.own-listings.store');
+    Route::post('/admin/own-listings/upload-media', [PropertyController::class, 'uploadMediaOwn'])->name('admin.own-listings.upload-media');
     Route::get('/admin/own-listings/{property}/preview', [PropertyController::class, 'preview'])->name('admin.own-listings.preview');
+    Route::get('/admin/own-listings/{property}/edit-section/{section}', [PropertyController::class, 'editSectionOwn'])->name('admin.own-listings.edit-section');
+    Route::get('/admin/own-listings/{property}/edit-section/{section}/load', [PropertyController::class, 'loadSectionOwn'])->name('admin.own-listings.edit-section.load');
+    Route::patch('/admin/own-listings/{property}/sections/{section}', [PropertyController::class, 'updateSectionOwn'])->name('admin.own-listings.sections.update');
     Route::get('/admin/own-listings/{property}/edit', [PropertyController::class, 'editOwn'])->name('admin.own-listings.edit');
     Route::put('/admin/own-listings/{property}', [PropertyController::class, 'updateOwn'])->name('admin.own-listings.update');
     Route::post('/admin/own-listings/{property}/duplicate', [PropertyController::class, 'duplicateOwn'])->name('admin.own-listings.duplicate');
@@ -913,7 +1250,11 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/dealer-listings', [PropertyController::class, 'indexDealer'])->name('admin.dealer-listings.index');
     Route::get('/admin/dealer-listings/create', [PropertyController::class, 'createDealer'])->name('admin.dealer-listings.create');
     Route::post('/admin/dealer-listings', [PropertyController::class, 'storeDealer'])->name('admin.dealer-listings.store');
+    Route::post('/admin/dealer-listings/upload-media', [PropertyController::class, 'uploadMediaDealer'])->name('admin.dealer-listings.upload-media');
     Route::get('/admin/dealer-listings/{property}/preview', [PropertyController::class, 'preview'])->name('admin.dealer-listings.preview');
+    Route::get('/admin/dealer-listings/{property}/edit-section/{section}', [PropertyController::class, 'editSectionDealer'])->name('admin.dealer-listings.edit-section');
+    Route::get('/admin/dealer-listings/{property}/edit-section/{section}/load', [PropertyController::class, 'loadSectionDealer'])->name('admin.dealer-listings.edit-section.load');
+    Route::patch('/admin/dealer-listings/{property}/sections/{section}', [PropertyController::class, 'updateSectionDealer'])->name('admin.dealer-listings.sections.update');
     Route::get('/admin/dealer-listings/{property}/edit', [PropertyController::class, 'editDealer'])->name('admin.dealer-listings.edit');
     Route::put('/admin/dealer-listings/{property}', [PropertyController::class, 'updateDealer'])->name('admin.dealer-listings.update');
     Route::post('/admin/dealer-listings/{property}/duplicate', [PropertyController::class, 'duplicateDealer'])->name('admin.dealer-listings.duplicate');
@@ -923,6 +1264,9 @@ Route::middleware('admin')->group(function () {
 
     Route::get('/admin/contact-settings', [ContactSettingsController::class, 'edit'])->name('admin.contact-settings.edit');
     Route::put('/admin/contact-settings', [ContactSettingsController::class, 'update'])->name('admin.contact-settings.update');
+    Route::get('/admin/contact-messages', [ContactMessageController::class, 'index'])->name('admin.contact-messages.index');
+    Route::get('/admin/contact-messages/{contactMessage}', [ContactMessageController::class, 'show'])->name('admin.contact-messages.show');
+    Route::put('/admin/contact-messages/{contactMessage}/status', [ContactMessageController::class, 'updateStatus'])->name('admin.contact-messages.update-status');
 
     Route::get('/admin/requests/projects', [PropertyRequestController::class, 'indexProjects'])->name('admin.requests.projects');
     Route::get('/admin/requests/properties', [PropertyRequestController::class, 'indexProperties'])->name('admin.requests.properties');

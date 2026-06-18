@@ -77,6 +77,16 @@
                                 <dt class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Phone</dt>
                                 <dd class="text-slate-800 dark:text-slate-200 mt-0.5">{{ $request->phone ?? '—' }}</dd>
                             </div>
+                            @if($source === 'project')
+                            <div>
+                                <dt class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Property type</dt>
+                                <dd class="text-slate-800 dark:text-slate-200 mt-0.5">{{ $request->property_type ?? '—' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Budget</dt>
+                                <dd class="text-slate-800 dark:text-slate-200 mt-0.5">{{ $request->budget ?? '—' }}</dd>
+                            </div>
+                            @endif
                         </dl>
                     </div>
 

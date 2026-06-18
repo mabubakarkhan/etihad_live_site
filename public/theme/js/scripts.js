@@ -283,11 +283,12 @@ function initRenstate() {
     }
     if ($(".testimonilas-carousel").length > 0) {
         var ms1 = new Swiper(".testimonilas-carousel .swiper-container", {
-            loop: false,
-            watchOverflow: true,
+            loop: true,
+            loopedSlides: 3,
+            watchOverflow: false,
             grabCursor: true,
             autoHeight: false,
-            centeredSlides: true,
+            centeredSlides: false,
             slidesPerView: 3,
             spaceBetween: 20,
             speed: 1400,
@@ -303,11 +304,13 @@ function initRenstate() {
                 1064: {
                     slidesPerView: 2,
                     spaceBetween: 10,
+                    loopedSlides: 2,
                 },
                 768: {
                     slidesPerView: 1,
                     spaceBetween: 0,
                     autoHeight: true,
+                    loopedSlides: 1,
                 },
             }
         });

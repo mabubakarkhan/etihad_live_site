@@ -5,49 +5,103 @@
     $pageTitle = ($dealer && $dealer->meta_title) ? $dealer->meta_title : ($dealer->name . ' – ' . config('app.name'));
     $bannerImage = ($dealer && $dealer->banner_image) ? url('storage/' . ltrim($dealer->banner_image, '/')) : asset('theme/images/bg/6.jpg');
     $dealerAvatar = $dealer && $dealer->profile_pic ? url('storage/' . ltrim($dealer->profile_pic, '/')) : null;
+    $heroImage = $dealerAvatar ?: $bannerImage;
+    $dealerEmail = $dealer->email ?: ($cs->email ?? null);
+    $dealerPhone = $dealer->phone ?: ($dealer->mobile ?: ($cs->phone ?? null));
+    $dealerWhatsapp = $dealer->whatsapp ?: ($cs->whatsapp ?? $dealerPhone);
+    $phoneClean = $dealerPhone ? preg_replace('/\s+/', '', $dealerPhone) : '';
+    $whatsappClean = $dealerWhatsapp ? preg_replace('/\D/', '', $dealerWhatsapp) : '';
+    $activeProperties = (int) ($dealer->properties_count ?? $properties->count());
+    $locationParts = array_filter([$dealer->city ?? null, $dealer->state ?? null]);
+    $aboutText = $dealer->info_detail ? trim(strip_tags($dealer->info_detail)) : '';
+    $socialLinks = array_filter([
+        'facebook' => $cs->facebook ?? null,
+        'instagram' => $cs->instagram ?? null,
+        'linkedin' => $cs->linkedin ?? null,
+        'youtube' => $cs->youtube ?? null,
+        'twitter' => $cs->twitter ?? null,
+        'tiktok' => $cs->tiktok ?? null,
+    ]);
 @endphp
 
 @section('title', $pageTitle)
 
-@if($dealer)
 @push('meta')
-@if(!empty($dealer->meta_description))<meta name="description" content="{{ e($dealer->meta_description) }}">@endif
-@if(!empty($dealer->meta_keywords))<meta name="keywords" content="{{ e($dealer->meta_keywords) }}">@endif
-@if(!empty($dealer->canonical_url))<link rel="canonical" href="{{ e($dealer->canonical_url) }}">@endif
+@include('partials.seo-meta', ['seo' => seo_from_record($dealer, [
+    'title' => $pageTitle,
+    'description' => $aboutText,
+    'canonical' => url()->current(),
+    'image' => $heroImage,
+])])
 @endpush
-@endif
 
 @section('content')
 <div id="main">
     @include('partials.header')
 
     <div class="wrapper">
-        <div class="content">
-            <div class="section hero-section hero-section_sin">
-                <div class="hero-section-wrap">
-                    <div class="hero-section-wrap-item">
-                        <div class="container">
-                            <div class="hero-section-container">
-                                <div class="hero-section-title">
-                                    <h2>{{ $dealer->name }}</h2>
-                                    <h5>{{ $dealer->info_detail ? \Illuminate\Support\Str::limit(strip_tags($dealer->info_detail), 120) : 'View properties listed by this dealer.' }}</h5>
+        <div class="content dealer-profile-page">
+            <section class="dealer-profile-hero">
+                <div class="dealer-profile-hero-media">
+                    <img src="{{ $heroImage }}" alt="" class="dealer-profile-hero-bg dealer-profile-hero-bg-desktop" loading="eager" aria-hidden="true">
+                    <img src="{{ $bannerImage }}" alt="" class="dealer-profile-hero-bg dealer-profile-hero-bg-mobile" loading="eager" aria-hidden="true">
+                    <div class="dealer-profile-hero-overlay"></div>
+                </div>
+                <div class="container dealer-profile-hero-body">
+                    <div class="dealer-profile-hero-inner">
+                        <div class="dealer-profile-hero-main">
+                            <div class="dealer-profile-avatar">
+                                @if($dealerAvatar)
+                                <img src="{{ $dealerAvatar }}" alt="{{ e($dealer->name) }}" loading="lazy">
+                                @else
+                                <span class="dealer-profile-avatar-fallback"><i class="fa-solid fa-user"></i></span>
+                                @endif
+                            </div>
+                            <div class="dealer-profile-meta">
+                                <h1 class="dealer-profile-name">{{ $dealer->name }}</h1>
+                                <div class="dealer-profile-meta-details">
+                                <a href="{{ route('portal') }}" class="dealer-profile-company">{{ config('app.name') }} <i class="fa-solid fa-angle-right"></i></a>
+                                <p class="dealer-profile-stat"><strong>{{ $activeProperties }}</strong> Active {{ $activeProperties === 1 ? 'Property' : 'Properties' }}</p>
+                                @if(!empty($locationParts))
+                                <div class="dealer-profile-tags">
+                                    @foreach($locationParts as $loc)
+                                    <span class="dealer-profile-tag"><i class="fa-solid fa-location-dot"></i> {{ $loc }}</span>
+                                    @endforeach
+                                    @if($dealer->show_homepage)
+                                    <span class="dealer-profile-tag dealer-profile-tag-featured"><i class="fa-solid fa-star"></i> Featured Agent</span>
+                                    @endif
+                                </div>
+                                @elseif($dealer->show_homepage)
+                                <div class="dealer-profile-tags">
+                                    <span class="dealer-profile-tag dealer-profile-tag-featured"><i class="fa-solid fa-star"></i> Featured Agent</span>
+                                </div>
+                                @endif
                                 </div>
                             </div>
                         </div>
-                        <div class="hs-scroll-down-wrap">
-                            <div class="scroll-down-item">
-                                <div class="mousey"><div class="scroller"></div></div>
-                                <span>Scroll Down To Discover</span>
-                            </div>
-                            <div class="svg-corner svg-corner_white" style="bottom:0;right: -39px; transform: rotate(90deg)"></div>
-                            <div class="svg-corner svg-corner_white" style="bottom:0;left: -39px;"></div>
-                        </div>
-                        <div class="bg-wrap bg-hero bg-parallax-wrap-gradien fs-wrapper" data-scrollax-parent="true">
-                            <div class="bg" data-bg="{{ $bannerImage }}" data-scrollax="properties: { translateY: '30%' }"></div>
+                        <div class="dealer-profile-actions">
+                            @if($dealerEmail)
+                            <a href="mailto:{{ e($dealerEmail) }}" class="dealer-profile-action dealer-profile-action-email" title="Email">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>Email</span>
+                            </a>
+                            @endif
+                            @if($phoneClean)
+                            <a href="tel:{{ $phoneClean }}" class="dealer-profile-action dealer-profile-action-call" title="Call">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>Call</span>
+                            </a>
+                            @endif
+                            @if($whatsappClean)
+                            <a href="https://wa.me/{{ $whatsappClean }}" target="_blank" rel="noopener" class="dealer-profile-action dealer-profile-action-whatsapp" title="WhatsApp">
+                                <i class="fa-brands fa-whatsapp"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                            @endif
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <div class="container">
                 <div class="breadcrumbs-list bl_flat">
@@ -57,161 +111,103 @@
                     <div class="breadcrumbs-list_dec"><i class="fa-solid fa-angle-right"></i></div>
                 </div>
 
-                <div class="main-content ms_vir_height dealer-page">
-                    <div class="boxed-container">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="boxed-content btf_init">
-                                    <div class="agent-preofile-wrap">
-                                        <div class="agent-preofile-header sh-links">
-                                            <div class="agent-preofile-header-bg"></div>
-                                            <div class="agent-preofile-header-avatar">
-                                                <div class="agent-preofile-header-avatar-item">
-                                                    @if($dealerAvatar)
-                                                    <img src="{{ $dealerAvatar }}" alt="{{ e($dealer->name) }}">
-                                                    @else
-                                                    <div style="width:100%;height:100%;min-height:180px;background:#cbd5e1;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-user" style="font-size:48px;color:#64748b;"></i></div>
-                                                    @endif
-                                                    <div class="svg-corner svg-corner_white" style="bottom:18px;right: -45px; transform: rotate(90deg)"></div>
-                                                    <div class="svg-corner svg-corner_white" style="bottom:18px;left: -47px;"></div>
-                                                </div>
-                                            </div>
-                                            <div class="abs_bg"></div>
-                                            <div class="profile-card-stats">
-                                                <ul>
-                                                    <li><span>{{ $dealer->properties_count }}</span> Properties</li>
-                                                    <li><span>{{ number_format((int) ($dealer->view_count ?? 0)) }}</span> Views</li>
-                                                </ul>
-                                            </div>
-                                            <div class="property-contacts-links">
-                                                @php
-                                                    $phoneClean = $cs->phone ? preg_replace('/\s+/', '', $cs->phone) : '';
-                                                    $whatsappClean = $cs->whatsapp ? preg_replace('/\D/', '', $cs->whatsapp) : $phoneClean;
-                                                @endphp
-                                                @if($phoneClean)
-                                                <a href="tel:{{ $phoneClean }}" class="tolt pcl_btn" data-microtip-position="left" data-tooltip="Call"><i class="fa-solid fa-phone"></i></a>
-                                                @endif
-                                                @if($whatsappClean)
-                                                <a href="https://wa.me/{{ $whatsappClean }}" target="_blank" rel="noopener" class="pcl_btn tolt" data-microtip-position="left" data-tooltip="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-                                                @endif
-                                                @if($cs->email)
-                                                <a href="mailto:{{ e($cs->email) }}" class="pcl_btn tolt" data-microtip-position="left" data-tooltip="Email"><i class="fa-solid fa-envelope"></i></a>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="agent-preofile-content">
-                                            <div class="agent-preofile-content-text">
-                                                <h4>{{ $dealer->name }}</h4>
-                                                @if($dealer->info_detail)
-                                                <p>{!! nl2br(e(strip_tags($dealer->info_detail))) !!}</p>
-                                                @else
-                                                <p>Properties listed by this dealer. Contact us using the details above for inquiries.</p>
-                                                @endif
-                                            </div>
-                                            @if($dealer->city || $dealer->state)
-                                            <div class="tagcloud_single">
-                                                <span class="tc_single_title"><i class="fa-regular fa-globe"></i> Area:</span>
-                                                <div class="tags-widget">
-                                                    @if($dealer->city)<a href="{{ url('/listing') }}?city={{ urlencode($dealer->city) }}">{{ $dealer->city }}</a>@endif
-                                                    @if($dealer->state)<a href="{{ url('/listing') }}?state={{ urlencode($dealer->state) }}">{{ $dealer->state }}</a>@endif
-                                                </div>
-                                            </div>
-                                            @endif
-                                        </div>
-                                        <div class="agent-preofile-footer">
-                                            <div class="agent-preofile-footer_title">Follow:</div>
-                                            <div class="agent-preofile-footer-social">
-                                                @if($cs->facebook)<a href="{{ $cs->facebook }}" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>@endif
-                                                @if($cs->instagram)<a href="{{ $cs->instagram }}" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>@endif
-                                                @if($cs->linkedin)<a href="{{ $cs->linkedin }}" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin-in"></i></a>@endif
-                                                @if($cs->youtube)<a href="{{ $cs->youtube }}" target="_blank" rel="noopener"><i class="fa-brands fa-youtube"></i></a>@endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-8">
-                                <div class="list-main-wrap-header box-list-header" style="margin-top: 0">
-                                    <div class="list-main-wrap-title">
-                                        <h2>{{ $dealer->name }} Properties: <strong>{{ $properties->count() }}</strong></h2>
-                                    </div>
-                                </div>
-
-                                @if($properties->isEmpty())
-                                <div class="boxed-content-item" style="padding: 48px 24px; text-align: center;">
-                                    <p style="margin: 0; color: #64748b;">No properties listed yet.</p>
-                                    <a href="{{ route('listing') }}" class="commentssubmit" style="margin-top: 16px; display: inline-block;">Browse all listings</a>
-                                </div>
-                                @else
-                                <div class="listing-item-container fw-listing-item">
-                                    @foreach($properties as $p)
-                                    @php
-                                        $detailUrl = route('property.show', $p->slug);
-                                        $imgUrl = $p->featured_image ? url('storage/' . ltrim($p->featured_image, '/')) : asset('theme/images/all/1.jpg');
-                                        $price = format_price($p->price_digits, $p->price_string);
-                                        $purposeLabel = $p->purpose === 'rent' ? 'Rent' : 'Sale';
-                                        $gallery = is_array($p->gallery) ? $p->gallery : [];
-                                        $photoCount = count($gallery) + ($p->featured_image ? 1 : 0);
-                                    @endphp
-                                    <div class="listing-item">
-                                        <div class="geodir-category-listing">
-                                            <div class="geodir-category-img">
-                                                <a href="{{ $detailUrl }}" class="geodir-category-img_item">
-                                                    <div class="bg" style="background-image: url({{ $imgUrl }});"></div>
-                                                    <div class="overlay"></div>
-                                                </a>
-                                                @if($p->short_address)
-                                                <div class="geodir-category-location">
-                                                    <a href="{{ $detailUrl }}" class="map-item"><i class="fas fa-map-marker-alt"></i> {{ $p->short_address }}</a>
-                                                </div>
-                                                @endif
-                                                <div class="listing-card-cats">
-                                                    <ul class="list-single-opt_header_cat">
-                                                        <li><a href="{{ route('listing') }}" class="cat-opt">{{ $purposeLabel }}</a></li>
-                                                        @foreach($p->projectTypes as $pt)
-                                                            <li><a href="{{ route('listing') }}" class="cat-opt">{{ $pt->name }}</a></li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-                                                <button type="button" class="geodir_save-btn tolt wishlist-btn" data-property-id="{{ $p->id }}" data-microtip-position="left" data-tooltip="Save" aria-label="Save to wishlist"><span><i class="fa-regular fa-heart wishlist-icon"></i></span></button>
-                                                <div class="geodir-category-listing_media-list">
-                                                    <span><i class="fas fa-camera"></i> {{ $photoCount }}</span>
-                                                </div>
-                                            </div>
-                                            <div class="geodir-category-content">
-                                                <h3><a href="{{ $detailUrl }}">{{ $p->title }}</a></h3>
-                                                <div class="geodir-category-content_price">{{ $price }}</div>
-                                                @if($p->description)
-                                                <p>{{ \Illuminate\Support\Str::limit(strip_tags($p->description), 120) }}</p>
-                                                @endif
-                                                <div class="geodir-category-content-details">
-                                                    <ul>
-                                                        <li><i class="fa-light fa-bed"></i><span>{{ $p->bedrooms ?? 0 }}</span></li>
-                                                        <li><i class="fa-light fa-bath"></i><span>{{ $p->bathrooms ?? 0 }}</span></li>
-                                                        <li><i class="fa-light fa-utensils"></i><span>{{ $p->kitchen ?? 0 }}</span></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <div class="geodir-category-footer">
-                                                <span class="gcf-company"><img src="{{ $dealerAvatar ?: asset('theme/images/agents/1.jpg') }}" alt=""><span>By {{ $dealer->name }}</span></span>
-                                                <a href="{{ $detailUrl }}" class="gid_link"><span>View Details</span> <i class="fa-solid fa-caret-right"></i></a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                                @endif
-                            </div>
+                <div class="main-content dealer-page">
+                    <div class="dealer-profile-about">
+                        <h2>About {{ $dealer->name }}</h2>
+                        @if($aboutText !== '')
+                        <p>{!! nl2br(e($aboutText)) !!}</p>
+                        @else
+                        <p>Properties listed by this team member. Use the contact buttons above for inquiries about available listings.</p>
+                        @endif
+                        @if($dealer->address)
+                        <p class="dealer-profile-about-line"><i class="fa-solid fa-map-marker-alt"></i> {{ $dealer->address }}</p>
+                        @endif
+                        @if(!empty($socialLinks))
+                        <div class="dealer-profile-social">
+                            <span class="dealer-profile-social-label">Follow:</span>
+                            @if(!empty($socialLinks['facebook']))<a href="{{ $socialLinks['facebook'] }}" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>@endif
+                            @if(!empty($socialLinks['instagram']))<a href="{{ $socialLinks['instagram'] }}" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>@endif
+                            @if(!empty($socialLinks['linkedin']))<a href="{{ $socialLinks['linkedin'] }}" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>@endif
+                            @if(!empty($socialLinks['youtube']))<a href="{{ $socialLinks['youtube'] }}" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>@endif
+                            @if(!empty($socialLinks['twitter']))<a href="{{ $socialLinks['twitter'] }}" target="_blank" rel="noopener" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>@endif
+                            @if(!empty($socialLinks['tiktok']))<a href="{{ $socialLinks['tiktok'] }}" target="_blank" rel="noopener" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>@endif
                         </div>
-                        <div class="limit-box"></div>
+                        @endif
+                    </div>
+
+                    <div class="dealer-profile-listings">
+                        <div class="dealer-profile-listings-head">
+                            <h2>{{ $dealer->name }} Properties: <strong>{{ $properties->count() }}</strong></h2>
+                        </div>
+
+                        @if($properties->isEmpty())
+                        <div class="dealer-profile-empty">
+                            <p>No properties listed yet.</p>
+                            <a href="{{ route('listing') }}" class="commentssubmit">Browse all listings</a>
+                        </div>
+                        @else
+                        <div class="listing-item-container fw-listing-item">
+                            @foreach($properties as $p)
+                            @php
+                                $detailUrl = route('property.show', $p->slug);
+                                $imgUrl = $p->featured_image ? url('storage/' . ltrim($p->featured_image, '/')) : asset('theme/images/all/1.jpg');
+                                $price = format_price($p->price_digits, $p->price_string);
+                                $purposeLabel = $p->purpose === 'rent' ? 'Rent' : 'Sale';
+                                $gallery = is_array($p->gallery) ? $p->gallery : [];
+                                $photoCount = count($gallery) + ($p->featured_image ? 1 : 0);
+                            @endphp
+                            <div class="listing-item">
+                                <div class="geodir-category-listing">
+                                    <div class="geodir-category-img">
+                                        <a href="{{ $detailUrl }}" class="geodir-category-img_item">
+                                            <div class="bg" data-bg="{{ $imgUrl }}"></div>
+                                            <div class="overlay"></div>
+                                        </a>
+                                        @if($p->short_address)
+                                        <div class="geodir-category-location">
+                                            <a href="{{ $detailUrl }}" class="map-item"><i class="fas fa-map-marker-alt"></i> {{ $p->short_address }}</a>
+                                        </div>
+                                        @endif
+                                        <div class="listing-card-cats">
+                                            <ul class="list-single-opt_header_cat">
+                                                <li><a href="{{ route('listing') }}" class="cat-opt">{{ $purposeLabel }}</a></li>
+                                                @foreach($p->projectTypes as $pt)
+                                                    <li><a href="{{ route('listing') }}" class="cat-opt">{{ $pt->name }}</a></li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                        <button type="button" class="geodir_save-btn tolt wishlist-btn" data-property-id="{{ $p->id }}" data-microtip-position="left" data-tooltip="Save" aria-label="Save to wishlist"><span><i class="fa-regular fa-heart wishlist-icon"></i></span></button>
+                                        <div class="geodir-category-listing_media-list">
+                                            <span><i class="fas fa-camera"></i> {{ $photoCount }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="geodir-category-content">
+                                        <h3 class="listing-card-title"><a href="{{ $detailUrl }}">{{ $p->title }}</a></h3>
+                                        <div class="geodir-category-content_price">{{ $price }}</div>
+                                        <div class="geodir-category-content-details">
+                                            <ul>
+                                                <li><i class="fa-light fa-bed"></i><span>{{ $p->bedrooms ?? 0 }}</span></li>
+                                                <li><i class="fa-light fa-bath"></i><span>{{ $p->bathrooms ?? 0 }}</span></li>
+                                                <li><i class="fa-light fa-utensils"></i><span>{{ $p->kitchen ?? 0 }}</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="geodir-category-footer">
+                                        <span class="gcf-company"><img src="{{ $dealerAvatar ?: asset('theme/images/agents/1.jpg') }}" alt=""><span>By {{ $dealer->name }}</span></span>
+                                        <a href="{{ $detailUrl }}" class="gid_link"><span>View Details</span> <i class="fa-solid fa-caret-right"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        @endif
                     </div>
                 </div>
 
                 <div class="to_top-btn-wrap">
                     <div class="to-top to-top_btn"><span>Back to top</span> <i class="fa-solid fa-arrow-up"></i></div>
-                    <div class="svg-corner svg-corner_white" style="top:0;left: -40px; transform: rotate(-90deg)"></div>
-                    <div class="svg-corner svg-corner_white" style="top:0;right: -40px; transform: rotate(-180deg)"></div>
+                    <div class="svg-corner svg-corner_white hero-corner-tl"></div>
+                    <div class="svg-corner svg-corner_white hero-corner-tr"></div>
                 </div>
             </div>
         </div>
@@ -226,16 +222,5 @@
 @endsection
 
 @push('styles')
-<style>
-#wishlist-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #0f172a; color: #fff; padding: 12px 24px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 9999; opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; pointer-events: none; font-size: 14px; }
-#wishlist-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-.geodir_save-btn.wishlist-btn { position: absolute; top: 12px; right: 12px; z-index: 2; }
-.geodir_save-btn .wishlist-icon { font-size: 1rem; }
-.dealer-page .agent-preofile-footer-social a { margin-right: 8px; }
-</style>
-@endpush
-
-@push('scripts')
-<script>
-</script>
+<link rel="stylesheet" href="{{ asset('theme/css/pages/dealer.css') }}">
 @endpush

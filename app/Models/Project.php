@@ -16,8 +16,10 @@ class Project extends Model
     protected $fillable = [
         'title',
         'slug',
+        'sort_order',
         'status',
         'price',
+        'launch_year',
         'description',
         'state',
         'city',
@@ -30,9 +32,16 @@ class Project extends Model
         'logo',
         'featured_image',
         'homepage_listing_image',
+        'hero_feature_cards',
+        'hero_stat_cards',
         'featured_youtube_url',
         'featured_video_title',
         'featured_video_description',
+        'vr_tour_url',
+        'vr_tour_meta_title',
+        'vr_tour_meta_description',
+        'vr_tour_meta_keywords',
+        'vr_tour_canonical_url',
         'about_developers',
         'developer_logo',
         'project_file_pdf',
@@ -47,6 +56,11 @@ class Project extends Model
         'price_plan_items',
         'faqs',
         'plans',
+        'pricing_place_cards',
+        'testimonial_items',
+        'invest_title',
+        'invest_points',
+        'invest_image',
         'title_descriptions',
         'videos',
         'gallery',
@@ -63,9 +77,14 @@ class Project extends Model
             'price_plan_items' => 'array',
             'faqs' => 'array',
             'plans' => 'array',
+            'pricing_place_cards' => 'array',
+            'testimonial_items' => 'array',
+            'invest_points' => 'array',
             'title_descriptions' => 'array',
             'videos' => 'array',
             'gallery' => 'array',
+            'hero_feature_cards' => 'array',
+            'hero_stat_cards' => 'array',
         ];
     }
 
@@ -79,11 +98,19 @@ class Project extends Model
         return $query->where('status', self::STATUS_ACTIVE);
     }
 
+    public function scopeFrontOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderByDesc('id');
+    }
+
     public static function booted(): void
     {
         static::creating(function (Project $project) {
             if (empty($project->slug)) {
                 $project->slug = Str::slug($project->title);
+            }
+            if (!$project->sort_order) {
+                $project->sort_order = (int) static::max('sort_order') + 1;
             }
         });
     }

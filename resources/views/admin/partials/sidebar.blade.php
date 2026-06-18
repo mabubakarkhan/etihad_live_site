@@ -56,13 +56,6 @@
                     <span class="text-sm">Project types</span>
                 </span>
             </a>
-            <a href="{{ route('admin.own-listings.index') }}"
-               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.own-listings.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
-                <span class="flex items-center gap-3">
-                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-xs {{ request()->routeIs('admin.own-listings.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">O</span>
-                    <span class="text-sm">Own listings</span>
-                </span>
-            </a>
             <a href="{{ route('admin.dealer-listings.index') }}"
                class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.dealer-listings.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
                 <span class="flex items-center gap-3">
@@ -75,6 +68,13 @@
                 <span class="flex items-center gap-3">
                     <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-xs {{ request()->routeIs('admin.dealers.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">D</span>
                     <span class="text-sm">Dealers</span>
+                </span>
+            </a>
+            <a href="{{ route('admin.dha.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.dha.*') || request()->routeIs('admin.dha-phases.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-xs {{ request()->routeIs('admin.dha.*') || request()->routeIs('admin.dha-phases.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">H</span>
+                    <span class="text-sm">DHA &amp; phases</span>
                 </span>
             </a>
             <a href="{{ route('admin.requests.projects') }}"
@@ -120,6 +120,13 @@
                     <span class="text-sm">Portal hero</span>
                 </span>
             </a>
+            <a href="{{ route('admin.portal-ads.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.portal-ads.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.portal-ads.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">AD</span>
+                    <span class="text-sm">Portal ads</span>
+                </span>
+            </a>
             <a href="{{ route('admin.cms-pages.index') }}"
                class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.cms-pages.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
                 <span class="flex items-center gap-3">
@@ -129,6 +136,13 @@
                 @if(request()->routeIs('admin.cms-pages.*'))
                     <span class="text-[11px] text-emerald-600 dark:text-emerald-400">active</span>
                 @endif
+            </a>
+            <a href="{{ route('admin.contact-messages.index') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.contact-messages.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-xs {{ request()->routeIs('admin.contact-messages.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">M</span>
+                    <span class="text-sm">Contact messages</span>
+                </span>
             </a>
                 </div>
             </div>

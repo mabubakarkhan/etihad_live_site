@@ -2,23 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HandlesPropertySectionUpdates;
 use App\Models\ActivityLog;
 use App\Models\Property;
 use App\Models\Dealer;
 use App\Models\ProjectType;
 use App\Models\State;
+use App\Models\DhaPhase;
+use App\Support\PropertyEditSections;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class PropertyController extends Controller
 {
+    use HandlesPropertySectionUpdates;
+
     private const LISTING_OWN = 'own';
     private const LISTING_DEALER = 'dealer';
 
     private function index(bool $dealerListings): \Illuminate\Contracts\View\View
     {
-        $query = Property::with(['projectTypes', 'dealer']);
+        $query = Property::with(['projectTypes', 'dealer', 'dhaPhase:id,title,slug']);
         $filterDealer = null;
         if ($dealerListings) {
             $query->where('dealer_id', '!=', 0);
@@ -45,7 +52,10 @@ class PropertyController extends Controller
         if (request()->filled('purpose')) {
             $query->where('purpose', request('purpose'));
         }
-        $properties = $query->orderBy('id', 'desc')->limit(2000)->get();
+        if (request()->filled('dha_phase')) {
+            $query->where('dha_phase_id', (int) request('dha_phase'));
+        }
+        $properties = $query->frontOrdered()->limit(2000)->get();
         $pageTitle = $dealerListings ? 'Dealer listings' : 'Own listings';
         $routePrefix = $dealerListings ? 'admin.dealer-listings' : 'admin.own-listings';
         $projectTypes = ProjectType::orderBy('name')->get();
@@ -53,7 +63,9 @@ class PropertyController extends Controller
         $filterProjectType = request('project_type');
         $filterPropertyType = request('property_type');
         $filterPurpose = request('purpose');
-        return view('admin.properties.index', compact('properties', 'pageTitle', 'routePrefix', 'filterDealer', 'projectTypes', 'filterStatus', 'filterProjectType', 'filterPropertyType', 'filterPurpose'));
+        $dhaPhases = DhaPhase::frontOrdered()->get(['id', 'title', 'slug']);
+        $filterDhaPhase = request('dha_phase');
+        return view('admin.properties.index', compact('properties', 'pageTitle', 'routePrefix', 'filterDealer', 'projectTypes', 'filterStatus', 'filterProjectType', 'filterPropertyType', 'filterPurpose', 'dhaPhases', 'filterDhaPhase'));
     }
 
     public function indexOwn()
@@ -76,7 +88,10 @@ class PropertyController extends Controller
         $routePrefix = $dealerListings ? 'admin.dealer-listings' : 'admin.own-listings';
         $pageTitle = $dealerListings ? 'Add dealer listing' : 'Add own listing';
         $preselectedDealer = $dealerListings && request('dealer') ? Dealer::find((int) request('dealer')) : null;
-        return view('admin.properties.create', compact('listingType', 'projectTypes', 'dealers', 'states', 'property', 'routePrefix', 'pageTitle', 'preselectedDealer'));
+        $uploadToken = session('property_upload_token', Str::uuid()->toString());
+        session(['property_upload_token' => $uploadToken]);
+        $dhaPhases = DhaPhase::frontOrdered()->get(['id', 'title', 'slug']);
+        return view('admin.properties.create', compact('listingType', 'projectTypes', 'dealers', 'states', 'property', 'routePrefix', 'pageTitle', 'preselectedDealer', 'uploadToken', 'dhaPhases'));
     }
 
     public function createOwn()
@@ -89,13 +104,20 @@ class PropertyController extends Controller
         return $this->create(true);
     }
 
-    private function store(Request $request, bool $dealerListings): \Illuminate\Http\RedirectResponse
+    private function store(Request $request, bool $dealerListings): \Illuminate\Http\RedirectResponse|JsonResponse
     {
-        $dealerId = $dealerListings ? (int) $request->input('dealer_id', 0) : 0;
-        if ($dealerListings) {
-            $request->validate(['dealer_id' => ['required', 'integer', 'min:1', 'exists:dealers,id']]);
+        try {
+            $dealerId = $dealerListings ? (int) $request->input('dealer_id', 0) : 0;
+            if ($dealerListings) {
+                $request->validate(['dealer_id' => ['required', 'integer', 'min:1', 'exists:dealers,id']]);
+            }
+            $validated = $this->validateProperty($request, null);
+        } catch (ValidationException $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+            }
+            throw $e;
         }
-        $validated = $this->validateProperty($request, null);
         $data = $this->buildPropertyData($request, $validated, null, $dealerId);
         $data['status'] = $data['status'] ?? 'active';
         $data['purpose'] = $data['purpose'] ?? 'sale';
@@ -109,6 +131,13 @@ class PropertyController extends Controller
             ActivityLog::record($admin, 'listing_created', "{$listingLabel} created: {$property->title} (ID: {$property->id}, slug: {$property->slug}).");
         }
         $editRoute = $dealerListings ? 'admin.dealer-listings.edit' : 'admin.own-listings.edit';
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'redirect' => route($editRoute, $property),
+                'message' => 'Listing created.',
+            ]);
+        }
         return redirect()->route($editRoute, $property)->with('status', 'Listing created.');
     }
 
@@ -137,7 +166,9 @@ class PropertyController extends Controller
         $states = State::with('cities')->orderBy('sort_order')->orderBy('name')->get();
         $routePrefix = $dealerListings ? 'admin.dealer-listings' : 'admin.own-listings';
         $pageTitle = $dealerListings ? 'Edit dealer listing' : 'Edit own listing';
-        return view('admin.properties.edit', compact('property', 'listingType', 'projectTypes', 'dealers', 'states', 'routePrefix', 'pageTitle'));
+        $dhaPhases = DhaPhase::frontOrdered()->get(['id', 'title', 'slug']);
+        $property->load('dhaPhase:id,title,slug');
+        return view('admin.properties.edit', compact('property', 'listingType', 'projectTypes', 'dealers', 'states', 'routePrefix', 'pageTitle', 'dhaPhases'));
     }
 
     public function editOwn(Property $property)
@@ -150,10 +181,126 @@ class PropertyController extends Controller
         return $this->edit($property, true);
     }
 
-    private function update(Request $request, Property $property, bool $dealerListings): \Illuminate\Http\RedirectResponse
+    private function editSection(Property $property, string $section, bool $dealerListings): \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
     {
-        $dealerId = $dealerListings ? (int) $request->input('dealer_id', 0) : 0;
-        $validated = $this->validateProperty($request, $property);
+        if (!PropertyEditSections::exists($section)) {
+            abort(404);
+        }
+        $isDealer = $property->dealer_id != 0;
+        if ($dealerListings && !$isDealer) {
+            return redirect()->route('admin.own-listings.edit-section', [$property, $section]);
+        }
+        if (!$dealerListings && $isDealer) {
+            return redirect()->route('admin.dealer-listings.edit-section', [$property, $section]);
+        }
+        $listingType = $dealerListings ? self::LISTING_DEALER : self::LISTING_OWN;
+        $projectTypes = ProjectType::orderBy('name')->get();
+        $dealers = $dealerListings ? Dealer::active()->orderBy('name')->get() : collect();
+        $states = State::with('cities')->orderBy('sort_order')->orderBy('name')->get();
+        $routePrefix = $dealerListings ? 'admin.dealer-listings' : 'admin.own-listings';
+        $pageTitle = $dealerListings ? 'Edit dealer listing' : 'Edit own listing';
+        $sections = PropertyEditSections::all();
+        $dhaPhases = DhaPhase::frontOrdered()->get(['id', 'title', 'slug']);
+        return view('admin.properties.edit-section', compact(
+            'property', 'listingType', 'projectTypes', 'dealers', 'states',
+            'routePrefix', 'pageTitle', 'section', 'sections', 'dhaPhases'
+        ));
+    }
+
+    public function editSectionOwn(Property $property, string $section)
+    {
+        return $this->editSection($property, $section, false);
+    }
+
+    public function editSectionDealer(Property $property, string $section)
+    {
+        return $this->editSection($property, $section, true);
+    }
+
+    private function loadSection(Property $property, string $section, bool $dealerListings): JsonResponse
+    {
+        if (!PropertyEditSections::exists($section)) {
+            abort(404);
+        }
+        $this->resolvePropertyForUpload($property->id, $dealerListings);
+        $listingType = $dealerListings ? self::LISTING_DEALER : self::LISTING_OWN;
+        $projectTypes = ProjectType::orderBy('name')->get();
+        $dealers = $dealerListings ? Dealer::active()->orderBy('name')->get() : collect();
+        $states = State::with('cities')->orderBy('sort_order')->orderBy('name')->get();
+        $dhaPhases = DhaPhase::frontOrdered()->get(['id', 'title', 'slug']);
+        $html = view('admin.properties._section_fragment', [
+            'property' => $property,
+            'listingType' => $listingType,
+            'projectTypes' => $projectTypes,
+            'dealers' => $dealers,
+            'states' => $states,
+            'dhaPhases' => $dhaPhases,
+            'section' => $section,
+        ])->render();
+
+        return response()->json([
+            'success' => true,
+            'html' => $html,
+            'section' => $section,
+            'label' => PropertyEditSections::all()[$section]['label'] ?? $section,
+        ]);
+    }
+
+    public function loadSectionOwn(Property $property, string $section): JsonResponse
+    {
+        return $this->loadSection($property, $section, false);
+    }
+
+    public function loadSectionDealer(Property $property, string $section): JsonResponse
+    {
+        return $this->loadSection($property, $section, true);
+    }
+
+    private function updateSection(Request $request, Property $property, string $section, bool $dealerListings): JsonResponse
+    {
+        if (!PropertyEditSections::exists($section)) {
+            abort(404);
+        }
+        $dealerId = $dealerListings ? (int) $request->input('dealer_id', $property->dealer_id) : 0;
+        try {
+            $validated = $this->validatePropertySection($request, $property, $section);
+        } catch (ValidationException $e) {
+            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+        }
+        $this->applyPropertySection($request, $property, $section, $validated, $dealerId);
+        $property->refresh();
+        $listingLabel = $dealerListings ? 'Dealer listing' : 'Own listing';
+        if ($admin = admin_user()) {
+            ActivityLog::record($admin, 'listing_section_updated', "{$listingLabel} section \"{$section}\" updated: {$property->title} (ID: {$property->id}).");
+        }
+        return response()->json([
+            'success' => true,
+            'message' => (PropertyEditSections::all()[$section]['label'] ?? $section) . ' saved.',
+            'section' => $section,
+        ]);
+    }
+
+    public function updateSectionOwn(Request $request, Property $property, string $section): JsonResponse
+    {
+        return $this->updateSection($request, $property, $section, false);
+    }
+
+    public function updateSectionDealer(Request $request, Property $property, string $section): JsonResponse
+    {
+        return $this->updateSection($request, $property, $section, true);
+    }
+
+    private function update(Request $request, Property $property, bool $dealerListings): \Illuminate\Http\RedirectResponse|JsonResponse
+    {
+        try {
+            $dealerId = $dealerListings ? (int) $request->input('dealer_id', 0) : 0;
+            $validated = $this->validateProperty($request, $property);
+        } catch (ValidationException $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+            }
+            throw $e;
+        }
         $data = $this->buildPropertyData($request, $validated, $property, $dealerId);
         $this->handlePropertyFiles($request, $property);
         unset($data['gallery'], $data['project_type_ids']);
@@ -164,7 +311,72 @@ class PropertyController extends Controller
             ActivityLog::record($admin, 'listing_updated', "{$listingLabel} updated: {$property->title} (ID: {$property->id}, slug: {$property->slug}).");
         }
         $editRoute = $dealerListings ? 'admin.dealer-listings.edit' : 'admin.own-listings.edit';
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Listing updated.',
+            ]);
+        }
         return redirect()->route($editRoute, $property)->with('status', 'Listing updated.');
+    }
+
+    public function uploadMediaOwn(Request $request): JsonResponse
+    {
+        return $this->uploadMedia($request, false);
+    }
+
+    public function uploadMediaDealer(Request $request): JsonResponse
+    {
+        return $this->uploadMedia($request, true);
+    }
+
+    private function uploadMedia(Request $request, bool $dealerListings): JsonResponse
+    {
+        $request->validate([
+            'type' => ['required', 'string', 'in:featured,gallery'],
+            'file' => ['required', 'image', 'max:10240'],
+            'property_id' => ['nullable', 'integer', 'exists:properties,id'],
+            'upload_token' => ['nullable', 'string', 'max:64'],
+        ]);
+
+        $property = null;
+        if ($request->filled('property_id')) {
+            $property = $this->resolvePropertyForUpload((int) $request->input('property_id'), $dealerListings);
+        }
+
+        $type = $request->input('type');
+        $subdir = $type === 'gallery' ? 'gallery' : 'featured';
+        if ($property) {
+            $base = 'properties/' . $property->id . '/' . $subdir;
+        } else {
+            $token = $request->input('upload_token') ?: session('property_upload_token');
+            if (!$token) {
+                return response()->json(['success' => false, 'message' => 'Upload session expired. Please refresh the page.'], 422);
+            }
+            $base = 'properties/staging/' . $token . '/' . $subdir;
+        }
+
+        $path = $request->file('file')->store($base, 'public');
+
+        return response()->json([
+            'success' => true,
+            'path' => $path,
+            'url' => asset('storage/' . $path),
+            'message' => 'Image uploaded successfully.',
+        ]);
+    }
+
+    private function resolvePropertyForUpload(int $propertyId, bool $dealerListings): Property
+    {
+        $property = Property::findOrFail($propertyId);
+        $isDealer = $property->dealer_id != 0;
+        if ($dealerListings && !$isDealer) {
+            abort(403);
+        }
+        if (!$dealerListings && $isDealer) {
+            abort(403);
+        }
+        return $property;
     }
 
     public function updateOwn(Request $request, Property $property)
@@ -229,6 +441,7 @@ class PropertyController extends Controller
         $newProperty->gallery = null;
         $newProperty->video_gallery = $property->video_gallery;
         $newProperty->videos = $property->videos;
+        $newProperty->sort_order = (int) Property::max('sort_order') + 1;
         $newProperty->save();
         $newProperty->projectTypes()->sync($property->projectTypes->pluck('id')->toArray());
 
@@ -280,6 +493,8 @@ class PropertyController extends Controller
             'address' => ['nullable', 'string'],
             'short_address' => ['nullable', 'string', 'max:500'],
             'town' => ['nullable', 'string', 'max:255'],
+            'is_dha_property' => ['nullable', 'boolean'],
+            'dha_phase_id' => ['nullable', 'integer', 'exists:dha_phases,id'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'google_map' => ['nullable', 'string'],
@@ -297,6 +512,10 @@ class PropertyController extends Controller
             'meta_description' => ['nullable', 'string', 'max:500'],
             'meta_keywords' => ['nullable', 'string', 'max:500'],
             'canonical_url' => ['nullable', 'string', 'max:500'],
+            'featured_image_path' => ['nullable', 'string', 'max:500'],
+            'gallery_paths' => ['nullable', 'array'],
+            'gallery_paths.*' => ['nullable', 'string', 'max:500'],
+            'upload_token' => ['nullable', 'string', 'max:64'],
         ]);
     }
 
@@ -304,6 +523,9 @@ class PropertyController extends Controller
     {
         $data = array_merge($validated, [
             'dealer_id' => $dealerId,
+            'dha_phase_id' => $request->boolean('is_dha_property') && $request->filled('dha_phase_id')
+                ? (int) $request->input('dha_phase_id')
+                : null,
             'is_hot' => $request->boolean('is_hot'),
             'purpose' => $request->input('purpose', 'sale'),
             'features' => array_values(array_filter(array_map('trim', (array) $request->input('features', [])))),
@@ -358,42 +580,85 @@ class PropertyController extends Controller
     protected function handlePropertyFiles(Request $request, Property $property): void
     {
         $disk = 'public';
-        $base = 'properties/' . $property->id;
+        $uploadToken = $request->input('upload_token');
+        $updates = [];
 
-        if ($request->boolean('remove_featured_image') && $property->featured_image) {
-            Storage::disk($disk)->delete($property->featured_image);
-            $property->update(['featured_image' => null]);
-        }
-        if ($request->hasFile('featured_image')) {
-            $path = $request->file('featured_image')->store($base, $disk);
-            $property->update(['featured_image' => $path]);
+        if ($request->boolean('remove_featured_image')) {
+            if ($property->featured_image) {
+                Storage::disk($disk)->delete($property->featured_image);
+            }
+            $updates['featured_image'] = null;
+        } elseif ($request->filled('featured_image_path')) {
+            $path = trim((string) $request->input('featured_image_path'));
+            if ($this->isAllowedMediaPath($path, $property->id, $uploadToken)) {
+                $finalPath = $this->finalizeMediaPath($path, $property->id, $uploadToken);
+                if ($property->featured_image && $property->featured_image !== $finalPath) {
+                    Storage::disk($disk)->delete($property->featured_image);
+                }
+                $updates['featured_image'] = $finalPath;
+            }
         }
 
-        $gallery = $property->gallery ?? [];
         $paths = (array) $request->input('gallery_paths', []);
         $order = (array) $request->input('gallery_order', []);
         $remove = (array) $request->input('gallery_remove', []);
         $out = [];
         foreach ($paths as $i => $path) {
-            $path = trim($path);
-            if ($path === '' || in_array($path, $remove, true)) continue;
-            $out[] = ['path' => $path, 'order' => isset($order[$i]) ? (int) $order[$i] : $i];
+            $path = trim((string) $path);
+            if ($path === '' || in_array($path, $remove, true)) {
+                continue;
+            }
+            if (!$this->isAllowedMediaPath($path, $property->id, $uploadToken)) {
+                continue;
+            }
+            $finalPath = $this->finalizeMediaPath($path, $property->id, $uploadToken);
+            $out[] = ['path' => $finalPath, 'order' => isset($order[$i]) ? (int) $order[$i] : $i];
         }
         foreach ($remove as $path) {
-            if ($path) Storage::disk($disk)->delete($path);
-        }
-        usort($out, fn($a, $b) => ($a['order'] ?? 0) <=> ($b['order'] ?? 0));
-        if ($request->hasFile('gallery_images')) {
-            $files = $request->file('gallery_images');
-            $files = is_array($files) ? $files : [$files];
-            $startOrder = empty($out) ? 0 : (max(array_column($out, 'order')) + 1);
-            foreach ($files as $i => $file) {
-                if (!$file || !$file->isValid()) continue;
-                $path = $file->store($base . '/gallery', $disk);
-                $out[] = ['path' => $path, 'order' => $startOrder + $i];
+            if ($path && Storage::disk($disk)->exists($path)) {
+                Storage::disk($disk)->delete($path);
             }
         }
-        $property->update(['gallery' => $out]);
+        usort($out, fn ($a, $b) => ($a['order'] ?? 0) <=> ($b['order'] ?? 0));
+        $updates['gallery'] = $out;
+
+        if (!empty($updates)) {
+            $property->update($updates);
+        }
+
+        if ($uploadToken) {
+            Storage::disk($disk)->deleteDirectory('properties/staging/' . $uploadToken);
+        }
+    }
+
+    protected function isAllowedMediaPath(string $path, int $propertyId, ?string $uploadToken): bool
+    {
+        if (str_starts_with($path, 'properties/' . $propertyId . '/')) {
+            return true;
+        }
+        if ($uploadToken && str_starts_with($path, 'properties/staging/' . $uploadToken . '/')) {
+            return true;
+        }
+        return false;
+    }
+
+    protected function finalizeMediaPath(string $path, int $propertyId, ?string $uploadToken): string
+    {
+        if (!$uploadToken || !str_starts_with($path, 'properties/staging/' . $uploadToken . '/')) {
+            return $path;
+        }
+
+        $relative = substr($path, strlen('properties/staging/' . $uploadToken . '/'));
+        $destDir = str_starts_with($relative, 'gallery/')
+            ? 'properties/' . $propertyId . '/gallery'
+            : 'properties/' . $propertyId . '/featured';
+        $filename = basename($path);
+        $newPath = $destDir . '/' . $filename;
+        Storage::disk('public')->makeDirectory($destDir);
+        if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->move($path, $newPath);
+        }
+        return $newPath;
     }
 
     protected function deletePropertyFiles(Property $property): void

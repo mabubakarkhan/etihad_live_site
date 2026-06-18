@@ -108,6 +108,14 @@
                                         <label for="youtube" class="block text-slate-700 dark:text-slate-300">YouTube</label>
                                         <input id="youtube" name="youtube" type="text" value="{{ old('youtube', $contactSetting->youtube ?? '') }}" placeholder="https://youtube.com/..." class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition" />
                                     </div>
+                                    <div class="space-y-1.5">
+                                        <label for="twitter" class="block text-slate-700 dark:text-slate-300">Twitter (X)</label>
+                                        <input id="twitter" name="twitter" type="text" value="{{ old('twitter', $contactSetting->twitter ?? '') }}" placeholder="https://x.com/... or https://twitter.com/..." class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition" />
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label for="tiktok" class="block text-slate-700 dark:text-slate-300">TikTok</label>
+                                        <input id="tiktok" name="tiktok" type="text" value="{{ old('tiktok', $contactSetting->tiktok ?? '') }}" placeholder="https://tiktok.com/@..." class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition" />
+                                    </div>
                                 </div>
                             </div>
 

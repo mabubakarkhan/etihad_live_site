@@ -1,0 +1,265 @@
+ETIHAD — DESIGNER IMAGE SIZE SHEET
+================================================================================
+Use these production export sizes. Format: WIDTHxHEIGHT (aspect ratio).
+
+Each entry lists:
+  • Production size (what to export)
+  • Storage path (under storage/app/public → URL /storage/…)
+  • Page / section
+  • Frontend display (CSS; may crop with object-fit: cover)
+
+Last updated: 2026-06-03 (project-new page, pricing place, invest image, portal ads)
+
+================================================================================
+A) HERO + FULL-WIDTH BANNERS
+================================================================================
+
+1) Portal Hero Slide (admin: Portal Hero)
+   Production:  1920x900 (64:30, ~2.13:1) — or wider (e.g. 2560x1200)
+   Storage:     portal-hero/{filename}
+   Page:        /portal home hero (full-bleed fade slider)
+   Display:     Full viewport background, cover, parallax
+   Safe area:   Center 1400x700 for headline overlap
+
+2) Dealer Page Banner (dealer banner_image)
+   Production:  1920x600 (16:5, 3.2:1)
+   Storage:     dealers/banners/{filename}
+   Page:        /dealer/{slug} hero (hero-section_sin)
+   Display:     Full-width parallax bg (height ~130% of section)
+   Safe area:   Center 1400x420
+
+3) CMS Page Hero Banner (cms_pages.banner_image)
+   Production:  1920x600 (16:5, 3.2:1)
+   Storage:     cms/banners/{filename}
+   Pages:       /projects, /team, /careers, /contact, legal pages, etc.
+   Display:     Same as dealer/CMS hero-section_sin
+   Safe area:   Center 1400x420
+
+4) Portal Ads — Properties + Dealers (admin: Portal Ads)
+   Production:  1600x450 (32:9, ~3.56:1)
+   Storage:     portal-ads/{filename}
+   Page:        /portal “Sell or Rent” + “Find a Trusted Agent” strips
+   Display:     Full card width, min-height 110px (128px mobile), object-fit cover
+   Safe area:   Left 240px + right 180px clear for title + CTA button (desktop)
+
+================================================================================
+B) DEALER IMAGES
+================================================================================
+
+5) Dealer Profile Picture (profile_pic)
+   Production:  400x400 (1:1)
+   Storage:     dealers/{filename}
+   Pages:       /dealer/{slug}, /portal agent carousel, listing card footer
+   Display:     Dealer page avatar 70x70 circle; portal agent card (responsive width);
+                 listing .gcf-company 40x40 circle
+   Note:        Keep face/subject centered for circle crops
+
+================================================================================
+C) LISTING / CARD IMAGES (projects + properties)
+================================================================================
+
+6) Project Featured Image (featured_image)
+   Production:  1920x1080 (16:9) — recommended for live project page hero
+                Alternate: 1200x800 (3:2) if same file used only on cards
+   Storage:     projects/{id}/featured/{filename}
+   Pages:       /project/{slug} (project-new hero + KFL building bg),
+                media strip fallback, OG image
+   Display:     Hero min-height calc(100vh - 86px), background-size cover;
+                media strip thumbs 150px height cover
+   Safe area:   Left 45% darker gradient — keep key subject right of center or full bleed
+
+7) Project Homepage Listing Image (homepage_listing_image)
+   Production:  1200x800 (3:2)
+   Storage:     projects/{id}/homepage/{filename}
+   Pages:       /portal project grid, /projects listing, admin thumbnails
+   Display:     .geodir-category-img_item height 320px (250px tablet), cover
+   Fallback:    Uses featured_image if homepage image empty
+
+8) Property Featured Image (featured_image)
+   Production:  1200x800 (3:2)
+   Storage:     properties/{id}/{filename}
+   Pages:       /listing, /property/{slug}, map cards, wishlist
+   Display:     Same listing card heights as (7); property gallery carousel
+
+9) Project Address Image (address_image) — legacy / admin
+   Production:  1200x800 (3:2)
+   Storage:     projects/{id}/address/{filename}
+   Page:        Admin preview only (not on project-new frontend)
+   Display:     N/A on live project-new
+
+================================================================================
+D) LOGOS (transparent PNG/WebP preferred)
+================================================================================
+
+10) Partner Logo (admin: Partners)
+    Production:  600x200 (3:1)
+    Storage:     partners/{filename}
+    Page:        /portal partners carousel
+    Display:     .client-item img aspect-ratio 6/2, contain, box ~110px tall
+
+11) Project Logo (logo — company/developer on old project layout)
+    Production:  600x200 (3:1) or 400x400 (1:1) if square mark
+    Storage:     projects/{id}/logo/{filename}
+    Page:        /project-old/{slug} developer block; admin list thumb
+    Display:     object-contain, varies (~80–120px wide)
+
+12) Project Developer Logo (developer_logo)
+    Production:  600x200 (3:1)
+    Storage:     projects/{id}/developer_logo/{filename}
+    Page:        Old project page / admin
+    Display:     max-h ~80px contain
+
+================================================================================
+E) GLOBAL TESTIMONIALS + PARTNERS (portal homepage)
+================================================================================
+
+13) Site Testimonial Avatar (admin: Testimonials — global model)
+    Production:  300x300 (1:1)
+    Storage:     testimonials/{filename}
+    Page:        /portal testimonials carousel
+    Display:     .testi-avatar 50x50 circle
+    Note:        Separate from project “Testimonials + Invest” tab (text only, no image)
+
+================================================================================
+F) PROJECT PAGE — NEW DESIGN (/project/{slug}, view: project-new)
+================================================================================
+
+14) Project Gallery Image (gallery_images[])
+    Production:  1600x1000 (8:5, 1.6:1)
+    Storage:     projects/{id}/gallery/{filename}
+    Page:        Media strip thumbnails, full-screen gallery modal
+    Display:     Strip: 150px height cover; modal: contain full viewport
+
+15) Pricing Place Card Image (pricing_place_images[])
+    Production:  1200x800 (3:2)
+    Storage:     projects/{id}/pricing-place/{filename}
+    Page:        “Pricing Place” slider cards
+    Display:     Image area min-height 200px (170px mobile), cover
+
+16) Project Plan Image (plan_images[])
+    Production:  1400x900 (14:9, ~1.56:1)
+    Storage:     projects/{id}/plans/{filename}
+    Page:        Plans grid + “View Plan” lightbox
+    Display:     Card min-height 220px (200px mobile) cover; modal max ~1200px wide contain
+
+17) Why Invest Background (invest_image)
+    Production:  1400x1000 (7:5, 1.4:1)
+    Storage:     projects/{id}/invest/{filename}
+    Page:        “Why Invest” panel (Testimonials + Invest section)
+    Display:     Absolute right 47% width, full height, cover
+    Safe area:   Important visual on RIGHT half (left has dark gradient + text)
+
+18) Project Testimonials (testimonial_items JSON)
+    Production:  N/A — quote, name, role only (no image upload)
+    Page:        Testimonials slider on project-new
+
+19) Featured Video + Video Gallery (videos[], featured_youtube_url)
+    Production:  N/A — YouTube/Vimeo URLs; thumbnails from YouTube API
+    Page:        Media strip, video gallery grid
+    Display:     Video cards min-height 180px; 4 columns desktop
+
+20) Project PDF (project_file_pdf)
+    Production:  N/A — PDF document, not an image
+    Storage:     projects/{id}/pdf/{filename}
+
+21) VR Tour
+    Production:  N/A — external vr_tour_url (+ SEO fields)
+    Page:        /project/{slug}/vr-tour (iframe); optional logo overlay max ~188x56px display
+
+22) Map embeds (iframe / Google Maps)
+    Production:  N/A
+    Display:     Highlights map popup; KFL location map 165px height;
+                 property/project old layout maps 400–450px height
+
+================================================================================
+G) PROJECT PAGE — OLD DESIGN (/project-old/{slug}, view: project)
+================================================================================
+
+23) Old Hero / Gallery (uses featured + gallery)
+    Display:     .project-rd-hero 500px height; gallery grid thumbs 110px height;
+                 plan/video sections per project-redesign.css
+
+24) NOC Planning Image (noc_planning_image) — old layout tab
+    Production:  1200x800 (3:2)
+    Storage:     projects/{id}/noc/{filename}
+    Page:        project-old NOC section (if enabled)
+    Display:     Responsive width, max ~48rem admin preview
+
+================================================================================
+H) PROPERTY DETAIL (/property/{slug})
+================================================================================
+
+25) Property Gallery Image (gallery_images[])
+    Production:  1600x1000 (8:5, 1.6:1)
+    Storage:     properties/{id}/gallery/{filename}
+    Page:        Image gallery grid, carousel
+    Display:     Grid minmax(280px, 1fr); full-width in carousel
+
+26) Property Map
+    Display:     #singleMap min-height 400px
+
+================================================================================
+I) LISTING GRID REFERENCE (shared CSS)
+================================================================================
+
+    .geodir-category-img_item     height 320px (desktop listing cards)
+    .geodir-category-img_item     height 250px (breakpoint in style.css)
+    .fw-listing-item2              height 270px (alternate layout)
+    Three-column grids:            /portal, /projects, /listing
+
+================================================================================
+J) STORAGE PATH QUICK REFERENCE
+================================================================================
+
+    portal-hero/                          Portal hero slides
+    portal-ads/                           Portal ad banners
+    dealers/                              Dealer profile pics
+    dealers/banners/                      Dealer page banners
+    cms/banners/                          CMS page heroes
+    partners/                             Partner logos
+    testimonials/                         Global testimonial avatars
+    projects/{id}/logo/
+    projects/{id}/featured/
+    projects/{id}/homepage/
+    projects/{id}/address/
+    projects/{id}/developer_logo/
+    projects/{id}/pdf/
+    projects/{id}/noc/
+    projects/{id}/plans/
+    projects/{id}/pricing-place/
+    projects/{id}/invest/
+    projects/{id}/gallery/
+    properties/{id}/                       Featured image
+    properties/{id}/gallery/               Property gallery
+    job-applications/                      CV uploads (documents, not images)
+
+================================================================================
+K) EXPORT RULES FOR DESIGNER
+================================================================================
+
+    Quality:        80–85% JPEG/WebP for photos
+    Color profile:  sRGB
+    File types:
+      • Photos / banners:     JPG or WebP
+      • Logos (transparency): PNG or WebP
+    Cropping:       Heroes and cards use object-fit: cover — keep subject in center
+                    safe zones listed above for text overlays
+    Retina:         Production widths above are minimums; 2x exports optional for logos
+    Max upload:     Portal hero 8 MB; most admin images 5 MB (server validation)
+
+================================================================================
+L) PAGE → PRIMARY IMAGE FIELDS
+================================================================================
+
+    /portal              Portal hero slides, portal ads, partners, global testimonials,
+                         project homepage_listing_image in grids
+    /project/{slug}      featured_image, gallery, pricing_place, plans, invest_image,
+                         videos (URLs)
+    /project-old/{slug}  Same uploads + noc_planning_image, logo, developer_logo
+    /property/{slug}     featured_image, gallery
+    /listing             property featured_image
+    /projects            homepage_listing_image or featured_image
+    /dealer/{slug}       banner_image, profile_pic
+    /team, /careers, …   CMS banner_image
+
+END

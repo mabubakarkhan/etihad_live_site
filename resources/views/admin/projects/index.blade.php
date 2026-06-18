@@ -21,11 +21,13 @@
                         @include('admin.partials.theme-toggle')
                         <a href="{{ route('admin.profile.show') }}" class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition">My profile</a>
                         <a href="{{ route('admin.project_types.index') }}" class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition">Project types</a>
+                        <a href="{{ route('admin.sort-order.index', ['tab' => 'projects']) }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-violet-500/50 text-violet-700 dark:text-violet-300 hover:bg-violet-500/10 transition">Sort order</a>
                         <a href="{{ route('admin.projects.create') }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition shadow shadow-emerald-500/40">Add project</a>
                         <form method="POST" action="{{ route('admin.logout') }}" class="inline-flex">@csrf<button type="submit" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition">Logout</button></form>
                     </div>
                 </header>
                 <section class="px-6 md:px-8 py-6 md:py-8 space-y-4">
+                    @php use App\Support\ProjectEditSections; @endphp
                     @if (session('status'))
                         <div class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">{{ session('status') }}</div>
                     @endif
@@ -67,6 +69,7 @@
                                     <th class="px-4 py-2 text-left">Type</th>
                                     <th class="px-4 py-2 text-left">Price</th>
                                     <th class="px-4 py-2 text-left">City</th>
+                                    <th class="px-4 py-2 text-left min-w-[200px]">Sections</th>
                                     <th class="px-4 py-2 text-left">Actions</th>
                                 </tr>
                             </thead>
@@ -109,6 +112,13 @@
                                         </td>
                                         <td class="px-4 py-2 text-slate-700 dark:text-slate-300">{{ $project->price ?? '—' }}</td>
                                         <td class="px-4 py-2 text-slate-700 dark:text-slate-300">{{ $project->city ?? '—' }}</td>
+                                        <td class="px-4 py-2">
+                                            <div class="flex flex-wrap gap-1 max-w-md">
+                                                @foreach(ProjectEditSections::all() as $slug => $meta)
+                                                    <a href="{{ route('admin.projects.edit-section', [$project, $slug]) }}" class="text-[10px] leading-tight px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">{{ $meta['label'] }}</a>
+                                                @endforeach
+                                            </div>
+                                        </td>
                                         <td class="px-4 py-2 text-left">
                                             <a href="{{ route('admin.projects.preview', $project) }}" target="_blank" rel="noopener noreferrer" class="text-[11px] px-2 py-1 rounded border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">View</a>
                                             <a href="{{ route('project.show', $project->slug) }}" target="_blank" rel="noopener noreferrer" class="text-[11px] px-2 py-1 rounded border border-sky-400 dark:border-sky-600 text-sky-700 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-sky-900/30 bg-sky-50/80 dark:bg-sky-900/20">Live</a>
@@ -118,7 +128,7 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <tr data-empty><td colspan="7" class="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-500">No projects yet. <a href="{{ route('admin.projects.create') }}" class="text-emerald-600 dark:text-emerald-400">Create one</a>.</td></tr>
+                                    <tr data-empty><td colspan="8" class="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-500">No projects yet. <a href="{{ route('admin.projects.create') }}" class="text-emerald-600 dark:text-emerald-400">Create one</a>.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>

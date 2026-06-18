@@ -18,6 +18,8 @@ class ContactSetting extends Model
         'instagram',
         'linkedin',
         'youtube',
+        'twitter',
+        'tiktok',
     ];
 
     protected function casts(): array
@@ -49,6 +51,8 @@ class ContactSetting extends Model
             'instagram' => null,
             'linkedin' => null,
             'youtube' => null,
+            'twitter' => null,
+            'tiktok' => null,
         ]);
     }
 }

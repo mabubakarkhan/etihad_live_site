@@ -18,6 +18,8 @@ class PropertyRequest extends Model
         'name',
         'phone',
         'email',
+        'property_type',
+        'budget',
         'message',
         'status',
     ];

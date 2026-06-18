@@ -101,6 +101,8 @@
                                     <th class="px-4 py-2 text-left">Listing / Dealer</th>
                                     @else
                                     <th class="px-4 py-2 text-left">Project</th>
+                                    <th class="px-4 py-2 text-left">Property type</th>
+                                    <th class="px-4 py-2 text-left">Budget</th>
                                     @endif
                                     <th class="px-4 py-2 text-left">Name</th>
                                     <th class="px-4 py-2 text-left">Contact</th>
@@ -138,6 +140,8 @@
                                             —
                                         @endif
                                     </td>
+                                    <td class="px-4 py-2 text-slate-600 dark:text-slate-400">{{ $req->property_type ?? '—' }}</td>
+                                    <td class="px-4 py-2 text-slate-600 dark:text-slate-400">{{ $req->budget ?? '—' }}</td>
                                     @endif
                                     <td class="px-4 py-2 text-slate-800 dark:text-slate-200 font-medium">{{ $req->name }}</td>
                                     <td class="px-4 py-2 text-slate-600 dark:text-slate-400">
@@ -150,7 +154,7 @@
                                 </tr>
                                 @empty
                                 <tr data-empty>
-                                    <td colspan="{{ $source === 'property' ? 8 : 7 }}" class="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-500">
+                                    <td colspan="{{ $source === 'property' ? 8 : 9 }}" class="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-500">
                                         @if(!empty($filterStatus) || !empty($filterType) || !empty($filterFromDate) || !empty($filterToDate) || !empty($filterSearch))
                                             No requests matching your filters.
                                         @else

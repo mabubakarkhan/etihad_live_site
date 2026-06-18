@@ -1,0 +1,537 @@
+/* Sell / Rent property landing — Etihad brand */
+.sell-property-page {
+    --etihad-gold: #c89b3c;
+    --etihad-gold-dark: #a9823d;
+    --etihad-gold-light: #fdf8ef;
+    --etihad-gold-muted: rgba(200, 155, 60, 0.14);
+    --sell-form-sticky-top: clamp(88px, 10vh, 110px);
+
+    background: #f8f6f2;
+    padding: clamp(28px, 4vh, 48px) 0 clamp(40px, 5vh, 64px);
+    text-align: left;
+}
+
+.sell-property-page__layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "scroll form";
+    gap: clamp(28px, 4vw, 48px);
+    align-items: stretch;
+    width: min(100% - 48px, 1320px);
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 clamp(16px, 3vw, 32px);
+    box-sizing: border-box;
+}
+
+.sell-property-page__scroll {
+    grid-area: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: clamp(32px, 4vh, 48px);
+    min-width: 0;
+    width: 100%;
+}
+
+.sell-property-page__form-col {
+    grid-area: form;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    width: 100%;
+    align-self: stretch;
+}
+
+.sell-property-page__form-stick {
+    position: sticky;
+    top: var(--sell-form-sticky-top);
+    z-index: 6;
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+    align-self: flex-start;
+}
+
+.sell-property-hero__title {
+    margin: 0 0 12px;
+    font-size: clamp(1.75rem, 3.2vw, 2.45rem);
+    font-weight: 800;
+    line-height: 1.15;
+    color: #0f172a;
+    max-width: none;
+    text-align: left;
+}
+
+.sell-property-hero__lead {
+    margin: 0 0 24px;
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: #475569;
+    max-width: 36rem;
+    text-align: left;
+}
+
+.sell-property-hero__illus {
+    margin-top: 8px;
+    width: 100%;
+    max-width: 520px;
+}
+
+.sell-property-hero__visual {
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    min-height: 200px;
+    max-height: 280px;
+    object-fit: cover;
+    object-position: left center;
+    border-radius: 14px;
+    box-shadow: 0 14px 36px rgba(15, 23, 42, 0.12);
+}
+
+.sell-property-hero__visual--placeholder {
+    background:
+        linear-gradient(135deg, rgba(200, 155, 60, 0.18) 0%, rgba(169, 130, 61, 0.08) 45%, rgba(248, 246, 242, 0.9) 100%),
+        repeating-linear-gradient(-45deg, rgba(200, 155, 60, 0.06) 0, rgba(200, 155, 60, 0.06) 2px, transparent 2px, transparent 14px);
+}
+
+.sell-property-block__title {
+    margin: 0 0 16px;
+    font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+    font-weight: 800;
+    line-height: 1.28;
+    color: #0f172a;
+    max-width: none;
+    text-align: left;
+}
+
+.sell-property-block__copy {
+    margin: 14px 0 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: #64748b;
+    max-width: 36rem;
+    text-align: left;
+}
+
+.sell-property-valuation__card {
+    padding: 18px 20px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+    width: 100%;
+    max-width: 100%;
+}
+
+.sell-property-valuation__head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.sell-property-valuation__price {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--etihad-gold-dark);
+}
+
+.sell-property-valuation__badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--etihad-gold-light);
+    color: var(--etihad-gold-dark);
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.sell-property-valuation__meta {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+    font-size: 0.88rem;
+    color: #475569;
+    line-height: 1.7;
+}
+
+.sell-property-valuation__meta .is-up {
+    color: var(--etihad-gold-dark);
+    font-weight: 600;
+}
+
+.sell-property-valuation__chart {
+    height: 120px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--etihad-gold-light);
+}
+
+.sell-property-valuation__chart img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.sell-property-valuation__chart-placeholder {
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(180deg, rgba(200, 155, 60, 0.22) 0%, rgba(200, 155, 60, 0.04) 72%, transparent 100%),
+        repeating-linear-gradient(90deg, rgba(169, 130, 61, 0.08) 0, rgba(169, 130, 61, 0.08) 1px, transparent 1px, transparent 40px);
+}
+
+.sell-property-transactions__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.sell-property-transactions__stats article {
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+}
+
+.sell-property-transactions__stats span {
+    display: block;
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.sell-property-transactions__stats strong {
+    display: block;
+    font-size: 1.1rem;
+    color: #0f172a;
+}
+
+.sell-property-transactions__stats em {
+    font-style: normal;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.sell-property-transactions__stats em.is-up {
+    color: var(--etihad-gold-dark);
+}
+
+.sell-property-transactions__table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    width: 100%;
+}
+
+.sell-property-transactions__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+}
+
+.sell-property-transactions__table th,
+.sell-property-transactions__table td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.sell-property-transactions__table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.sell-property-faqs__list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+}
+
+.sell-property-faq {
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.sell-property-faq summary {
+    padding: 14px 18px;
+    font-weight: 700;
+    color: #0f172a;
+    cursor: pointer;
+    list-style: none;
+}
+
+.sell-property-faq summary::-webkit-details-marker {
+    display: none;
+}
+
+.sell-property-block,
+.sell-property-hero,
+.sell-property-faqs {
+    width: 100%;
+}
+
+.sell-property-faq p {
+    margin: 0;
+    padding: 0 18px 16px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #64748b;
+}
+
+/* Form card — compact, no inner scroll */
+.sell-property-form-card {
+    width: 100%;
+    padding: 18px 18px 16px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
+.sell-property-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+}
+
+.sell-property-form__label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0f172a;
+    text-align: left;
+}
+
+.sell-property-form__group {
+    margin: 0;
+}
+
+.sell-property-form__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.sell-property-form__row--contact {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sell-property-form__toggle {
+    display: grid;
+    gap: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+    background: #f8fafc;
+}
+
+.sell-property-form__toggle--2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.sell-property-form__pill {
+    margin: 0;
+    cursor: pointer;
+}
+
+.sell-property-form__pill input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sell-property-form__pill span {
+    display: block;
+    padding: 8px 10px;
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #475569;
+    transition: background 0.2s, color 0.2s;
+}
+
+.sell-property-form__pill.is-active span,
+.sell-property-form__pill:has(input:checked) span {
+    background: var(--etihad-gold-light);
+    color: var(--etihad-gold-dark);
+}
+
+.sell-property-form__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.sell-property-form__chip {
+    margin: 0;
+    cursor: pointer;
+}
+
+.sell-property-form__chip input {
+    position: absolute;
+    opacity: 0;
+}
+
+.sell-property-form__chip span {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    font-size: 0.74rem;
+    color: #475569;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.sell-property-form__chip:has(input:checked) span {
+    border-color: var(--etihad-gold);
+    background: var(--etihad-gold-light);
+    color: var(--etihad-gold-dark);
+    font-weight: 600;
+}
+
+.sell-property-form__input,
+.sell-property-form__input-icon input,
+.sell-property-form select.sell-property-form__input {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    padding: 9px 10px;
+    font-size: 0.82rem;
+    color: #0f172a;
+    font-family: inherit;
+}
+
+.sell-property-form__input-icon {
+    position: relative;
+}
+
+.sell-property-form__input-icon i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--etihad-gold);
+    opacity: 0.75;
+    font-size: 0.9rem;
+}
+
+.sell-property-form__input-icon input {
+    padding-left: 36px;
+}
+
+.sell-property-form__input:focus,
+.sell-property-form__input-icon input:focus,
+.sell-property-form select:focus {
+    outline: none;
+    border-color: var(--etihad-gold);
+    box-shadow: 0 0 0 3px var(--etihad-gold-muted);
+}
+
+.sell-property-form__msg {
+    font-size: 0.84rem;
+    line-height: 1.45;
+    min-height: 1.2em;
+}
+
+.sell-property-form__msg.is-success {
+    color: var(--etihad-gold-dark);
+}
+
+.sell-property-form__msg.is-error {
+    color: #b91c1c;
+}
+
+.sell-property-form__submit {
+    width: 100%;
+    border: 0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, #d4a84a 0%, var(--etihad-gold) 55%, var(--etihad-gold-dark) 100%);
+    box-shadow: 0 10px 24px rgba(200, 155, 60, 0.28);
+    transition: opacity 0.2s, transform 0.2s, filter 0.2s;
+    margin-top: 2px;
+}
+
+.sell-property-form__submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.03);
+}
+
+.sell-property-form__submit:disabled {
+    opacity: 0.72;
+    cursor: wait;
+}
+
+.sell-property-form__submit-loading[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 991px) {
+    .sell-property-page__layout {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "form"
+            "scroll";
+        width: min(100% - 24px, 1280px);
+    }
+
+    .sell-property-page__form-stick {
+        position: static;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .sell-property-hero__title {
+        max-width: none;
+    }
+
+    .sell-property-block__title {
+        max-width: none;
+    }
+
+    .sell-property-transactions__stats {
+        grid-template-columns: 1fr;
+    }
+
+    .sell-property-form__row,
+    .sell-property-form__row--contact {
+        grid-template-columns: 1fr;
+    }
+
+    .sell-property-hero__illus {
+        max-width: none;
+    }
+
+    .sell-property-hero__visual {
+        max-width: none;
+        max-height: 240px;
+    }
+}

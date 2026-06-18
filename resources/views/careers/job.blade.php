@@ -6,42 +6,17 @@
     $subheading = trim(implode(' · ', array_filter([$career->department, $career->location, $career->employment_type])));
 @endphp
 @section('title', $jobTitle)
-@if($career->meta_description)
+
 @push('meta')
-<meta name="description" content="{{ e($career->meta_description) }}">
-@if(!empty($career->meta_keywords))<meta name="keywords" content="{{ e($career->meta_keywords) }}">@endif
-@if(!empty($career->canonical_url))<link rel="canonical" href="{{ e($career->canonical_url) }}">@endif
+@include('partials.seo-meta', ['seo' => seo_from_record($career, [
+    'title' => $jobTitle,
+    'canonical' => url()->current(),
+    'image' => $bannerImage,
+])])
 @endpush
-@endif
 
 @push('styles')
-<style>
-.career-job-page .job-description-section { text-align: left; }
-.career-job-page .job-description-section .boxed-content-title { text-align: left; }
-.career-job-page .job-description { font-size: 15px; line-height: 1.85; color: #334155; text-align: left; }
-.career-job-page .job-description p { margin-bottom: 12px; }
-.career-job-page .job-meta-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.career-job-page .job-meta-item { display: flex; gap: 10px; align-items: flex-start; color: #475569; font-size: 13px; }
-.career-job-page .job-meta-item i { color: var(--theme-color, #e85d04); margin-top: 2px; width: 18px; text-align: center; }
-.career-job-page .job-meta-item strong { color: #0f172a; font-weight: 700; margin-right: 6px; }
-.career-job-page .job-status-wrap { text-align: left; margin-bottom: 12px; }
-.career-job-page .job-status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-.career-job-page .job-status-pill.status-open { background: rgba(34, 197, 94, .15); border: 1px solid rgba(34, 197, 94, .35); color: #15803d; }
-.career-job-page .job-status-pill.status-closed { background: rgba(100, 116, 139, .15); border: 1px solid rgba(100, 116, 139, .3); color: #475569; }
-.career-job-page .job-status-pill.status-draft { background: rgba(245, 158, 11, .15); border: 1px solid rgba(245, 158, 11, .35); color: #b45309; }
-.career-job-page .job-apply-box { text-align: left; }
-.career-job-page .job-apply-msg { margin-top: 10px; padding: 10px; border-radius: 8px; display: none; }
-.career-job-page .job-apply-msg.success { background: #dcfce7; color: #166534; display: block; }
-.career-job-page .job-apply-msg.error { background: #fee2e2; color: #991b1b; display: block; }
-.career-job-page .job-cv-email { margin-bottom: 12px; }
-.career-job-page .job-cv-email a { color: var(--theme-color, #e85d04); font-weight: 600; }
-.career-job-page .custom-form .cs-intputwrap input[type="file"] { width: 100%; padding: 10px; border: 1px solid #eee; background: #f9f9f9; border-radius: 4px; font-size: 14px; }
-/* OR separator: bigger, centered, line stops at OR then continues */
-.career-job-page .job-or-separator { display: flex; align-items: center; justify-content: center; gap: 0; margin: 18px 0; text-align: center; }
-.career-job-page .job-or-separator::before,
-.career-job-page .job-or-separator::after { content: ''; flex: 1; max-width: 120px; height: 1px; background: #ddd; }
-.career-job-page .job-or-separator span { padding: 0 20px; font-size: 1.35rem; font-weight: 800; letter-spacing: 0.08em; color: #64748b; white-space: nowrap; }
-</style>
+<link rel="stylesheet" href="{{ asset('theme/css/pages/careers-job.css') }}">
 @endpush
 
 @push('scripts')
@@ -91,7 +66,7 @@
                         <div class="container">
                             <div class="hero-section-container">
                                 <div class="hero-section-title">
-                                    <h2>{{ $career->title }}</h2>
+                                    <h1>{{ $career->title }}</h1>
                                     @if($subheading)<h5>{{ $subheading }}</h5>@endif
                                 </div>
                             </div>
@@ -166,7 +141,7 @@
                                             @endif
                                             @if($career->status === 'active')
                                             <div class="job-or-separator"><span>OR</span></div>
-                                            <p style="margin-bottom: 14px;">Use the form below to submit your application.</p>
+                                            <p class="career-apply-intro">Use the form below to submit your application.</p>
                                             <div class="custom-form property-request-form no-icons" id="job_apply_cf">
                                                 <form id="job-apply-form" action="{{ route('careers.apply', $career->slug) }}" method="post" enctype="multipart/form-data">
                                                     @csrf
@@ -200,7 +175,7 @@
                                             </div>
                                             @endif
                                             @if($career->apply_url && $career->status !== 'active')
-                                            <p style="margin-top: 12px;"><a href="{{ e($career->apply_url) }}" class="commentssubmit commentssubmit_fw"><i class="fa-light fa-arrow-up-right-from-square"></i> Apply online</a></p>
+                                            <p class="career-apply-external"><a href="{{ e($career->apply_url) }}" class="commentssubmit commentssubmit_fw"><i class="fa-light fa-arrow-up-right-from-square"></i> Apply online</a></p>
                                             @endif
                                         </div>
                                     </div>
@@ -212,11 +187,12 @@
                 </div>
                 <div class="to_top-btn-wrap">
                     <div class="to-top to-top_btn"><span>Back to top</span> <i class="fa-solid fa-arrow-up"></i></div>
-                    <div class="svg-corner svg-corner_white" style="top:0;left: -40px; transform: rotate(-90deg)"></div>
-                    <div class="svg-corner svg-corner_white" style="top:0;right: -40px; transform: rotate(-180deg)"></div>
+                    <div class="svg-corner svg-corner_white hero-corner-tl"></div>
+                    <div class="svg-corner svg-corner_white hero-corner-tr"></div>
                 </div>
             </div>
         </div>
+
         @include('partials.footer')
     </div>
     @include('partials.theme-panels')

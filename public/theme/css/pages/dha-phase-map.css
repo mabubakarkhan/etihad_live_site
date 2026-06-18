@@ -1,0 +1,88 @@
+/* DHA phase — dedicated map page */
+.dha-phase-map-page {
+    padding: clamp(28px, 4vh, 48px) clamp(20px, 5vw, 88px) clamp(40px, 5vh, 64px);
+    background: #f8f6f2;
+    font-family: 'Poppins', sans-serif;
+}
+
+.dha-phase-map-page__head {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+}
+
+.dha-phase-map-page__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #a9823d;
+    text-decoration: none;
+}
+
+.dha-phase-map-page__back:hover {
+    color: #c89b3c;
+}
+
+.dha-phase-map-page__title {
+    margin: 0;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+    font-weight: 600;
+    color: #0f172a;
+    text-align: left;
+}
+
+.dha-phase-map-page__frame {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(200, 155, 60, 0.28);
+    box-shadow: 0 14px 36px rgba(15, 23, 42, 0.1);
+    background: #fff;
+}
+
+.dha-phase-map-page__frame iframe {
+    display: block;
+    width: 100%;
+    min-height: min(520px, 62vh);
+    border: 0;
+}
+
+.dha-phase-map-page__plots {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.dha-phase-map-page__plot {
+    margin: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(200, 155, 60, 0.22);
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+.dha-phase-map-page__plot figcaption {
+    padding: 10px 14px 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.dha-phase-map-page__plot a {
+    display: block;
+}
+
+.dha-phase-map-page__plot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    object-fit: cover;
+}

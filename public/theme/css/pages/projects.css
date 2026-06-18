@@ -1,0 +1,38 @@
+.projects-listing .listing-item-container.three-columns-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 1200px) {
+    .projects-listing .listing-item-container.three-columns-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+    .projects-listing .listing-item-container.three-columns-grid { grid-template-columns: 1fr; }
+}
+.projects-listing .geodir-category-img .bg { background-size: cover; background-position: center; }
+/* Project card footer: company left, View Details right, vertically centered in one row */
+.projects-listing .geodir-category-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.projects-listing .geodir-category-footer .gcf-company {
+    float: none;
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+}
+.projects-listing .geodir-category-footer .gcf-company img {
+    float: none;
+    margin-right: 8px;
+}
+.projects-listing .geodir-category-footer .gcf-company span {
+    float: none;
+    top: 0;
+    position: relative;
+}
+.projects-listing .geodir-category-footer .gid_link {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+}

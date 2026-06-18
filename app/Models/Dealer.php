@@ -15,6 +15,8 @@ class Dealer extends Model
         'name',
         'slug',
         'status',
+        'show_homepage',
+        'show_homepage_ad',
         'email',
         'phone',
         'whatsapp',
@@ -31,6 +33,11 @@ class Dealer extends Model
         'banner_image',
     ];
 
+    protected $casts = [
+        'show_homepage' => 'boolean',
+        'show_homepage_ad' => 'boolean',
+    ];
+
     public function properties(): HasMany
     {
         return $this->hasMany(Property::class, 'dealer_id');
@@ -44,6 +51,11 @@ class Dealer extends Model
     public function scopeActive($query)
     {
         return $query->where('status', self::STATUS_ACTIVE);
+    }
+
+    public function profileUrl(): ?string
+    {
+        return $this->slug ? route('dealer.show', $this->slug) : null;
     }
 
     public static function booted(): void

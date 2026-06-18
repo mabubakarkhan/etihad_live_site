@@ -4,11 +4,14 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{{ ($cmsPage && $cmsPage->meta_title) ? $cmsPage->meta_title : config('app.name') }}</title>
-        @if($cmsPage ?? null)
-        @if(!empty($cmsPage->meta_description))<meta name="description" content="{{ e($cmsPage->meta_description) }}">@endif
-        @if(!empty($cmsPage->meta_keywords))<meta name="keywords" content="{{ e($cmsPage->meta_keywords) }}">@endif
-        @if(!empty($cmsPage->canonical_url))<link rel="canonical" href="{{ e($cmsPage->canonical_url) }}">@endif
-        @endif
+        @php
+            $homeTitle = ($cmsPage && $cmsPage->meta_title) ? $cmsPage->meta_title : config('app.name');
+            $homeSeo = seo_from_record($cmsPage ?? null, [
+                'title' => $homeTitle,
+                'canonical' => url('/'),
+            ]);
+        @endphp
+        @include('partials.seo-meta', ['seo' => $homeSeo])
     </head>
     <body style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; padding: 0; background: #f5f5f5;">
         <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">

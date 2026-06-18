@@ -35,6 +35,7 @@
                     @if (session('status'))
                         <div class="mb-4 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">{{ session('status') }}</div>
                     @endif
+                    <div id="form-success-top" class="mb-4 hidden rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-800 dark:text-emerald-200" role="status"></div>
                     <div id="form-errors-top" class="mb-4 hidden rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-800 dark:text-rose-200" role="alert">
                         <p class="font-medium mb-1">Please fix the following:</p>
                         <ul id="form-errors-list" class="list-disc list-inside space-y-0.5"></ul>
@@ -46,6 +47,7 @@
                                 'slug' => ['tab' => 'tab-basics', 'name' => 'Basics'],
                                 'status' => ['tab' => 'tab-status', 'name' => 'Status'],
                                 'price' => ['tab' => 'tab-basics', 'name' => 'Basics'],
+                                'launch_year' => ['tab' => 'tab-basics', 'name' => 'Basics'],
                                 'description' => ['tab' => 'tab-basics', 'name' => 'Basics'],
                                 'project_type_ids' => ['tab' => 'tab-basics', 'name' => 'Basics'],
                                 'state' => ['tab' => 'tab-address', 'name' => 'Address'],
@@ -61,8 +63,13 @@
                                 'featured_youtube_url' => ['tab' => 'tab-featured-video', 'name' => 'Featured video'],
                                 'featured_video_title' => ['tab' => 'tab-featured-video', 'name' => 'Featured video'],
                                 'featured_video_description' => ['tab' => 'tab-featured-video', 'name' => 'Featured video'],
+                                'vr_tour_url' => ['tab' => 'tab-vr-tour', 'name' => 'VR Tour'],
+                                'vr_tour_meta_title' => ['tab' => 'tab-vr-tour', 'name' => 'VR Tour'],
+                                'vr_tour_meta_description' => ['tab' => 'tab-vr-tour', 'name' => 'VR Tour'],
+                                'vr_tour_meta_keywords' => ['tab' => 'tab-vr-tour', 'name' => 'VR Tour'],
+                                'vr_tour_canonical_url' => ['tab' => 'tab-vr-tour', 'name' => 'VR Tour'],
                                 'about_developers' => ['tab' => 'tab-about', 'name' => 'About developers'],
-                                'project_file_pdf' => ['tab' => 'tab-pdf', 'name' => 'Project file (PDF)'],
+                                'project_file_pdf' => ['tab' => 'tab-media', 'name' => 'Brochure PDF'],
                                 'noc_planning_content' => ['tab' => 'tab-noc', 'name' => 'NOC & planning'],
                                 'noc_planning_image' => ['tab' => 'tab-noc', 'name' => 'NOC & planning'],
                                 'future_note_title' => ['tab' => 'tab-future-note', 'name' => 'Future note'],
@@ -90,7 +97,9 @@
                             </ul>
                         </div>
                     @endif
-                    <form method="POST" action="{{ route('admin.projects.update', $project) }}" enctype="multipart/form-data" id="project-form">
+                    <form method="POST" action="{{ route('admin.projects.update', $project) }}" id="project-form"
+                        data-upload-url="{{ route('admin.projects.upload-media') }}"
+                        data-project-id="{{ $project->id }}">
                         @csrf
                         @method('PUT')
                         <div class="mb-6 flex flex-wrap items-center gap-3">
@@ -102,6 +111,7 @@
                 </section>
             </main>
         </div>
+        <script src="{{ asset('theme/js/admin-project-media.js') }}"></script>
         @include('admin.projects._form_scripts')
     </body>
 </html>

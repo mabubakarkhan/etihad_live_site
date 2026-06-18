@@ -1,0 +1,13 @@
+Client Changelog - Today
+
+- Improved the project detail page experience with better visual balance, cleaner layout flow, and refined content presentation.
+- Enhanced the hero area for better readability and smoother interaction, including improved image behavior and action visibility.
+- Fixed the location map display issue so project location now appears correctly on the page.
+- Restored and improved the video area presentation to make project videos easier to browse and view.
+- Added a more attractive video gallery style with cleaner cards and clearer play actions.
+- Fixed video gallery visibility for all saved video entries, including multiple items entered in admin.
+- Ensured all video items entered in the admin panel now appear correctly on the live project page.
+- Improved popup interaction details for better usability, including consistent pointer behavior on close controls.
+- Refined overall section spacing and visual consistency to give the page a more polished, premium look.
+- Kept the original comparison version of the project page available while continuing improvements on the new page.
+- Updated internal daily change tracking so today’s updates are clearly organized for review and sharing.

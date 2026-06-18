@@ -28,6 +28,8 @@ class ContactSettingsController extends Controller
             'instagram' => ['nullable', 'string', 'max:500'],
             'linkedin' => ['nullable', 'string', 'max:500'],
             'youtube' => ['nullable', 'string', 'max:500'],
+            'twitter' => ['nullable', 'string', 'max:500'],
+            'tiktok' => ['nullable', 'string', 'max:500'],
         ]);
 
         $contactSetting = ContactSetting::instance();

@@ -1,3 +1,6 @@
+{{-- Block search engines from indexing any admin URL (login, dashboard, CRUD, previews). --}}
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+
 {{-- Theme: runs first so no flash. Cookie: admin_theme = "light" | "dark". Default: dark. --}}
 <script>
     (function() {

@@ -1,0 +1,36 @@
+/* DHA main page — align sections with hero caption inset + footer reveal */
+.dha-main-page .dha-main-lux-flow {
+    --dha-content-pad-x: clamp(20px, 5vw, 88px);
+}
+
+.dha-main-page .dha-main-lux-flow .container,
+.dha-main-page .dha-main-sections > .container,
+.dha-main-page .dha-main-cta-banner__inner.container {
+    width: auto;
+    max-width: none;
+    margin-left: var(--dha-content-pad-x);
+    margin-right: var(--dha-content-pad-x);
+}
+
+.dha-main-page .dha-main-stats-strip__inner {
+    width: auto;
+    max-width: none;
+    margin-left: var(--dha-content-pad-x);
+    margin-right: var(--dha-content-pad-x);
+}
+
+#main:has(.dha-main-page) .wrapper > .content {
+    position: relative;
+    z-index: 3;
+    background: var(--dha-main-dark, #060d18) !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+#main:has(.dha-main-page) .wrapper {
+    background: var(--dha-main-dark, #060d18);
+}
+
+.dha-main-page-footer-tab {
+    display: none !important;
+}

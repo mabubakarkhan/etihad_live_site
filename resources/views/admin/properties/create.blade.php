@@ -52,6 +52,7 @@
                                 'description' => ['tab' => 'tab-basic', 'name' => 'Basic'],
                                 'status' => ['tab' => 'tab-status', 'name' => 'Status'],
                                 'featured_image' => ['tab' => 'tab-featured-image', 'name' => 'Featured image'],
+                                'featured_image_path' => ['tab' => 'tab-featured-image', 'name' => 'Featured image'],
                                 'state' => ['tab' => 'tab-address', 'name' => 'Address'],
                                 'city' => ['tab' => 'tab-address', 'name' => 'Address'],
                                 'address' => ['tab' => 'tab-address', 'name' => 'Address'],
@@ -98,7 +99,9 @@
                             <a href="{{ route('admin.dealers.create') }}" class="inline-flex mt-3 items-center rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400">Add dealer</a>
                         </div>
                     @else
-                    <form method="POST" action="{{ route($routePrefix . '.store') }}" enctype="multipart/form-data" id="property-form">
+                    <form method="POST" action="{{ route($routePrefix . '.store') }}" id="property-form"
+                        data-upload-url="{{ route($routePrefix . '.upload-media') }}"
+                        data-property-id="">
                         @csrf
                         <div class="mb-6 flex flex-wrap items-center gap-3">
                             <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition">Create listing</button>
@@ -110,6 +113,7 @@
                 </section>
             </main>
         </div>
+        <script src="{{ asset('theme/js/admin-property-media.js') }}"></script>
         @include('admin.properties._form_scripts')
     </body>
 </html>

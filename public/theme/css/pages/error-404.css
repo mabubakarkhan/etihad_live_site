@@ -1,0 +1,24 @@
+.error-page-main { margin-top: 30px; margin-bottom: 60px; }
+.error-page-inner { text-align: center; padding: 50px 30px 60px; }
+.error-page-code {
+    font-size: 120px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--main-color, #EE7838);
+    margin-bottom: 16px;
+}
+.error-page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1e1e1e;
+    margin: 0 0 12px;
+}
+.error-page-text {
+    font-size: 1rem;
+    color: #5e646a;
+    margin: 0 auto 28px;
+    max-width: 480px;
+}
+@media (max-width: 768px) {
+    .error-page-code { font-size: 72px; }
+}

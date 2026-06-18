@@ -39,8 +39,24 @@
                                     <option value="inactive" {{ ($filterStatus ?? '') === 'inactive' ? 'selected' : '' }}>Inactive</option>
                                 </select>
                             </div>
+                            <div class="space-y-1">
+                                <label for="filter-show-homepage" class="block text-xs font-medium text-slate-500 dark:text-slate-400">Show Homepage</label>
+                                <select id="filter-show-homepage" name="show_homepage" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100">
+                                    <option value="">All</option>
+                                    <option value="yes" {{ ($filterShowHomepage ?? '') === 'yes' ? 'selected' : '' }}>Yes</option>
+                                    <option value="no" {{ ($filterShowHomepage ?? '') === 'no' ? 'selected' : '' }}>No</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label for="filter-show-homepage-ad" class="block text-xs font-medium text-slate-500 dark:text-slate-400">Homepage Ad</label>
+                                <select id="filter-show-homepage-ad" name="show_homepage_ad" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100">
+                                    <option value="">All</option>
+                                    <option value="yes" {{ ($filterShowHomepageAd ?? '') === 'yes' ? 'selected' : '' }}>Yes</option>
+                                    <option value="no" {{ ($filterShowHomepageAd ?? '') === 'no' ? 'selected' : '' }}>No</option>
+                                </select>
+                            </div>
                             <button type="submit" class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400 transition">Apply</button>
-                            @if (!empty($filterStatus))
+                            @if (!empty($filterStatus) || !empty($filterShowHomepage) || !empty($filterShowHomepageAd))
                                 <a href="{{ route('admin.dealers.index') }}" class="rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Clear</a>
                             @endif
                         </form>
@@ -52,6 +68,8 @@
                                     <th class="px-4 py-2 text-left w-14">Photo</th>
                                     <th class="px-4 py-2 text-left">Name</th>
                                     <th class="px-4 py-2 text-left">Status</th>
+                                    <th class="px-4 py-2 text-left">Homepage</th>
+                                    <th class="px-4 py-2 text-left">Homepage Ad</th>
                                     <th class="px-4 py-2 text-left">Email / Phone</th>
                                     <th class="px-4 py-2 text-left">City / State</th>
                                     <th class="px-4 py-2 text-left">Properties</th>
@@ -77,6 +95,20 @@
                                                 <a href="{{ route('admin.dealers.index', ['status' => 'inactive']) }}" class="inline-flex items-center rounded-full bg-slate-400/20 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:text-slate-400 border border-slate-400/30 hover:opacity-90">Inactive</a>
                                             @endif
                                         </td>
+                                        <td class="px-4 py-2">
+                                            @if($dealer->show_homepage)
+                                                <a href="{{ route('admin.dealers.index', ['show_homepage' => 'yes']) }}" class="inline-flex items-center rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 hover:opacity-90">Yes</a>
+                                            @else
+                                                <a href="{{ route('admin.dealers.index', ['show_homepage' => 'no']) }}" class="inline-flex items-center rounded-full bg-slate-400/20 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:text-slate-400 border border-slate-400/30 hover:opacity-90">No</a>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-2">
+                                            @if($dealer->show_homepage_ad)
+                                                <a href="{{ route('admin.dealers.index', ['show_homepage_ad' => 'yes']) }}" class="inline-flex items-center rounded-full bg-sky-500/15 px-2 py-0.5 text-[11px] font-medium text-sky-700 dark:text-sky-300 border border-sky-500/30 hover:opacity-90">Yes</a>
+                                            @else
+                                                <a href="{{ route('admin.dealers.index', ['show_homepage_ad' => 'no']) }}" class="inline-flex items-center rounded-full bg-slate-400/20 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:text-slate-400 border border-slate-400/30 hover:opacity-90">No</a>
+                                            @endif
+                                        </td>
                                         <td class="px-4 py-2 text-slate-600 dark:text-slate-400">{{ $dealer->email ?? '—' }}<br><span class="text-xs">{{ $dealer->phone ?? $dealer->mobile ?? '' }}</span></td>
                                         <td class="px-4 py-2 text-slate-600 dark:text-slate-400">{{ $dealer->city ?? '—' }} / {{ $dealer->state ?? '—' }}</td>
                                         <td class="px-4 py-2"><span class="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">{{ $dealer->properties_count }}</span></td>
@@ -88,7 +120,7 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <tr data-empty><td colspan="8" class="px-4 py-6 text-center text-sm text-slate-500">No dealers yet. <a href="{{ route('admin.dealers.create') }}" class="text-emerald-600 dark:text-emerald-400">Add dealer</a>.</td></tr>
+                                    <tr data-empty><td colspan="10" class="px-4 py-6 text-center text-sm text-slate-500">No dealers yet. <a href="{{ route('admin.dealers.create') }}" class="text-emerald-600 dark:text-emerald-400">Add dealer</a>.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>

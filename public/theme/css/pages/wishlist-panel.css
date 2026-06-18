@@ -1,0 +1,5 @@
+/* Wishlist panel: remove the theme's vertical divider line inside items */
+    .wish-list-items .wish-list-item:before { display: none !important; }
+    /* Wishlist panel: ensure FontAwesome solid heart actually renders filled */
+    .wish-list-wrap .wishlist-icon.fa-solid { font-weight: 900 !important; }
+    .wish-list-wrap .wishlist-icon.fa-regular { font-weight: 400 !important; }

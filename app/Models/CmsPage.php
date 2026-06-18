@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 class CmsPage extends Model
 {
@@ -20,6 +22,29 @@ class CmsPage extends Model
 
     public static function findBySlug(string $slug): ?self
     {
-        return static::where('slug', $slug)->first();
+        try {
+            return static::where('slug', $slug)->first();
+        } catch (QueryException $e) {
+            Log::warning('Failed to load cms_pages by slug', [
+                'slug' => $slug,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    public static function findSafe(int $id): ?self
+    {
+        try {
+            return static::find($id);
+        } catch (QueryException $e) {
+            Log::warning('Failed to load cms_pages by id', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 }

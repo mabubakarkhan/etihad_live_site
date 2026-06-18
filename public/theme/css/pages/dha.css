@@ -1,0 +1,735 @@
+/* DHA homepage grid + phase pages */
+.dha-main-page,
+.dha-phase-page {
+    position: relative;
+    min-height: 50vh;
+}
+.dha-phase-listing-main .boxed-container {
+    padding: 0;
+}
+.dha-phase-page .main-content.dha-phase-listing-main {
+    min-height: 0;
+    margin-top: 0;
+}
+.dha-home-section {
+    padding: 60px 0 40px;
+}
+.dha-home-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+.dha-phase-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+@media (max-width: 991px) {
+    .dha-phase-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 575px) {
+    .dha-phase-grid { grid-template-columns: 1fr; }
+}
+.dha-phase-card {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.dha-phase-carousel .swiper-slide {
+    height: auto;
+    display: flex;
+}
+.dha-phase-carousel .swiper-slide .dha-phase-card {
+    flex: 1 1 auto;
+}
+.dha-phase-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+.dha-phase-card img,
+.dha-phase-card .dha-phase-card-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.5s ease;
+}
+.dha-phase-card:hover img,
+.dha-phase-card:hover .dha-phase-card-bg {
+    transform: scale(1.08);
+}
+.dha-phase-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.35) 45%, rgba(0, 0, 0, 0.05) 100%);
+    pointer-events: none;
+}
+.dha-phase-card-title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 18px 16px;
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    z-index: 2;
+}
+.dha-page-hero {
+    position: relative;
+    min-height: 420px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    background: #0f172a;
+}
+.dha-page-hero-img {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+}
+.dha-page-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.88) 0%,
+        rgba(0, 0, 0, 0.55) 28%,
+        rgba(0, 0, 0, 0.18) 55%,
+        rgba(0, 0, 0, 0) 78%
+    );
+}
+.dha-page-hero-body {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 56px 0 44px;
+    color: #fff;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+.dha-page-hero-inner {
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    text-align: center;
+}
+.dha-page-hero-body h1 {
+    color: #fff;
+    margin: 0 0 12px;
+    text-align: center;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+.dha-main-page .dha-page-hero-body h1 {
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.15;
+}
+.dha-page-hero-lead,
+.dha-main-page .dha-page-hero-body p.dha-page-hero-lead {
+    color: #fff;
+    margin: 0 auto;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    max-width: 760px;
+    text-align: center;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+.dha-page-hero-breadcrumb {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    margin: 0 auto 10px;
+    text-align: center;
+}
+.dha-phase-page .dha-page-hero-breadcrumb {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 0 auto 14px;
+    max-width: 100%;
+    text-align: center;
+}
+.dha-phase-page .dha-page-hero-body h1 {
+    font-size: clamp(2.5rem, 7vw, 4.25rem);
+    font-weight: 700;
+    line-height: 1.06;
+    margin: 0;
+    letter-spacing: -0.02em;
+    text-align: center;
+}
+.dha-page-hero-breadcrumb a {
+    color: #fff;
+    text-decoration: none;
+}
+.dha-page-hero-breadcrumb a:hover {
+    text-decoration: underline;
+}
+@media (min-width: 992px) {
+    .dha-page-hero {
+        min-height: 480px;
+    }
+}
+.dha-rich-content {
+    padding: 40px 0;
+}
+.dha-phase-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 24px 0;
+}
+.dha-phase-type-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #047857;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background 0.2s, color 0.2s;
+}
+.dha-phase-type-chip:hover {
+    background: #10b981;
+    color: #fff;
+}
+.dha-plot-maps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+}
+.dha-plot-map-item {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+}
+.dha-plot-map-item a {
+    display: block;
+    position: relative;
+}
+.dha-plot-map-item img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+.dha-plot-map-item:hover img {
+    transform: scale(1.05);
+}
+.dha-plot-map-item span {
+    display: block;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.dha-phase-listings-wrap {
+    padding: 48px 0 80px;
+    margin-bottom: 0;
+    background: #f8fafc;
+    min-height: 320px;
+}
+.dha-phase-page .listing-area-container {
+    margin-bottom: 24px;
+}
+.dha-phase-page .listing-pagination-wrap,
+.dha-phase-page #listing-pagination-wrap {
+    margin-bottom: 32px;
+}
+.dha-phase-map-box {
+    height: 360px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+/* —— DHA Phase detail hero (v2) — parabolic curve reference —— */
+.dha-phase-page .dha-phase-hero-v2,
+.dha-phase-page .dha-phase-hero-v2 h1,
+.dha-phase-page .dha-phase-hero-v2 p {
+    text-align: left !important;
+}
+.dha-phase-hero-v2 {
+    position: relative;
+    min-height: clamp(700px, 94vh, 940px);
+    background: #0a0c10;
+    overflow: hidden;
+    isolation: isolate;
+    padding-bottom: 88px;
+}
+.dha-phase-hero-v2__waves {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.22;
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3E%3Cpath d='M-40 420 C120 300 220 520 400 380 C560 260 640 440 860 300' fill='none' stroke='%23c5a059' stroke-width='1.2'/%3E%3Cpath d='M-60 500 C140 360 260 560 420 430 C580 300 660 500 900 340' fill='none' stroke='%23c5a059' stroke-width='0.9'/%3E%3Cpath d='M-20 320 C160 200 280 400 460 270 C620 160 700 360 920 220' fill='none' stroke='%23c5a059' stroke-width='0.8'/%3E%3C/svg%3E") left center / 72% auto no-repeat;
+}
+.dha-phase-hero-v2__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+.dha-phase-hero-v2__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 72% 42%;
+    display: block;
+}
+.dha-phase-hero-v2__shape {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+.dha-phase-hero-v2__shape-fill {
+    fill: #0a0c10;
+}
+.dha-phase-hero-v2__shape-stroke {
+    fill: none;
+    stroke: url(#dhaHeroGold);
+    stroke-width: 2.8;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 0 12px rgba(197, 160, 89, 0.55));
+}
+.dha-phase-hero-v2__panel {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: min(50vw, 640px);
+    min-height: clamp(700px, 94vh, 940px);
+    display: flex;
+    align-items: center;
+    padding: 108px 6% 140px max(20px, calc((100vw - 1170px) / 2 + 15px));
+    background: transparent;
+    pointer-events: none;
+}
+.dha-phase-hero-v2__panel-inner {
+    position: relative;
+    z-index: 4;
+    width: 100%;
+    max-width: 520px;
+    text-align: left;
+    pointer-events: auto;
+}
+.dha-phase-hero-v2__crumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 26px;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.72);
+    text-align: left;
+}
+.dha-phase-hero-v2__crumb a {
+    color: rgba(255, 255, 255, 0.82);
+    text-decoration: none;
+}
+.dha-phase-hero-v2__crumb a:hover {
+    color: #c5a059;
+}
+.dha-phase-hero-v2__crumb-sep {
+    opacity: 0.55;
+    font-size: 0.9rem;
+}
+.dha-phase-hero-v2__title {
+    margin: 0 0 22px;
+    padding: 0;
+    font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    font-size: clamp(2.85rem, 6vw, 5rem);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    text-align: left !important;
+}
+.dha-phase-hero-v2__title-gold {
+    display: inline;
+    color: #c5a059;
+    margin-right: 0.2em;
+}
+.dha-phase-hero-v2__title-white {
+    display: inline;
+    color: #fff;
+}
+.dha-phase-hero-v2__lead {
+    margin: 0 0 34px;
+    max-width: 460px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    line-height: 1.75;
+    text-align: left !important;
+}
+.dha-phase-hero-v2__stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px 14px;
+    margin-bottom: 36px;
+}
+.dha-phase-hero-v2__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+}
+.dha-phase-hero-v2__stat i {
+    color: #c5a059;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+.dha-phase-hero-v2__stat-label {
+    display: block;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 500;
+    line-height: 1.3;
+}
+.dha-phase-hero-v2__stat-value {
+    display: block;
+    color: #c5a059;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.25;
+    word-break: break-word;
+}
+.dha-phase-hero-v2__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    justify-content: flex-start;
+}
+.dha-phase-hero-v2__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 14px 26px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+.dha-phase-hero-v2__btn--primary {
+    background: linear-gradient(135deg, #d4b06a 0%, #a9823d 100%);
+    border: 1px solid #c5a059;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(169, 130, 61, 0.35);
+}
+.dha-phase-hero-v2__btn--primary:hover {
+    background: linear-gradient(135deg, #e0bc78 0%, #b8924a 100%);
+    color: #fff;
+    transform: translateY(-1px);
+}
+.dha-phase-hero-v2__btn--ghost {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(197, 160, 89, 0.65);
+    color: #fff;
+}
+.dha-phase-hero-v2__btn--ghost:hover {
+    border-color: #c5a059;
+    color: #fff;
+    transform: translateY(-1px);
+}
+.dha-phase-hero-v2__investors {
+    position: absolute;
+    z-index: 4;
+    left: clamp(42%, 48vw, 52%);
+    bottom: 118px;
+    transform: translateX(-12%);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: rgba(8, 10, 14, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+}
+.dha-phase-hero-v2__investors-count {
+    color: #fff;
+    font-size: 0.88rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.dha-phase-hero-v2__investors-avatars {
+    display: flex;
+    align-items: center;
+}
+.dha-phase-hero-v2__avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid #0a0c10;
+    margin-left: -10px;
+    background: linear-gradient(135deg, #64748b, #334155) center/cover no-repeat;
+}
+.dha-phase-hero-v2__investors-avatars .dha-phase-hero-v2__avatar:first-child {
+    margin-left: 0;
+    background-image: url('../../images/avatar/1.jpg');
+}
+.dha-phase-hero-v2__investors-avatars .dha-phase-hero-v2__avatar:nth-child(2) {
+    background: linear-gradient(135deg, #94a3b8, #475569);
+}
+.dha-phase-hero-v2__investors-avatars .dha-phase-hero-v2__avatar:nth-child(3) {
+    background: linear-gradient(135deg, #78716c, #44403c);
+}
+.dha-phase-hero-v2__investors-avatars .dha-phase-hero-v2__avatar:nth-child(4) {
+    background: linear-gradient(135deg, #a8a29e, #57534e);
+}
+.dha-phase-hero-v2__investors-more {
+    width: 34px;
+    height: 34px;
+    margin-left: -10px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #d4b06a, #a9823d);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    border: 2px solid #0a0c10;
+}
+.dha-phase-hero-v2__nav {
+    position: absolute;
+    left: max(16px, calc((100vw - 1140px) / 2));
+    right: max(16px, calc((100vw - 1140px) / 2));
+    bottom: 22px;
+    z-index: 6;
+    pointer-events: none;
+}
+.dha-phase-hero-v2__nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 10px;
+    border-radius: 14px;
+    background: rgba(10, 12, 16, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    pointer-events: auto;
+}
+.dha-phase-hero-v2__nav-inner::-webkit-scrollbar {
+    display: none;
+}
+.dha-phase-hero-v2__nav-link {
+    flex: 1 1 0;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 12px 14px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    border-radius: 10px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.dha-phase-hero-v2__nav-link i {
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+.dha-phase-hero-v2__nav-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+.dha-phase-hero-v2__nav-link.is-active {
+    color: #fff;
+    background: linear-gradient(135deg, #d4b06a 0%, #a9823d 100%);
+    box-shadow: 0 4px 16px rgba(169, 130, 61, 0.35);
+}
+.dha-phase-section {
+    padding: 56px 0;
+    scroll-margin-top: 100px;
+}
+.dha-phase-section--alt {
+    background: #f8fafc;
+}
+.dha-phase-section-title {
+    margin: 0 0 24px;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.75rem, 3vw, 2.35rem);
+    font-weight: 600;
+    color: #0f172a;
+}
+.dha-phase-properties-head {
+    padding: 48px 0 8px;
+    background: #fff;
+}
+.dha-phase-properties-title {
+    margin: 0;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.75rem, 3vw, 2.35rem);
+    font-weight: 600;
+    color: #0f172a;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.dha-phase-section-empty {
+    margin: 0;
+    color: #64748b;
+    font-size: 1rem;
+}
+.dha-phase-gallery-item {
+    display: block;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 180px;
+}
+.dha-phase-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+.dha-phase-gallery-item:hover img {
+    transform: scale(1.05);
+}
+.dha-phase-contact-box {
+    max-width: 720px;
+    padding: 28px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+}
+.dha-phase-contact-box p {
+    margin: 0 0 20px;
+    color: #334155;
+    line-height: 1.65;
+}
+.dha-phase-contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.dha-phase-contact-actions .dha-phase-hero-v2__btn--ghost {
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+.dha-phase-contact-actions .dha-phase-hero-v2__btn--ghost:hover {
+    border-color: #a9823d;
+    color: #a9823d;
+}
+.dha-phase-embed-map iframe {
+    width: 100%;
+    min-height: 360px;
+    border: 0;
+    border-radius: 12px;
+}
+@media (max-width: 1199px) {
+    .dha-phase-hero-v2__stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 16px;
+    }
+    .dha-phase-hero-v2__panel {
+        max-width: min(58vw, 600px);
+    }
+    .dha-phase-hero-v2__investors {
+        left: 40%;
+        bottom: 110px;
+    }
+}
+@media (max-width: 991px) {
+    .dha-phase-hero-v2 {
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+        padding-bottom: 0;
+    }
+    .dha-phase-hero-v2__waves,
+    .dha-phase-hero-v2__shape,
+    .dha-phase-hero-v2__investors {
+        display: none;
+    }
+    .dha-phase-hero-v2__bg {
+        position: relative;
+        order: 1;
+        height: 48vw;
+        min-height: 260px;
+        max-height: 400px;
+    }
+    .dha-phase-hero-v2__bg-img {
+        height: 100%;
+        object-position: center center;
+    }
+    .dha-phase-hero-v2__panel {
+        order: 2;
+        max-width: none;
+        min-height: 0;
+        padding: 36px 20px 28px;
+        background: #0a0c10;
+    }
+    .dha-phase-hero-v2__nav {
+        position: relative;
+        order: 3;
+        left: 0;
+        right: 0;
+        bottom: auto;
+        padding: 0 12px 16px;
+    }
+    .dha-phase-hero-v2__nav-link {
+        padding: 10px 10px;
+        font-size: 0.68rem;
+    }
+    .dha-phase-hero-v2__nav-link span {
+        display: none;
+    }
+}
+@media (max-width: 575px) {
+    .dha-phase-hero-v2__stats {
+        grid-template-columns: 1fr;
+    }
+    .dha-phase-hero-v2__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .dha-phase-hero-v2__btn {
+        width: 100%;
+    }
+}

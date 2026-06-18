@@ -16,9 +16,31 @@ class DealerController extends Controller
         if (request()->filled('status')) {
             $query->where('status', request('status'));
         }
+        if (request()->filled('show_homepage')) {
+            $showHomepage = request('show_homepage');
+            if ($showHomepage === 'yes') {
+                $query->where('show_homepage', true);
+            } elseif ($showHomepage === 'no') {
+                $query->where(function ($q) {
+                    $q->whereNull('show_homepage')->orWhere('show_homepage', false);
+                });
+            }
+        }
+        if (request()->filled('show_homepage_ad')) {
+            $showHomepageAd = request('show_homepage_ad');
+            if ($showHomepageAd === 'yes') {
+                $query->where('show_homepage_ad', true);
+            } elseif ($showHomepageAd === 'no') {
+                $query->where(function ($q) {
+                    $q->whereNull('show_homepage_ad')->orWhere('show_homepage_ad', false);
+                });
+            }
+        }
         $dealers = $query->limit(2000)->get();
         $filterStatus = request('status');
-        return view('admin.dealers.index', compact('dealers', 'filterStatus'));
+        $filterShowHomepage = request('show_homepage');
+        $filterShowHomepageAd = request('show_homepage_ad');
+        return view('admin.dealers.index', compact('dealers', 'filterStatus', 'filterShowHomepage', 'filterShowHomepageAd'));
     }
 
     public function create()
@@ -33,6 +55,8 @@ class DealerController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:120', 'unique:dealers,slug'],
             'status' => ['nullable', 'string', 'in:active,inactive'],
+            'show_homepage' => ['nullable', 'boolean'],
+            'show_homepage_ad' => ['nullable', 'boolean'],
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:50'],
             'whatsapp' => ['nullable', 'string', 'max:50'],
@@ -47,6 +71,8 @@ class DealerController extends Controller
             'canonical_url' => ['nullable', 'string', 'max:500'],
         ]);
         $validated['status'] = $validated['status'] ?? 'active';
+        $validated['show_homepage'] = $request->boolean('show_homepage');
+        $validated['show_homepage_ad'] = $request->boolean('show_homepage_ad');
         if (isset($validated['slug']) && trim((string) $validated['slug']) !== '') {
             $validated['slug'] = \Illuminate\Support\Str::slug(trim($validated['slug']));
         } else {
@@ -80,6 +106,8 @@ class DealerController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:120', 'unique:dealers,slug,' . $dealer->id],
             'status' => ['nullable', 'string', 'in:active,inactive'],
+            'show_homepage' => ['nullable', 'boolean'],
+            'show_homepage_ad' => ['nullable', 'boolean'],
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:50'],
             'whatsapp' => ['nullable', 'string', 'max:50'],
@@ -98,6 +126,8 @@ class DealerController extends Controller
         } else {
             $validated['slug'] = \Illuminate\Support\Str::slug($dealer->name);
         }
+        $validated['show_homepage'] = $request->boolean('show_homepage');
+        $validated['show_homepage_ad'] = $request->boolean('show_homepage_ad');
 
         if ($request->boolean('remove_profile_pic') && $dealer->profile_pic) {
             Storage::disk('public')->delete($dealer->profile_pic);

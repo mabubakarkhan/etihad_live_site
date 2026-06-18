@@ -34,6 +34,7 @@
                             @csrf
                             <div class="space-y-1.5">
                                 <label for="profile_pic" class="block text-sm text-slate-700 dark:text-slate-300">Profile picture</label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Recommended 400×400px (1:1). Portrait photo shown on the profile circle.</p>
                                 <input id="profile_pic" name="profile_pic" type="file" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" />
                             </div>
                             <div class="space-y-1.5">
@@ -52,6 +53,20 @@
                                     <option value="inactive" {{ old('status', 'active') === 'inactive' ? 'selected' : '' }}>Inactive</option>
                                 </select>
                                 <p class="text-xs text-slate-500 dark:text-slate-400">Inactive dealers are hidden when creating dealer listings.</p>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
+                                    <input type="checkbox" name="show_homepage" value="1" {{ old('show_homepage') ? 'checked' : '' }} class="rounded border-slate-300 dark:border-slate-700 text-emerald-500 focus:ring-emerald-500">
+                                    <span>Show on homepage popular agents section</span>
+                                </label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Default is No (unchecked).</p>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
+                                    <input type="checkbox" name="show_homepage_ad" value="1" {{ old('show_homepage_ad') ? 'checked' : '' }} class="rounded border-slate-300 dark:border-slate-700 text-emerald-500 focus:ring-emerald-500">
+                                    <span>Show on homepage Ad</span>
+                                </label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Shows dealer photo in the “Find a Trusted Agent” banner (max 5). Default is No (unchecked).</p>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="space-y-1.5">
@@ -116,6 +131,7 @@
                             </div>
                             <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg transition-colors mt-6">
                                 <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Banner</h2>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Recommended 1920×540px (wide hero). Full-width banner on team profile page; desktop uses it as hero background when no portrait is uploaded.</p>
                                 <input type="file" name="banner_image" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" />
                             </div>
                             <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg transition-colors mt-6">

@@ -58,7 +58,9 @@ class PropertyRequestController extends Controller
                 $q->where('name', 'like', $term)
                     ->orWhere('email', 'like', $term)
                     ->orWhere('message', 'like', $term)
-                    ->orWhere('phone', 'like', $term);
+                    ->orWhere('phone', 'like', $term)
+                    ->orWhere('property_type', 'like', $term)
+                    ->orWhere('budget', 'like', $term);
             });
         }
 
