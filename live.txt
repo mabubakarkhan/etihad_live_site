@@ -1,66 +1,48 @@
-LIVE / DEPLOY — FIX HTTP 500 on new.etihadmarketing.co
+LIVE / DEPLOY — HTTP 500 debug kit (temporary files — delete after fix)
 
 =========================================
 
-DIAGNOSIS (checked remotely):
-- Static files work (CSS, robots.txt)
-- ALL Laravel/PHP routes return 500 with empty body (/ , /portal, /project, /up)
-- etihadsite.enterests.com works fine (PHP 8.2.31)
-- new.etihadmarketing.co Laravel bootstrap is failing before it can log/display errors
+UPLOAD ORDER:
 
-STEP 1 — Upload these 2 files FIRST (bypass Laravel .htaccess):
-  public/ping.php          -> open https://new.etihadmarketing.co/ping.php
-  public/etihad-diag.php   -> open https://new.etihadmarketing.co/etihad-diag.php
+1) public/test.php           -> https://new.etihadmarketing.co/test.php
+2) public/db-test.php        -> https://new.etihadmarketing.co/db-test.php
+3) public/etihad-diag.php    -> https://new.etihadmarketing.co/etihad-diag.php
+4) public/index.php          -> replaces live index (shows exact boot error)
 
-  ping.php should show: PHP OK 8.2.x
-  etihad-diag.php will print the exact error + last log lines.
-  DELETE both files after fixing.
+Optional: public/ping.php    -> quick PHP OK check
 
-STEP 2 — Clear Laravel cache via FTP (delete if present):
-  bootstrap/cache/config.php
-  bootstrap/cache/routes-v7.php
-  bootstrap/cache/services.php
-  bootstrap/cache/packages.php
+AFTER FIX:
+- Set $ETIHAD_LIVE_DEBUG = false in public/index.php
+  OR re-upload public/index.php.production-backup as public/index.php
+- DELETE: test.php, db-test.php, etihad-diag.php, ping.php
+- DELETE via FTP if present:
+    bootstrap/cache/config.php
+    bootstrap/cache/routes-v7.php
+    bootstrap/cache/services.php
+    bootstrap/cache/packages.php
 
-STEP 3 — Re-upload in BINARY mode:
-  routes/web.php
-  app/Helpers/price.php
-
-STEP 4 — If still broken, copy routes/web.php FROM etihadsite.enterests.com
-  (working server) then re-apply today's CSS/view files only.
+DO NOT modify .env on server.
 
 
 
-— Recovery / backend —
+— Debug / boot files —
 
-app/Helpers/price.php
+public/index.php
 
-routes/web.php
+public/index.php.production-backup
 
+public/test.php
 
-
-— Diagnostics (upload first, delete after) —
-
-public/ping.php
+public/db-test.php
 
 public/etihad-diag.php
 
+public/ping.php
 
 
-— Today's frontend files —
 
-resources/views/partials/property-card.blade.php
+— Likely fix files (after you see the error) —
 
-resources/views/partials/listing-page-scripts.blade.php
+routes/web.php
 
-resources/views/partials/dha-main-stats-strip.blade.php
-
-public/theme/css/etihad-front.css
-
-public/theme/css/pages/property-page.css
-
-public/theme/css/pages/listing.css
-
-public/theme/css/pages/portal.css
-
-public/theme/css/pages/dha-main-hero.css
+app/Helpers/price.php
