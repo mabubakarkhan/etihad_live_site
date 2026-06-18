@@ -29,6 +29,13 @@ class CmsPageController extends Controller
             'meta_description' => ['nullable', 'string', 'max:500'],
             'meta_keywords' => ['nullable', 'string', 'max:500'],
             'canonical_url' => ['nullable', 'string', 'max:500'],
+            'meta_robots' => ['nullable', 'string', 'max:120'],
+            'og_title' => ['nullable', 'string', 'max:255'],
+            'og_description' => ['nullable', 'string', 'max:500'],
+            'twitter_card' => ['nullable', 'string', 'max:40'],
+            'twitter_title' => ['nullable', 'string', 'max:255'],
+            'twitter_description' => ['nullable', 'string', 'max:500'],
+            'structured_data_json' => ['nullable', 'string'],
         ]);
 
         if ($request->boolean('remove_banner_image') && $cmsPage->banner_image) {
@@ -42,6 +49,30 @@ class CmsPageController extends Controller
             }
             $path = $request->file('banner_image')->store('cms/banners', 'public');
             $validated['banner_image'] = $path;
+        }
+
+        if ($request->boolean('remove_og_image') && $cmsPage->og_image) {
+            Storage::disk('public')->delete($cmsPage->og_image);
+            $validated['og_image'] = null;
+        }
+
+        if ($request->hasFile('og_image')) {
+            if ($cmsPage->og_image) {
+                Storage::disk('public')->delete($cmsPage->og_image);
+            }
+            $validated['og_image'] = $request->file('og_image')->store('cms/seo', 'public');
+        }
+
+        if ($request->boolean('remove_twitter_image') && $cmsPage->twitter_image) {
+            Storage::disk('public')->delete($cmsPage->twitter_image);
+            $validated['twitter_image'] = null;
+        }
+
+        if ($request->hasFile('twitter_image')) {
+            if ($cmsPage->twitter_image) {
+                Storage::disk('public')->delete($cmsPage->twitter_image);
+            }
+            $validated['twitter_image'] = $request->file('twitter_image')->store('cms/seo', 'public');
         }
 
         $cmsPage->update($validated);

@@ -1,20 +1,91 @@
-LIVE — folders to upload manually
+Root homepage — upload to live:
 
-=========================================
+routes/web.php
+resources/views/partials/homepage-head-seo.blade.php
+resources/views/partials/homepage-tracking-head.blade.php
+resources/views/partials/homepage-tracking-body-open.blade.php
+resources/views/partials/homepage-tracking-body-close.blade.php
+resources/views/partials/homepage-menu-contact.blade.php
+resources/views/partials/homepage-location-card.blade.php
+resources/views/partials/homepage-footer-contact.blade.php
+resources/views/partials/homepage-footer-socials.blade.php
+resources/views/partials/homepage-social-links.blade.php
+resources/views/partials/homepage-social-icon.blade.php
+resources/views/admin/site_seo_settings/edit.blade.php
+resources/views/admin/contact_settings/edit.blade.php
+resources/views/admin/cms_pages/edit.blade.php
+resources/views/admin/partials/sidebar.blade.php
+app/Models/SiteSeoSetting.php
+app/Models/ContactSetting.php
+app/Models/CmsPage.php
+app/Http/Controllers/SiteSeoSettingsController.php
+app/Http/Controllers/ContactSettingsController.php
+app/Http/Controllers/CmsPageController.php
+app/Helpers/contact.php
+app/Helpers/seo.php
+composer.json
+database/migrations/2026_06_16_100000_add_homepage_contact_fields_to_contact_settings_table.php
+database/migrations/2026_06_16_101000_add_advanced_seo_fields_to_cms_pages_table.php
+database/migrations/2026_06_17_120000_create_homepage_vision_settings_table.php
+database/migrations/2026_06_17_130000_create_homepage_why_settings_table.php
+database/migrations/2026_06_17_140000_create_homepage_about_settings_table.php
+database/migrations/2026_06_17_150000_create_homepage_investment_journey_tables.php
+app/Models/HomepageHeroSetting.php
+app/Models/HomepageVisionSetting.php
+app/Models/HomepageWhySetting.php
+app/Models/HomepageAboutSetting.php
+app/Models/HomepageInvestmentJourneySetting.php
+app/Models/HomepageInvestmentJourneyStep.php
+app/Http/Controllers/HomepageHeroSettingController.php
+app/Http/Controllers/HomepageVisionSettingController.php
+app/Http/Controllers/HomepageWhySettingController.php
+app/Http/Controllers/HomepageAboutSettingController.php
+app/Http/Controllers/HomepageInvestmentJourneyController.php
+resources/views/admin/homepage_hero/edit.blade.php
+resources/views/admin/homepage_vision/edit.blade.php
+resources/views/admin/homepage_why/edit.blade.php
+resources/views/admin/homepage_about/edit.blade.php
+resources/views/admin/homepage_investment_journey/edit.blade.php
+resources/views/partials/homepage-vision-section.blade.php
+resources/views/partials/homepage-why-section.blade.php
+resources/views/partials/homepage-about-hero-screen.blade.php
+resources/views/partials/homepage-about-mobile.blade.php
+resources/views/partials/homepage-investment-journey-section.blade.php
+resources/views/partials/homepage-projects-showcase-cards.blade.php
+resources/views/partials/homepage-hot-offers-card.blade.php
+resources/views/partials/homepage-testimonials-slides.blade.php
+homepage.html
+public/homepage/index.html
+public/homepage/assets/
+public/homepage/dist/
 
-MAIN FOLDER (all images & uploads):
+On live after upload:
+php artisan migrate --force
+composer dump-autoload
 
-storage/app/public/
+Rebuild after homepage.html / assets changes:
+php tools/build_homepage.php
 
-Copy local → live, then open ONCE:
+Admin:
+- Contact settings — email, phone, WhatsApp, address, socials, website, map URL, office title, location image
+- CMS Pages → Home — meta title/description, OG/Twitter, robots, JSON-LD
+- SEO & tracking — GA4, GTM, Facebook/TikTok pixels, Hotjar, verification tags, custom head/body scripts
 
-https://new.etihadmarketing.co/fix-storage.php?token=etihad-storage-fix
-
-(Upload public/fix-storage.php first. Delete it after success.)
-
-Note: run-storage-fix needs token from LIVE .env MIGRATION_RUN_TOKEN
-— server.txt token may not match new.etihadmarketing.co
-
-Code: app/ config/ routes/ resources/ public/theme/ public/index.php
-
-Do not upload: .env  vendor/
+Dynamic homepage sections:
+- Explore Projects
+- Featured Hot Offers (Popular / Residential / Commercial)
+- Recent Properties map with property list sidebar (click list item to focus map marker)
+- Testimonials carousel (admin Testimonials)
+- Contact info + socials (menu, location card, footer)
+- SEO meta + tracking scripts
+- Homepage → Hero image (admin/homepage-hero)
+- Homepage → Vision / CEO message (admin/homepage-vision)
+- Homepage → Why Choose Etihad (admin/homepage-why) — text + 4 collage images
+- Homepage → About Etihad (admin/homepage-about) — text, video, center + secondary images
+- Homepage → Investment Journey (admin/homepage-investment-journey) — timeline heading + steps
+- Homepage → What Set Us Apart (admin/homepage-what-sets-apart) — feature cards with SVG/image icons
+- Homepage → Our Achievements (admin/homepage-achievements) — stat value, suffix, label cards
+- Homepage → Make Your Choice (admin/homepage-choice) — background + swiper slides
+- Homepage → DHA section (admin/homepage-dha-section) — first showcase strip; cards from DHA Phases
+- Homepage → Dealers section (admin/homepage-dealers-section) — second listings strip; cards from dealers with Show on homepage
+- Homepage → Location section (admin/homepage-location-section) — map background, card photo, pin; text from Contact settings

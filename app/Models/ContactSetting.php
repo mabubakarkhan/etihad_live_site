@@ -20,6 +20,10 @@ class ContactSetting extends Model
         'youtube',
         'twitter',
         'tiktok',
+        'website',
+        'map_url',
+        'office_title',
+        'location_image',
     ];
 
     protected function casts(): array

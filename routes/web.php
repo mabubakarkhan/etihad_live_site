@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
@@ -17,6 +18,17 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\ProjectTypeController;
 use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\HomepageHeroSettingController;
+use App\Http\Controllers\HomepageDhaSectionController;
+use App\Http\Controllers\HomepageDealersSectionController;
+use App\Http\Controllers\HomepageLocationSectionController;
+use App\Http\Controllers\HomepageChoiceController;
+use App\Http\Controllers\HomepageAchievementsController;
+use App\Http\Controllers\HomepageWhatSetsApartController;
+use App\Http\Controllers\HomepageInvestmentJourneyController;
+use App\Http\Controllers\HomepageAboutSettingController;
+use App\Http\Controllers\HomepageVisionSettingController;
+use App\Http\Controllers\HomepageWhySettingController;
 use App\Http\Controllers\PortalHeroSlideController;
 use App\Http\Controllers\PortalAdController;
 use App\Http\Controllers\TestimonialController;
@@ -29,6 +41,7 @@ use App\Http\Controllers\DhaPhaseController;
 use App\Models\DhaSetting;
 use App\Models\DhaPhase;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SiteSeoSettingsController;
 use App\Http\Controllers\ContactSettingsController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\SellRentLeadController;
@@ -38,15 +51,27 @@ use App\Http\Controllers\CareerController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\AdminNotificationController;
 use App\Models\PropertyRequest;
+use App\Models\HomepageHeroSetting;
+use App\Models\HomepageDhaSectionSetting;
+use App\Models\HomepageDealersSectionSetting;
+use App\Models\HomepageLocationSectionSetting;
+use App\Models\HomepageChoiceSetting;
+use App\Models\HomepageAchievementsSetting;
+use App\Models\HomepageWhatSetsApartSetting;
+use App\Models\HomepageInvestmentJourneySetting;
+use App\Models\HomepageAboutSetting;
+use App\Models\HomepageVisionSetting;
+use App\Models\HomepageWhySetting;
 use App\Models\PortalHeroSlide;
 use App\Models\PortalAd;
 use App\Models\Partner;
-use App\Models\Testimonial;
+use App\Models\SiteSeoSetting;
 use App\Models\Project;
 use App\Models\VisitorDailyCount;
 use App\Models\CmsPage;
 use App\Models\Dealer;
 use App\Models\ContactSetting;
+use App\Models\Testimonial;
 use App\Models\SellRentPageSetting;
 
 if (!function_exists('db_safe')) {
@@ -161,8 +186,322 @@ Route::get('/run-storage-fix', function () {
 })->name('run-storage-fix');
 
 Route::get('/', function () {
-    $cmsPage = db_safe('home.cms_page', fn () => CmsPage::findBySlug('home'));
-    return view('index', compact('cmsPage'));
+    $homepagePath = public_path('homepage/index.html');
+
+    if (! is_file($homepagePath)) {
+        $cmsPage = db_safe('home.cms_page', fn () => CmsPage::findBySlug('home'));
+        return view('index', compact('cmsPage'));
+    }
+
+    $html = file_get_contents($homepagePath);
+    $appBase = rtrim(request()->getSchemeAndHttpHost() . request()->getBaseUrl(), '/');
+    $base = $appBase . '/homepage/';
+    $homeUrl = url('/');
+
+    $html = preg_replace_callback(
+        '/\b(src|href)=(["\'])((?!https?:|\/\/|data:|#|__)(?:assets\/|dist\/)[^"\']+)\2/',
+        static fn (array $m) => $m[1] . '=' . $m[2] . $base . $m[3] . $m[2],
+        $html
+    );
+    $html = preg_replace_callback(
+        '/\bsrcset=(["\'])((?!https?:|\/\/)(?:assets\/)[^"\']+)\1/',
+        static fn (array $m) => 'srcset=' . $m[1] . $base . $m[2] . $m[1],
+        $html
+    );
+    $html = str_replace(
+        'src="../theme/js/etihad-map-styles.js"',
+        'src="' . $appBase . '/theme/js/etihad-map-styles.js"',
+        $html
+    );
+
+    $html = str_replace('__HOME_CANONICAL__', $homeUrl, $html);
+    $html = str_replace('__HOME_URL__', $homeUrl, $html);
+
+    $homepageHeroSetting = db_safe('home.hero_setting', fn () => HomepageHeroSetting::instance(), new HomepageHeroSetting());
+    $homepageHeroImage = homepage_asset_url($homepageHeroSetting->hero_image ?? null, $base, 'hero-screen-1-D7I92d4H.webp');
+    $html = str_replace('__HOMEPAGE_HERO_IMAGE__', $homepageHeroImage, $html);
+
+    $html = str_replace('__HOMEPAGE_SIDEBAR_NAV__', View::make('partials.homepage-sidebar-nav')->render(), $html);
+    $html = str_replace('__HOMEPAGE_NAVBAR_NAV__', View::make('partials.homepage-navbar-nav')->render(), $html);
+    $html = str_replace('__HOMEPAGE_FOOTER_NAV__', View::make('partials.homepage-footer-nav')->render(), $html);
+    $html = str_replace('__HOMEPAGE_NAVBAR_SCROLL__', View::make('partials.homepage-navbar-scroll')->render(), $html);
+
+    $homepageDhaSection = db_safe('home.dha_section', fn () => HomepageDhaSectionSetting::instance(), new HomepageDhaSectionSetting());
+    $homepageDhaPhases = db_safe('home.dha_phases_showcase', fn () => DhaPhase::active()->frontOrdered()->get(), collect());
+    $html = str_replace('__HOMEPAGE_DHA_SECTION__', View::make('partials.homepage-dha-section', [
+        'setting' => $homepageDhaSection,
+        'phases' => $homepageDhaPhases,
+    ])->render(), $html);
+
+    $homepageProjects = db_safe('home.projects_showcase', fn () => Project::query()
+        ->with(['projectTypes:id,name,slug'])
+        ->active()
+        ->where(function ($query) {
+            $query->where(function ($inner) {
+                $inner->whereNotNull('homepage_listing_image')
+                    ->where('homepage_listing_image', '!=', '');
+            })->orWhere(function ($inner) {
+                $inner->whereNotNull('featured_image')
+                    ->where('featured_image', '!=', '');
+            });
+        })
+        ->frontOrdered()
+        ->get([
+            'id', 'title', 'slug', 'city', 'state', 'price', 'launch_year',
+            'description', 'featured_image', 'homepage_listing_image', 'pricing_place_cards',
+        ]), collect());
+
+    $projectCardsHtml = View::make('partials.homepage-projects-showcase-cards', [
+        'projects' => $homepageProjects,
+    ])->render();
+
+    $html = str_replace('__HOMEPAGE_PROJECTS_CARDS__', $projectCardsHtml, $html);
+
+    $homepagePropertyBase = function () {
+        return Property::query()
+            ->with(['projectTypes:id,name,slug'])
+            ->where('dealer_id', '!=', 0)
+            ->whereHas('dealer', function ($q) {
+                $q->where('status', Dealer::STATUS_ACTIVE);
+            })
+            ->active()
+            ->whereNotNull('featured_image')
+            ->where('featured_image', '!=', '')
+            ->frontOrdered();
+    };
+
+    $popularProperties = db_safe('home.hot_offers_popular', fn () => $homepagePropertyBase()
+        ->where('is_hot', true)
+        ->limit(3)
+        ->get(), collect());
+
+    $residentialProperties = db_safe('home.hot_offers_residential', fn () => $homepagePropertyBase()
+        ->whereHas('projectTypes', function ($q) {
+            $q->whereRaw('LOWER(slug) = ?', ['residential']);
+        })
+        ->limit(3)
+        ->get(), collect());
+
+    $commercialProperties = db_safe('home.hot_offers_commercial', fn () => $homepagePropertyBase()
+        ->whereHas('projectTypes', function ($q) {
+            $q->whereRaw('LOWER(slug) = ?', ['commercial']);
+        })
+        ->limit(3)
+        ->get(), collect());
+
+    $hotOffersPanelsHtml = View::make('partials.homepage-hot-offers-panels', [
+        'popularProperties' => $popularProperties,
+        'residentialProperties' => $residentialProperties,
+        'commercialProperties' => $commercialProperties,
+    ])->render();
+
+    $html = str_replace('__HOMEPAGE_HOT_OFFERS_PANELS__', $hotOffersPanelsHtml, $html);
+
+    $homepageDealersSection = db_safe('home.dealers_section', fn () => HomepageDealersSectionSetting::instance(), new HomepageDealersSectionSetting());
+    $homepageDealers = db_safe('home.dealers_showcase', fn () => Dealer::query()
+        ->active()
+        ->where('show_homepage', true)
+        ->whereNotNull('slug')
+        ->where('slug', '!=', '')
+        ->withCount('properties')
+        ->orderBy('name', 'asc')
+        ->get(['id', 'name', 'slug', 'profile_pic', 'banner_image', 'info_detail', 'view_count', 'city', 'state']), collect());
+    $html = str_replace('__HOMEPAGE_DEALERS_SECTION__', View::make('partials.homepage-dealers-section', [
+        'setting' => $homepageDealersSection,
+        'dealers' => $homepageDealers,
+    ])->render(), $html);
+
+    $homepageMapProperties = db_safe('home.map_properties', fn () => Property::query()
+        ->with(['projectTypes:id,name'])
+        ->where('dealer_id', '!=', 0)
+        ->whereHas('dealer', function ($q) {
+            $q->where('status', Dealer::STATUS_ACTIVE);
+        })
+        ->active()
+        ->whereNotNull('latitude')
+        ->whereNotNull('longitude')
+        ->frontOrdered()
+        ->limit(100)
+        ->get()
+        ->map(function (Property $p) {
+            $address = trim(implode(', ', array_filter([
+                $p->short_address,
+                $p->address,
+                $p->town,
+                $p->city,
+                $p->state,
+            ])));
+
+            $areaParts = [];
+            if ($p->area_kanal) {
+                $areaParts[] = rtrim(rtrim(number_format((float) $p->area_kanal, 2), '0'), '.') . ' Kanal';
+            }
+            if ($p->area_marla) {
+                $areaParts[] = rtrim(rtrim(number_format((float) $p->area_marla, 2), '0'), '.') . ' Marla';
+            }
+
+            $purposeLabel = $p->purpose === Property::PURPOSE_RENT ? 'Rent' : 'Sale';
+            $badge = $p->projectTypes->first()?->name
+                ?: ($p->is_hot ? 'Featured' : $purposeLabel);
+
+            return [
+                'id' => $p->id,
+                'title' => $p->title,
+                'detail_url' => route('property.show', $p->slug),
+                'latitude' => (float) $p->latitude,
+                'longitude' => (float) $p->longitude,
+                'description' => $p->description
+                    ? \Illuminate\Support\Str::limit(strip_tags($p->description), 140)
+                    : $address,
+                'address' => $address,
+                'price' => format_price($p->price_digits, $p->price_string),
+                'purpose_label' => $purposeLabel,
+                'badge' => $badge,
+                'size' => $areaParts ? implode(' / ', $areaParts) : '',
+                'status' => $purposeLabel,
+            ];
+        })
+        ->filter(fn (array $p) => $p['latitude'] && $p['longitude'])
+        ->values(), collect());
+
+    $homepageMapJson = $homepageMapProperties->toJson(
+        JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
+    );
+
+    $html = str_replace('__HOMEPAGE_MAP_PROPERTIES_JSON__', $homepageMapJson, $html);
+
+    $homepageTestimonials = db_safe('home.testimonials', fn () => Testimonial::query()
+        ->whereNotNull('image')
+        ->where('image', '!=', '')
+        ->whereNotNull('comment')
+        ->where('comment', '!=', '')
+        ->orderBy('id')
+        ->get(['id', 'name', 'image', 'comment', 'city']), collect());
+
+    $testimonialsSlidesHtml = View::make('partials.homepage-testimonials-slides', [
+        'testimonials' => $homepageTestimonials,
+    ])->render();
+
+    $html = str_replace('__HOMEPAGE_TESTIMONIALS_SLIDES__', $testimonialsSlidesHtml, $html);
+
+    $homepageContact = db_safe('home.contact_settings', fn () => ContactSetting::instance()) ?? new ContactSetting();
+    $homepageCmsPage = db_safe('home.cms_page', fn () => CmsPage::findBySlug('home'));
+    $homepageSiteSeo = db_safe('home.site_seo', fn () => SiteSeoSetting::instance());
+    $homepageAssetBase = $base;
+
+    $homepageSeo = seo_homepage_bundle($homepageCmsPage, $homepageSiteSeo, [
+        'title' => 'Best Real Estate Company & Property Developer Lahore | Etihad',
+        'description' => 'Transform your real estate portfolio with Etihad Marketing, a leading property development and real estate company in Lahore, Pakistan offering premium residential and commercial properties.',
+        'keywords' => 'Real estate Lahore, Property developer Pakistan, Residential projects Lahore, Commercial properties Lahore, DHA Lahore properties, Etihad Marketing, Premium properties Pakistan, Investment properties Lahore',
+        'canonical' => $homeUrl,
+        'image' => $homepageAssetBase . 'assets/og-image-C3mzMeAS.png',
+        'type' => 'website',
+    ]);
+
+    $html = str_replace('__HOMEPAGE_HEAD_SEO__', View::make('partials.homepage-head-seo', ['seo' => $homepageSeo])->render(), $html);
+    $html = str_replace('__HOMEPAGE_TRACKING_HEAD__', View::make('partials.homepage-tracking-head', ['siteSeo' => $homepageSiteSeo])->render(), $html);
+    $html = str_replace('__HOMEPAGE_TRACKING_BODY_OPEN__', View::make('partials.homepage-tracking-body-open', ['siteSeo' => $homepageSiteSeo])->render(), $html);
+    $html = str_replace('__HOMEPAGE_TRACKING_BODY_CLOSE__', View::make('partials.homepage-tracking-body-close', ['siteSeo' => $homepageSiteSeo])->render(), $html);
+    $html = str_replace('__HOMEPAGE_MENU_CONTACT__', View::make('partials.homepage-menu-contact', ['cs' => $homepageContact])->render(), $html);
+
+    $homepageLocationSection = db_safe('home.location_section', fn () => HomepageLocationSectionSetting::instance(), new HomepageLocationSectionSetting());
+    $defaultLocationMapUrl = $homepageAssetBase . 'assets/location-Q0z4vYJT.webp';
+    $defaultLocationPinUrl = $homepageAssetBase . 'assets/pin-Ckk56Ywx.png';
+    $resolvedLocationMapUrl = homepage_asset_url($homepageLocationSection->map_background_image ?? null, $homepageAssetBase, 'location-Q0z4vYJT.webp');
+    $resolvedLocationPinUrl = homepage_asset_url($homepageLocationSection->pin_image ?? null, $homepageAssetBase, 'pin-Ckk56Ywx.png');
+
+    if ($resolvedLocationMapUrl !== $defaultLocationMapUrl) {
+        $html = str_replace($defaultLocationMapUrl, $resolvedLocationMapUrl, $html);
+    }
+
+    if ($resolvedLocationPinUrl !== $defaultLocationPinUrl) {
+        $html = str_replace($defaultLocationPinUrl, $resolvedLocationPinUrl, $html);
+    }
+
+    $html = str_replace('__HOMEPAGE_LOCATION_CARD__', View::make('partials.homepage-location-card', [
+        'cs' => $homepageContact,
+        'locationSection' => $homepageLocationSection,
+        'assetBase' => $homepageAssetBase,
+    ])->render(), $html);
+
+    $html = str_replace('__HOMEPAGE_FOOTER_CONTACT__', View::make('partials.homepage-footer-contact', ['cs' => $homepageContact])->render(), $html);
+    $html = str_replace('__HOMEPAGE_FOOTER_LEGAL__', View::make('partials.homepage-footer-legal')->render(), $html);
+    $html = str_replace('__HOMEPAGE_FOOTER_SOCIALS__', View::make('partials.homepage-footer-socials', ['cs' => $homepageContact])->render(), $html);
+
+    $homepageVision = db_safe('home.vision', fn () => HomepageVisionSetting::instance(), new HomepageVisionSetting());
+    $html = str_replace('__HOMEPAGE_VISION_SECTION__', View::make('partials.homepage-vision-section', [
+        'vision' => $homepageVision,
+        'assetBase' => $base,
+    ])->render(), $html);
+
+    $homepageWhy = db_safe('home.why', fn () => HomepageWhySetting::instance(), new HomepageWhySetting());
+    $html = str_replace([
+        '__HOMEPAGE_WHY_IMAGE_LEFT__',
+        '__HOMEPAGE_WHY_IMAGE_CENTER__',
+        '__HOMEPAGE_WHY_IMAGE_RIGHT__',
+        '__HOMEPAGE_WHY_IMAGE_CENTER_BACK__',
+    ], [
+        $homepageWhy->imageUrl('image_left', $base, 'contemporary-left-BqpaZZO6.avif'),
+        $homepageWhy->imageUrl('image_center', $base, 'contemporary-center-Cy1UF1UF.avif'),
+        $homepageWhy->imageUrl('image_right', $base, 'contemporary-right-BGFk98DL.avif'),
+        $homepageWhy->imageUrl('image_center_back', $base, 'contemporary-center-back-MRHJVZZb.avif'),
+    ], $html);
+    $html = str_replace('__HOMEPAGE_WHY_SECTION__', View::make('partials.homepage-why-section', [
+        'why' => $homepageWhy,
+    ])->render(), $html);
+
+    $homepageChoice = db_safe('home.choice', fn () => HomepageChoiceSetting::instance(), new HomepageChoiceSetting());
+    $homepageChoiceSlides = db_safe('home.choice_slides', fn () => HomepageChoiceSetting::orderedSlides(), collect());
+    $html = str_replace('__HOMEPAGE_CHOICE_SECTION__', View::make('partials.homepage-choice-section', [
+        'choice' => $homepageChoice,
+        'slides' => $homepageChoiceSlides,
+        'assetBase' => $base,
+    ])->render(), $html);
+
+    $homepageAbout = db_safe('home.about', fn () => HomepageAboutSetting::instance(), new HomepageAboutSetting());
+    $html = str_replace('__HOMEPAGE_ABOUT_HERO_SCREEN__', View::make('partials.homepage-about-hero-screen', [
+        'about' => $homepageAbout,
+        'assetBase' => $base,
+        'heroImage' => $homepageHeroImage,
+    ])->render(), $html);
+    $html = str_replace('__HOMEPAGE_ABOUT_MOBILE_SECTION__', View::make('partials.homepage-about-mobile', [
+        'about' => $homepageAbout,
+        'assetBase' => $base,
+    ])->render(), $html);
+
+    $homepageJourney = db_safe('home.investment_journey', fn () => HomepageInvestmentJourneySetting::instance(), new HomepageInvestmentJourneySetting());
+    $homepageJourneySteps = db_safe('home.investment_journey_steps', fn () => HomepageInvestmentJourneySetting::orderedSteps(), collect());
+    $html = str_replace('__HOMEPAGE_INVESTMENT_JOURNEY_SECTION__', View::make('partials.homepage-investment-journey-section', [
+        'journey' => $homepageJourney,
+        'steps' => $homepageJourneySteps,
+    ])->render(), $html);
+
+    $homepageApart = db_safe('home.what_sets_apart', fn () => HomepageWhatSetsApartSetting::instance(), new HomepageWhatSetsApartSetting());
+    $homepageApartCards = db_safe('home.what_sets_apart_cards', fn () => HomepageWhatSetsApartSetting::orderedCards(), collect());
+    $html = str_replace('__HOMEPAGE_WHAT_SETS_APART_SECTION__', View::make('partials.homepage-what-sets-apart-section', [
+        'apart' => $homepageApart,
+        'cards' => $homepageApartCards,
+    ])->render(), $html);
+
+    $homepageAchievements = db_safe('home.achievements', fn () => HomepageAchievementsSetting::instance(), new HomepageAchievementsSetting());
+    $homepageAchievementStats = db_safe('home.achievement_stats', fn () => HomepageAchievementsSetting::orderedStats(), collect());
+    $html = str_replace('__HOMEPAGE_ACHIEVEMENTS_SECTION__', View::make('partials.homepage-achievements-section', [
+        'achievements' => $homepageAchievements,
+        'stats' => $homepageAchievementStats,
+    ])->render(), $html);
+
+    $html = preg_replace_callback(
+        '/\b(src|href)=(["\'])((?!https?:|\/\/|data:|#|__)(?:assets\/|dist\/)[^"\']+)\2/',
+        static fn (array $m) => $m[1] . '=' . $m[2] . $base . $m[3] . $m[2],
+        $html
+    );
+    $html = preg_replace_callback(
+        '/\bsrcset=(["\'])((?!https?:|\/\/)(?:assets\/)[^"\']+)\1/',
+        static fn (array $m) => 'srcset=' . $m[1] . $base . $m[2] . $m[1],
+        $html
+    );
+
+    return response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
 });
 
 Route::get('/portal', function () {
@@ -1191,6 +1530,28 @@ Route::middleware('admin')->group(function () {
     Route::put('/admin/testimonials/{testimonial}', [TestimonialController::class, 'update'])->name('admin.testimonials.update');
     Route::delete('/admin/testimonials/{testimonial}', [TestimonialController::class, 'destroy'])->name('admin.testimonials.destroy');
 
+    Route::get('/admin/homepage-hero', [HomepageHeroSettingController::class, 'edit'])->name('admin.homepage-hero.edit');
+    Route::put('/admin/homepage-hero', [HomepageHeroSettingController::class, 'update'])->name('admin.homepage-hero.update');
+    Route::get('/admin/homepage-vision', [HomepageVisionSettingController::class, 'edit'])->name('admin.homepage-vision.edit');
+    Route::put('/admin/homepage-vision', [HomepageVisionSettingController::class, 'update'])->name('admin.homepage-vision.update');
+    Route::get('/admin/homepage-why', [HomepageWhySettingController::class, 'edit'])->name('admin.homepage-why.edit');
+    Route::put('/admin/homepage-why', [HomepageWhySettingController::class, 'update'])->name('admin.homepage-why.update');
+    Route::get('/admin/homepage-about', [HomepageAboutSettingController::class, 'edit'])->name('admin.homepage-about.edit');
+    Route::put('/admin/homepage-about', [HomepageAboutSettingController::class, 'update'])->name('admin.homepage-about.update');
+    Route::get('/admin/homepage-investment-journey', [HomepageInvestmentJourneyController::class, 'edit'])->name('admin.homepage-investment-journey.edit');
+    Route::put('/admin/homepage-investment-journey', [HomepageInvestmentJourneyController::class, 'update'])->name('admin.homepage-investment-journey.update');
+    Route::get('/admin/homepage-what-sets-apart', [HomepageWhatSetsApartController::class, 'edit'])->name('admin.homepage-what-sets-apart.edit');
+    Route::put('/admin/homepage-what-sets-apart', [HomepageWhatSetsApartController::class, 'update'])->name('admin.homepage-what-sets-apart.update');
+    Route::get('/admin/homepage-achievements', [HomepageAchievementsController::class, 'edit'])->name('admin.homepage-achievements.edit');
+    Route::put('/admin/homepage-achievements', [HomepageAchievementsController::class, 'update'])->name('admin.homepage-achievements.update');
+    Route::get('/admin/homepage-choice', [HomepageChoiceController::class, 'edit'])->name('admin.homepage-choice.edit');
+    Route::put('/admin/homepage-choice', [HomepageChoiceController::class, 'update'])->name('admin.homepage-choice.update');
+    Route::get('/admin/homepage-dha-section', [HomepageDhaSectionController::class, 'edit'])->name('admin.homepage-dha-section.edit');
+    Route::put('/admin/homepage-dha-section', [HomepageDhaSectionController::class, 'update'])->name('admin.homepage-dha-section.update');
+    Route::get('/admin/homepage-dealers-section', [HomepageDealersSectionController::class, 'edit'])->name('admin.homepage-dealers-section.edit');
+    Route::put('/admin/homepage-dealers-section', [HomepageDealersSectionController::class, 'update'])->name('admin.homepage-dealers-section.update');
+    Route::get('/admin/homepage-location-section', [HomepageLocationSectionController::class, 'edit'])->name('admin.homepage-location-section.edit');
+    Route::put('/admin/homepage-location-section', [HomepageLocationSectionController::class, 'update'])->name('admin.homepage-location-section.update');
     Route::get('/admin/portal-hero', [PortalHeroSlideController::class, 'index'])->name('admin.portal-hero.index');
     Route::get('/admin/portal-hero/create', [PortalHeroSlideController::class, 'create'])->name('admin.portal-hero.create');
     Route::post('/admin/portal-hero', [PortalHeroSlideController::class, 'store'])->name('admin.portal-hero.store');
@@ -1264,6 +1625,8 @@ Route::middleware('admin')->group(function () {
 
     Route::get('/admin/contact-settings', [ContactSettingsController::class, 'edit'])->name('admin.contact-settings.edit');
     Route::put('/admin/contact-settings', [ContactSettingsController::class, 'update'])->name('admin.contact-settings.update');
+    Route::get('/admin/site-seo-settings', [SiteSeoSettingsController::class, 'edit'])->name('admin.site-seo-settings.edit');
+    Route::put('/admin/site-seo-settings', [SiteSeoSettingsController::class, 'update'])->name('admin.site-seo-settings.update');
     Route::get('/admin/contact-messages', [ContactMessageController::class, 'index'])->name('admin.contact-messages.index');
     Route::get('/admin/contact-messages/{contactMessage}', [ContactMessageController::class, 'show'])->name('admin.contact-messages.show');
     Route::put('/admin/contact-messages/{contactMessage}/status', [ContactMessageController::class, 'updateStatus'])->name('admin.contact-messages.update-status');

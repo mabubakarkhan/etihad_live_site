@@ -96,6 +96,91 @@
 
             <div>
                 <div class="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase px-2 mb-2">
+                    Homepage
+                </div>
+                <div class="space-y-1">
+            <a href="{{ route('admin.homepage-hero.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-hero.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-hero.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">H</span>
+                    <span class="text-sm">Hero image</span>
+                </span>
+            </a>
+            <a href="{{ route('admin.homepage-dha-section.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-dha-section.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-dha-section.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">D</span>
+                    <span class="text-sm">DHA section</span>
+                </span>
+            </a>
+            <a href="{{ route('admin.homepage-dealers-section.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-dealers-section.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-dealers-section.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">L</span>
+                    <span class="text-sm">Dealers section</span>
+                </span>
+            </a>
+            <a href="{{ route('admin.homepage-location-section.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-location-section.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-location-section.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">O</span>
+                    <span class="text-sm">Location section</span>
+                </span>
+            </a>
+            <a href="{{ route('admin.homepage-vision.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-vision.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-vision.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">V</span>
+                    <span class="text-sm">Vision</span>
+                </span>
+            </a>
+            <a href="{{ route('admin.homepage-why.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-why.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-why.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">W</span>
+                    <span class="text-sm">Why Choose Etihad</span>
+                </span>
+            </a>
+            <a href="{{ route('admin.homepage-about.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-about.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-about.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">A</span>
+                    <span class="text-sm">About Etihad</span>
+                </span>
+            </a>
+            <a href="{{ route('admin.homepage-investment-journey.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-investment-journey.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-investment-journey.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">J</span>
+                    <span class="text-sm">Investment Journey</span>
+                </span>
+            </a>
+            <a href="{{ route('admin.homepage-what-sets-apart.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-what-sets-apart.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-what-sets-apart.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">S</span>
+                    <span class="text-sm">What Set Us Apart</span>
+                </span>
+            </a>
+            <a href="{{ route('admin.homepage-achievements.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-achievements.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-achievements.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">T</span>
+                    <span class="text-sm">Our Achievements</span>
+                </span>
+            </a>
+            <a href="{{ route('admin.homepage-choice.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-choice.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-choice.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">C</span>
+                    <span class="text-sm">Make Your Choice</span>
+                </span>
+            </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase px-2 mb-2">
                     Homepage &amp; marketing
                 </div>
                 <div class="space-y-1">
@@ -116,8 +201,8 @@
             <a href="{{ route('admin.portal-hero.index') }}"
                class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.portal-hero.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
                 <span class="flex items-center gap-3">
-                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.portal-hero.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">H</span>
-                    <span class="text-sm">Portal hero</span>
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.portal-hero.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">H2</span>
+                    <span class="text-sm">Portal hero slides</span>
                 </span>
             </a>
             <a href="{{ route('admin.portal-ads.edit') }}"
@@ -189,6 +274,16 @@
                     <span class="text-sm">Contact settings</span>
                 </span>
                 @if(request()->routeIs('admin.contact-settings.*'))
+                    <span class="text-[11px] text-emerald-600 dark:text-emerald-400">active</span>
+                @endif
+            </a>
+            <a href="{{ route('admin.site-seo-settings.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.site-seo-settings.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-xs {{ request()->routeIs('admin.site-seo-settings.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">S</span>
+                    <span class="text-sm">SEO &amp; tracking</span>
+                </span>
+                @if(request()->routeIs('admin.site-seo-settings.*'))
                     <span class="text-[11px] text-emerald-600 dark:text-emerald-400">active</span>
                 @endif
             </a>

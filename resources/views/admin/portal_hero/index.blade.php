@@ -15,7 +15,7 @@
                 <header class="px-8 pt-6 pb-4 border-b border-slate-200 dark:border-slate-800/70 flex items-center justify-between flex-wrap gap-3">
                     <div>
                         <h1 class="text-xl md:text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">Portal hero slides</h1>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Background images for the <strong>/portal</strong> home hero (full-bleed fade slider). Theme uses full-height backgrounds — use wide images (e.g. 1920×900px or larger).</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Background slider images for the <strong>/portal</strong> homepage hero. Use wide images (e.g. 1920×900px or larger). For the root homepage single hero image, use <a href="{{ route('admin.homepage-hero.edit') }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Homepage hero</a>.</p>
                     </div>
                     <div class="flex items-center gap-3 flex-shrink-0">
                         @include('admin.partials.theme-toggle')

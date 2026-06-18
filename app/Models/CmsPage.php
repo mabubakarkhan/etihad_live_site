@@ -17,6 +17,15 @@ class CmsPage extends Model
         'meta_description',
         'meta_keywords',
         'canonical_url',
+        'meta_robots',
+        'og_title',
+        'og_description',
+        'og_image',
+        'twitter_card',
+        'twitter_title',
+        'twitter_description',
+        'twitter_image',
+        'structured_data_json',
         'banner_image',
     ];
 

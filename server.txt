@@ -6,9 +6,7 @@ PS: NBC$w+2gITb(
 
 new.etihadmarketing.co
 
-etihadsite.enterests.com/
-
-https://etihadsite.enterests.com/run-migrations?token=d5f15d4g1f2h5fg2ds
+https://new.etihadmarketing.co/run-migrations?token=d5f15d4g1f2h5fg2ds
 
 
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\ContactSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ContactSettingsController extends Controller
 {
@@ -30,9 +31,25 @@ class ContactSettingsController extends Controller
             'youtube' => ['nullable', 'string', 'max:500'],
             'twitter' => ['nullable', 'string', 'max:500'],
             'tiktok' => ['nullable', 'string', 'max:500'],
+            'website' => ['nullable', 'string', 'max:500'],
+            'map_url' => ['nullable', 'string', 'max:500'],
+            'office_title' => ['nullable', 'string', 'max:255'],
         ]);
 
         $contactSetting = ContactSetting::instance();
+
+        if ($request->boolean('remove_location_image') && $contactSetting->location_image) {
+            Storage::disk('public')->delete($contactSetting->location_image);
+            $validated['location_image'] = null;
+        }
+
+        if ($request->hasFile('location_image')) {
+            if ($contactSetting->location_image) {
+                Storage::disk('public')->delete($contactSetting->location_image);
+            }
+            $validated['location_image'] = $request->file('location_image')->store('contact', 'public');
+        }
+
         $contactSetting->update($validated);
 
         if ($admin = admin_user()) {

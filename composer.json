@@ -29,7 +29,9 @@
             "app/Helpers/admin.php",
             "app/Helpers/price.php",
             "app/Helpers/icons.php",
-            "app/Helpers/seo.php"
+            "app/Helpers/seo.php",
+            "app/Helpers/contact.php",
+            "app/Helpers/homepage.php"
         ]
     },
     "autoload-dev": {

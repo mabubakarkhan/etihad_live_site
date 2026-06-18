@@ -42,7 +42,7 @@
                     @endif
 
                     <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg shadow-slate-200/80 dark:shadow-slate-950/50 transition-colors max-w-3xl">
-                        <form method="POST" action="{{ route('admin.contact-settings.update') }}" class="space-y-4 text-sm">
+                        <form method="POST" action="{{ route('admin.contact-settings.update') }}" enctype="multipart/form-data" class="space-y-4 text-sm">
                             @csrf
                             @method('PUT')
 
@@ -87,6 +87,36 @@
                             <div class="space-y-1.5">
                                 <label for="whatsapp" class="block text-slate-700 dark:text-slate-300">WhatsApp</label>
                                 <input id="whatsapp" name="whatsapp" type="text" value="{{ old('whatsapp', $contactSetting->whatsapp ?? '') }}" placeholder="+92 300 1234567 or full URL" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition" />
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="space-y-1.5">
+                                    <label for="website" class="block text-slate-700 dark:text-slate-300">Website</label>
+                                    <input id="website" name="website" type="text" value="{{ old('website', $contactSetting->website ?? '') }}" placeholder="www.etihadmarketing.co" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition" />
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label for="map_url" class="block text-slate-700 dark:text-slate-300">Google Maps link</label>
+                                    <input id="map_url" name="map_url" type="text" value="{{ old('map_url', $contactSetting->map_url ?? '') }}" placeholder="https://maps.app.goo.gl/..." class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition" />
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label for="office_title" class="block text-slate-700 dark:text-slate-300">Office title (homepage location card)</label>
+                                <input id="office_title" name="office_title" type="text" value="{{ old('office_title', $contactSetting->office_title ?? '') }}" placeholder="LAHORE OFFICE" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition" />
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label for="location_image" class="block text-slate-700 dark:text-slate-300">Location card image (legacy fallback)</label>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Prefer uploading under <strong>Homepage → Location section</strong>. This field is only used if no homepage card image is set.</p>
+                                @if($contactSetting->location_image ?? null)
+                                    <div class="mb-2 flex items-center gap-3 flex-wrap">
+                                        <img src="{{ url('storage/' . ltrim($contactSetting->location_image, '/')) }}" alt="" class="h-20 w-20 rounded-lg object-cover border border-slate-200 dark:border-slate-700" />
+                                        <label class="inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
+                                            <input type="checkbox" name="remove_location_image" value="1" class="rounded border-slate-400" /> Remove image
+                                        </label>
+                                    </div>
+                                @endif
+                                <input id="location_image" name="location_image" type="file" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" />
                             </div>
 
                             <div class="pt-2 border-t border-slate-200 dark:border-slate-700">

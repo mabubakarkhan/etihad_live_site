@@ -93,6 +93,71 @@
                                     <label for="canonical_url" class="block text-slate-700 dark:text-slate-300">Canonical URL</label>
                                     <input id="canonical_url" name="canonical_url" type="text" value="{{ old('canonical_url', $cmsPage->canonical_url ?? '') }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition" placeholder="Optional" />
                                 </div>
+                                <div class="space-y-1.5">
+                                    <label for="meta_robots" class="block text-slate-700 dark:text-slate-300">Robots</label>
+                                    <input id="meta_robots" name="meta_robots" type="text" value="{{ old('meta_robots', $cmsPage->meta_robots ?? '') }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition" placeholder="index, follow" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg transition-colors">
+                            <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">Advanced SEO &amp; social sharing</h2>
+                            @if($cmsPage->slug === 'home')
+                                <p class="text-xs text-emerald-700 dark:text-emerald-300 mb-4">These fields power the root homepage meta tags, Open Graph, Twitter cards, and JSON-LD.</p>
+                            @else
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Optional overrides for richer search and social previews.</p>
+                            @endif
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="space-y-1.5">
+                                        <label for="og_title" class="block text-slate-700 dark:text-slate-300">Open Graph title</label>
+                                        <input id="og_title" name="og_title" type="text" value="{{ old('og_title', $cmsPage->og_title ?? '') }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100" />
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label for="twitter_card" class="block text-slate-700 dark:text-slate-300">Twitter card type</label>
+                                        <input id="twitter_card" name="twitter_card" type="text" value="{{ old('twitter_card', $cmsPage->twitter_card ?? '') }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100" placeholder="summary_large_image" />
+                                    </div>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label for="og_description" class="block text-slate-700 dark:text-slate-300">Open Graph description</label>
+                                    <textarea id="og_description" name="og_description" rows="2" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100">{{ old('og_description', $cmsPage->og_description ?? '') }}</textarea>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="space-y-1.5">
+                                        <label for="twitter_title" class="block text-slate-700 dark:text-slate-300">Twitter title</label>
+                                        <input id="twitter_title" name="twitter_title" type="text" value="{{ old('twitter_title', $cmsPage->twitter_title ?? '') }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100" />
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label for="twitter_description" class="block text-slate-700 dark:text-slate-300">Twitter description</label>
+                                        <input id="twitter_description" name="twitter_description" type="text" value="{{ old('twitter_description', $cmsPage->twitter_description ?? '') }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100" />
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="space-y-1.5">
+                                        <label for="og_image" class="block text-slate-700 dark:text-slate-300">Open Graph image</label>
+                                        @if($cmsPage->og_image)
+                                            <div class="mb-2 flex items-center gap-3 flex-wrap">
+                                                <img src="{{ asset('storage/' . $cmsPage->og_image) }}" alt="" class="max-h-20 rounded-lg border border-slate-200 dark:border-slate-600 object-cover" />
+                                                <label class="inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer"><input type="checkbox" name="remove_og_image" value="1" class="rounded border-slate-400" /> Remove</label>
+                                            </div>
+                                        @endif
+                                        <input type="file" name="og_image" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5" />
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label for="twitter_image" class="block text-slate-700 dark:text-slate-300">Twitter image</label>
+                                        @if($cmsPage->twitter_image)
+                                            <div class="mb-2 flex items-center gap-3 flex-wrap">
+                                                <img src="{{ asset('storage/' . $cmsPage->twitter_image) }}" alt="" class="max-h-20 rounded-lg border border-slate-200 dark:border-slate-600 object-cover" />
+                                                <label class="inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer"><input type="checkbox" name="remove_twitter_image" value="1" class="rounded border-slate-400" /> Remove</label>
+                                            </div>
+                                        @endif
+                                        <input type="file" name="twitter_image" accept="image/*" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5" />
+                                    </div>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label for="structured_data_json" class="block text-slate-700 dark:text-slate-300">Structured data (JSON-LD)</label>
+                                    <textarea id="structured_data_json" name="structured_data_json" rows="8" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm font-mono text-slate-900 dark:text-slate-100" placeholder='{"@@context":"https://schema.org","@@type":"RealEstateAgent",...}'>{{ old('structured_data_json', $cmsPage->structured_data_json ?? '') }}</textarea>
+                                </div>
                             </div>
                         </div>
 

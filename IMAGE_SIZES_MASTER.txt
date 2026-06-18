@@ -110,7 +110,54 @@ D) LOGOS (transparent PNG/WebP preferred)
     Display:     max-h ~80px contain
 
 ================================================================================
-E) GLOBAL TESTIMONIALS + PARTNERS (portal homepage)
+E) ROOT HOMEPAGE (/) — STATIC BUNDLE + CMS SECTIONS
+================================================================================
+
+13a) Homepage Hero Background (admin: Homepage → Hero image)
+     Production:  1920x1080 (16:9) or wider
+     Storage:     homepage-hero/{filename}
+     Page:        Root / first hero screen
+     Display:     Full viewport, object-fit cover
+
+13b) Homepage Vision — CEO Photo (admin: Homepage → Vision)
+     Production:  400x544 (~3:4 portrait)
+     Storage:     homepage-vision/{filename}
+     Page:        CEO message section
+     Display:     ~320x436 px cover crop on desktop
+
+13c) Homepage Why Choose — Collage Images (admin: Homepage → Why Choose Etihad)
+     Images feed Contemporary section and animate into Why Choose on scroll.
+     Left:          345x440 production → ~306x390 display
+     Center:        470x600 production → ~323x413 display
+     Right:         345x440 production → ~345x400 display
+     Center back:   466x594 production → ~350x420 display
+     Storage:       homepage-why/{filename}
+     Page:          / Contemporary + Why Choose sections
+     Display:       Portrait slots, object-fit cover
+
+13d) Homepage About Etihad (admin: Homepage → About Etihad)
+     Showcase video:     1280x720 or 1920x1080 (16:9) → ~544x314 display
+     Center image:       600x900 (2:3 portrait) → ~475x720 mobile display
+     Secondary image:    345x440 portrait → ~345x400 display
+     Storage:            homepage-about/{filename}
+     Page:               / hero screen 2 (desktop) + About mobile block
+     Display:            Video + portrait images, object-fit cover
+
+13e) Homepage What Set Us Apart — Card icons (admin: Homepage → What Set Us Apart)
+     Icon SVG:        inline stroke icons, viewBox 64x64, stroke currentColor
+     Icon image:      128x128 px PNG/SVG (optional upload overrides SVG)
+     Card display:    ~310x180 px desktop grid cell; icon slot ~96x96 px (6rem)
+     Storage:         homepage-what-sets-apart/{filename} for uploaded icons
+     Page:            / What Set Us Apart section
+
+13f) Homepage Make Your Choice — Background (admin: Homepage → Make Your Choice)
+     Landscape:       1920x1080 (16:9) full-bleed behind swiper
+     Portrait:        1080x1920 optional (falls back to landscape, then static bundle)
+     Static default:  choice-background-CtCIvw6A.avif
+     Storage:         homepage-choice/{filename}
+
+================================================================================
+F) GLOBAL TESTIMONIALS + PARTNERS (portal homepage)
 ================================================================================
 
 13) Site Testimonial Avatar (admin: Testimonials — global model)
