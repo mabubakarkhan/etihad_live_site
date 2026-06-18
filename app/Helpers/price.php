@@ -33,3 +33,14 @@ if (! function_exists('format_price')) {
         return $currency . ' On Request';
     }
 }
+
+if (! function_exists('dealer_profile_url')) {
+    function dealer_profile_url(?object $dealer): ?string
+    {
+        if (! $dealer || empty($dealer->slug)) {
+            return null;
+        }
+
+        return url('/our-team/' . ltrim((string) $dealer->slug, '/'));
+    }
+}

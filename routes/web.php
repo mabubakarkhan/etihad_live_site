@@ -207,7 +207,7 @@ Route::get('/portal', function () {
                 'dealer_image_url' => $p->dealer && $p->dealer->profile_pic
                     ? url('storage/' . ltrim($p->dealer->profile_pic, '/'))
                     : asset('theme/images/avatar/1.jpg'),
-                'dealer_url' => $p->dealer?->profileUrl(),
+                'dealer_url' => dealer_profile_url($p->dealer),
                 'excerpt' => $p->description ? \Illuminate\Support\Str::limit(strip_tags($p->description), 120) : '',
                 'purpose' => $p->purpose,
                 'filter_class' => $filterClass,
@@ -731,7 +731,7 @@ Route::get('/property/{slug}', function ($slug) {
             'kitchen' => $p->kitchen ?? 0,
             'dealer_name' => $dealerName,
             'dealer_image_url' => $dealerImageUrl,
-            'dealer_url' => $p->dealer?->profileUrl(),
+            'dealer_url' => dealer_profile_url($p->dealer),
             'photo_count' => $photoCount,
         ];
     })->values()->all();
@@ -1143,7 +1143,7 @@ Route::get('/api/listing/dealers', function (Request $request) {
             'purpose_label' => $purposeLabel,
             'dealer_name' => $dealerName,
             'dealer_image_url' => $dealerImageUrl,
-            'dealer_url' => $p->dealer?->profileUrl(),
+            'dealer_url' => dealer_profile_url($p->dealer),
         ];
     });
 

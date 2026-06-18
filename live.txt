@@ -1,0 +1,50 @@
+LIVE / DEPLOY — Fix HTTP 500 on new.etihadmarketing.co
+
+=========================================
+
+URGENT — if site shows HTTP 500 after upload:
+
+1. Via FTP on new.etihadmarketing.co, DELETE these cache files (if present):
+   bootstrap/cache/config.php
+   bootstrap/cache/routes-v7.php
+   bootstrap/cache/services.php
+   bootstrap/cache/packages.php
+
+2. Re-upload routes/web.php in BINARY mode (full file ~1294 lines).
+   A partial/corrupt upload causes site-wide 500.
+
+3. If still 500: copy routes/web.php FROM etihadsite.enterests.com
+   (that domain works) then re-upload the files below.
+
+4. Upload app/Helpers/price.php (dealer URL helper — no Dealer.php change required).
+
+
+
+— Today's feature files —
+
+app/Helpers/price.php
+
+routes/web.php
+
+resources/views/partials/property-card.blade.php
+
+resources/views/partials/listing-page-scripts.blade.php
+
+resources/views/partials/dha-main-stats-strip.blade.php
+
+public/theme/css/etihad-front.css
+
+public/theme/css/pages/property-page.css
+
+public/theme/css/pages/listing.css
+
+public/theme/css/pages/portal.css
+
+public/theme/css/pages/dha-main-hero.css
+
+
+
+— Optional (dealer link also works via price.php helper) —
+
+app/Models/Dealer.php
+
