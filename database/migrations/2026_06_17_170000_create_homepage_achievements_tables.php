@@ -9,28 +9,38 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('homepage_achievements_settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('title_line_1')->nullable();
-            $table->string('title_highlight')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('homepage_achievements_settings')) {
+            Schema::create('homepage_achievements_settings', function (Blueprint $table) {
+                $table->id();
+                $table->string('title_line_1')->nullable();
+                $table->string('title_highlight')->nullable();
+                $table->timestamps();
+            });
+        }
 
-        Schema::create('homepage_achievement_stats', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('sort_order')->default(0);
-            $table->string('value');
-            $table->string('suffix')->nullable();
-            $table->string('label');
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('homepage_achievement_stats')) {
+            Schema::create('homepage_achievement_stats', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedInteger('sort_order')->default(0);
+                $table->string('value');
+                $table->string('suffix')->nullable();
+                $table->string('label');
+                $table->timestamps();
+            });
+        }
 
-        DB::table('homepage_achievements_settings')->insert([
-            'title_line_1' => 'Our',
-            'title_highlight' => 'Achievements',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        if (Schema::hasTable('homepage_achievements_settings') && ! DB::table('homepage_achievements_settings')->exists()) {
+            DB::table('homepage_achievements_settings')->insert([
+                'title_line_1' => 'Our',
+                'title_highlight' => 'Achievements',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        if (! Schema::hasTable('homepage_achievement_stats') || DB::table('homepage_achievement_stats')->exists()) {
+            return;
+        }
 
         $stats = [
             ['sort_order' => 1, 'value' => '5000', 'suffix' => '+', 'label' => 'Satisfied Customers'],

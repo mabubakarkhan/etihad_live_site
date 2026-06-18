@@ -10,19 +10,25 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('homepage_vision_settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('tagline')->nullable();
-            $table->string('heading_line_1')->nullable();
-            $table->string('heading_line_2')->nullable();
-            $table->string('ceo_image')->nullable();
-            $table->text('message_paragraph_1')->nullable();
-            $table->text('message_paragraph_2_highlight')->nullable();
-            $table->text('message_paragraph_2_body')->nullable();
-            $table->string('ceo_name')->nullable();
-            $table->string('ceo_title')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('homepage_vision_settings')) {
+            Schema::create('homepage_vision_settings', function (Blueprint $table) {
+                $table->id();
+                $table->string('tagline')->nullable();
+                $table->string('heading_line_1')->nullable();
+                $table->string('heading_line_2')->nullable();
+                $table->string('ceo_image')->nullable();
+                $table->text('message_paragraph_1')->nullable();
+                $table->text('message_paragraph_2_highlight')->nullable();
+                $table->text('message_paragraph_2_body')->nullable();
+                $table->string('ceo_name')->nullable();
+                $table->string('ceo_title')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('homepage_vision_settings') || DB::table('homepage_vision_settings')->exists()) {
+            return;
+        }
 
         $ceoImagePath = null;
         $sourceImage = public_path('homepage/assets/ceo-zeeshan-butt.png');

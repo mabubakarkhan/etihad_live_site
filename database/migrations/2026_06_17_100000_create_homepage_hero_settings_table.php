@@ -8,11 +8,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('homepage_hero_settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('hero_image')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('homepage_hero_settings')) {
+            Schema::create('homepage_hero_settings', function (Blueprint $table) {
+                $table->id();
+                $table->string('hero_image')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

@@ -9,27 +9,37 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('homepage_investment_journey_settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('title_line_1')->nullable();
-            $table->string('title_highlight')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('homepage_investment_journey_settings')) {
+            Schema::create('homepage_investment_journey_settings', function (Blueprint $table) {
+                $table->id();
+                $table->string('title_line_1')->nullable();
+                $table->string('title_highlight')->nullable();
+                $table->timestamps();
+            });
+        }
 
-        Schema::create('homepage_investment_journey_steps', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('sort_order')->default(0);
-            $table->string('title');
-            $table->text('description');
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('homepage_investment_journey_steps')) {
+            Schema::create('homepage_investment_journey_steps', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedInteger('sort_order')->default(0);
+                $table->string('title');
+                $table->text('description');
+                $table->timestamps();
+            });
+        }
 
-        DB::table('homepage_investment_journey_settings')->insert([
-            'title_line_1' => 'Real Estate Investment',
-            'title_highlight' => 'Journey',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        if (Schema::hasTable('homepage_investment_journey_settings') && ! DB::table('homepage_investment_journey_settings')->exists()) {
+            DB::table('homepage_investment_journey_settings')->insert([
+                'title_line_1' => 'Real Estate Investment',
+                'title_highlight' => 'Journey',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        if (! Schema::hasTable('homepage_investment_journey_steps') || DB::table('homepage_investment_journey_steps')->exists()) {
+            return;
+        }
 
         $steps = [
             ['sort_order' => 1, 'title' => '1. Discovery', 'description' => 'Explore our premium properties and identify the perfect investment opportunity that matches your goals and budget.'],

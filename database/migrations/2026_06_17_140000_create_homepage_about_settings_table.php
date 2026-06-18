@@ -10,7 +10,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('homepage_about_settings', function (Blueprint $table) {
+        if (! Schema::hasTable('homepage_about_settings')) {
+            Schema::create('homepage_about_settings', function (Blueprint $table) {
             $table->id();
             $table->string('tagline_about')->nullable();
             $table->string('tagline_vision')->nullable();
@@ -35,7 +36,12 @@ return new class extends Migration
             $table->string('affiliated_text')->nullable();
             $table->string('affiliated_url')->nullable();
             $table->timestamps();
-        });
+            });
+        }
+
+        if (! Schema::hasTable('homepage_about_settings') || DB::table('homepage_about_settings')->exists()) {
+            return;
+        }
 
         $centerImage = null;
         $secondaryImage = null;

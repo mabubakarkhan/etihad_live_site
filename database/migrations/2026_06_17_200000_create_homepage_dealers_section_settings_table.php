@@ -9,18 +9,24 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('homepage_dealers_section_settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('eyebrow')->nullable();
-            $table->string('title_line_1')->nullable();
-            $table->string('title_highlight')->nullable();
-            $table->text('description')->nullable();
-            $table->string('footer_note')->nullable();
-            $table->string('card_badge')->nullable();
-            $table->string('cta_label')->nullable();
-            $table->string('view_all_label')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('homepage_dealers_section_settings')) {
+            Schema::create('homepage_dealers_section_settings', function (Blueprint $table) {
+                $table->id();
+                $table->string('eyebrow')->nullable();
+                $table->string('title_line_1')->nullable();
+                $table->string('title_highlight')->nullable();
+                $table->text('description')->nullable();
+                $table->string('footer_note')->nullable();
+                $table->string('card_badge')->nullable();
+                $table->string('cta_label')->nullable();
+                $table->string('view_all_label')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('homepage_dealers_section_settings') || DB::table('homepage_dealers_section_settings')->exists()) {
+            return;
+        }
 
         DB::table('homepage_dealers_section_settings')->insert([
             'eyebrow' => 'Trusted Agents',

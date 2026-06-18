@@ -9,15 +9,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('homepage_dha_section_settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('eyebrow')->nullable();
-            $table->string('title_line_1')->nullable();
-            $table->string('title_highlight')->nullable();
-            $table->text('description')->nullable();
-            $table->string('footer_note')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('homepage_dha_section_settings')) {
+            Schema::create('homepage_dha_section_settings', function (Blueprint $table) {
+                $table->id();
+                $table->string('eyebrow')->nullable();
+                $table->string('title_line_1')->nullable();
+                $table->string('title_highlight')->nullable();
+                $table->text('description')->nullable();
+                $table->string('footer_note')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('homepage_dha_section_settings') || DB::table('homepage_dha_section_settings')->exists()) {
+            return;
+        }
 
         DB::table('homepage_dha_section_settings')->insert([
             'eyebrow' => 'Defence Housing Authority',

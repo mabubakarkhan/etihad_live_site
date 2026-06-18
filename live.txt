@@ -89,3 +89,4 @@ Dynamic homepage sections:
 - Homepage → DHA section (admin/homepage-dha-section) — first showcase strip; cards from DHA Phases
 - Homepage → Dealers section (admin/homepage-dealers-section) — second listings strip; cards from dealers with Show on homepage
 - Homepage → Location section (admin/homepage-location-section) — map background, card photo, pin; text from Contact settings
+- Homepage CMS migrations (2026_06_17_*) skip create/seed when table or rows already exist — safe to re-run /run-migrations on live

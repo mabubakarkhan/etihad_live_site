@@ -54,31 +54,41 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::create('homepage_what_sets_apart_settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('title_line_1')->nullable();
-            $table->string('title_highlight')->nullable();
-            $table->text('subtitle')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('homepage_what_sets_apart_settings')) {
+            Schema::create('homepage_what_sets_apart_settings', function (Blueprint $table) {
+                $table->id();
+                $table->string('title_line_1')->nullable();
+                $table->string('title_highlight')->nullable();
+                $table->text('subtitle')->nullable();
+                $table->timestamps();
+            });
+        }
 
-        Schema::create('homepage_what_sets_apart_cards', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('sort_order')->default(0);
-            $table->string('title');
-            $table->text('description');
-            $table->text('icon_svg')->nullable();
-            $table->string('icon_image')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('homepage_what_sets_apart_cards')) {
+            Schema::create('homepage_what_sets_apart_cards', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedInteger('sort_order')->default(0);
+                $table->string('title');
+                $table->text('description');
+                $table->text('icon_svg')->nullable();
+                $table->string('icon_image')->nullable();
+                $table->timestamps();
+            });
+        }
 
-        DB::table('homepage_what_sets_apart_settings')->insert([
-            'title_line_1' => 'What',
-            'title_highlight' => 'Set Us Apart?',
-            'subtitle' => 'At Etihad Marketing, we combine expertise, innovation, and customer-centric solutions to deliver exceptional real estate experiences in Pakistan.',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        if (Schema::hasTable('homepage_what_sets_apart_settings') && ! DB::table('homepage_what_sets_apart_settings')->exists()) {
+            DB::table('homepage_what_sets_apart_settings')->insert([
+                'title_line_1' => 'What',
+                'title_highlight' => 'Set Us Apart?',
+                'subtitle' => 'At Etihad Marketing, we combine expertise, innovation, and customer-centric solutions to deliver exceptional real estate experiences in Pakistan.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        if (! Schema::hasTable('homepage_what_sets_apart_cards') || DB::table('homepage_what_sets_apart_cards')->exists()) {
+            return;
+        }
 
         $now = now();
         foreach ($this->seedCards() as $card) {

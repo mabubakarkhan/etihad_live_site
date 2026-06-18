@@ -39,18 +39,24 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::create('homepage_why_settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('heading_line_1')->nullable();
-            $table->string('heading_line_2')->nullable();
-            $table->text('description')->nullable();
-            $table->string('scroll_label')->nullable();
-            $table->string('image_left')->nullable();
-            $table->string('image_center')->nullable();
-            $table->string('image_right')->nullable();
-            $table->string('image_center_back')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('homepage_why_settings')) {
+            Schema::create('homepage_why_settings', function (Blueprint $table) {
+                $table->id();
+                $table->string('heading_line_1')->nullable();
+                $table->string('heading_line_2')->nullable();
+                $table->text('description')->nullable();
+                $table->string('scroll_label')->nullable();
+                $table->string('image_left')->nullable();
+                $table->string('image_center')->nullable();
+                $table->string('image_right')->nullable();
+                $table->string('image_center_back')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('homepage_why_settings') || DB::table('homepage_why_settings')->exists()) {
+            return;
+        }
 
         $images = $this->seedImages();
 
