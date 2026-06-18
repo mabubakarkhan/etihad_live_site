@@ -1,13 +1,15 @@
-LIVE / DEPLOY — FIX HTTP 500
+LIVE / DEPLOY — FIX 500 (upload to public/ folder on server)
 
-Upload ONLY this file to your server (replace the old one):
+Your site folder on server is:
+public_html/new.etihadmarketing.co/public/
 
-public/index.php
+Upload these 3 files INTO that public/ folder:
 
-If still 500, also upload:
+1. public/index.php
+2. public/hosting-polyfills.php
+3. public/.user.ini
 
-bootstrap/hosting-polyfills.php
+Do NOT upload to domain root — upload into the public/ folder
+(same place as etihad-diag.php and ping.php).
 
-(or public/hosting-polyfills.php as backup)
-
-Cause: mbstring PHP extension was disabled on new.etihadmarketing.co
+Then open: https://new.etihadmarketing.co/
