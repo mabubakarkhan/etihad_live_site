@@ -18,7 +18,9 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+    'driver' => extension_loaded('pdo')
+        ? env('SESSION_DRIVER', 'file')
+        : 'file',
 
     /*
     |--------------------------------------------------------------------------

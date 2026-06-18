@@ -1,15 +1,15 @@
-LIVE / DEPLOY — FIX 500 (upload to public/ folder on server)
+LIVE / DEPLOY — FIX "Class PDO not found"
 
-Your site folder on server is:
-public_html/new.etihadmarketing.co/public/
+Upload to: public_html/new.etihadmarketing.co/public/
 
-Upload these 3 files INTO that public/ folder:
-
-1. public/index.php
-2. public/hosting-polyfills.php
-3. public/.user.ini
-
-Do NOT upload to domain root — upload into the public/ folder
-(same place as etihad-diag.php and ping.php).
+1. public/.user.ini          (enables PDO + mbstring — wait 5 min after upload)
+2. config/session.php        (uses file sessions if PDO still missing)
 
 Then open: https://new.etihadmarketing.co/
+
+If still error: cPanel → Select PHP Version → Extensions
+→ enable: pdo, pdo_mysql, mbstring, mysqli
+
+Also keep uploaded:
+- public/index.php
+- public/hosting-polyfills.php
