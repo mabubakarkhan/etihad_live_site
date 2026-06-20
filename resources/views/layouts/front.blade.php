@@ -14,7 +14,11 @@
     <link type="text/css" rel="stylesheet" href="{{ asset('theme/css/etihad-front.css') }}">
     @stack('styles')
 
-    <link rel="shortcut icon" href="{{ asset('theme/images/favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('theme/images/favicon_io/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('theme/images/favicon_io/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('theme/images/favicon_io/favicon-16x16.png') }}">
+    <link rel="shortcut icon" href="{{ asset('theme/images/favicon_io/favicon.ico') }}">
+    <link rel="manifest" href="{{ asset('theme/images/favicon_io/site.webmanifest') }}">
 </head>
 <body
     data-base-url="{{ url('/') }}"

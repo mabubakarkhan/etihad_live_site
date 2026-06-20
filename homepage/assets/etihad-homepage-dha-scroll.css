@@ -1,0 +1,209 @@
+/* Horizontal GSAP scroll — DHA phases + Explore Projects (center start/end) */
+
+.dha-showcase--phases .dha-showcase__rail,
+.dha-showcase--projects .dha-showcase__rail {
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  scroll-snap-type: none;
+  pointer-events: auto;
+  padding-top: 2.2rem;
+  padding-bottom: 1.2rem;
+  box-sizing: content-box;
+}
+
+.dha-showcase--phases .dha-showcase__cards,
+.dha-showcase--projects .dha-showcase__cards {
+  --hscroll-card-w: min(27rem, 78vw);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--hscroll-card-w);
+  gap: 2.2rem;
+  width: max-content;
+  padding-left: calc(50vw - var(--hscroll-card-w) / 2);
+  padding-right: calc(50vw - var(--hscroll-card-w) / 2);
+  box-sizing: content-box;
+}
+
+@media (min-width: 992px) {
+  .dha-showcase--phases .dha-showcase__cards,
+  .dha-showcase--projects .dha-showcase__cards {
+    --hscroll-card-w: min(42rem, 36vw);
+  }
+}
+
+.dha-showcase--gsap-scroll .dha-showcase__cards {
+  will-change: transform;
+  pointer-events: auto;
+}
+
+.dha-showcase--phases a.dha-showcase__card,
+.dha-showcase--projects a.dha-showcase__card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dha-showcase--phases .dha-showcase__card,
+.dha-showcase--projects .dha-showcase__card {
+  scroll-snap-align: unset;
+  cursor: pointer;
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
+  transform-origin: center center;
+  border-radius: 2.8rem;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.dha-showcase--phases .dha-showcase__card-media,
+.dha-showcase--projects .dha-showcase__card-media {
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.dha-showcase--phases .dha-showcase__card::before,
+.dha-showcase--projects .dha-showcase__card::before {
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.dha-showcase--phases .dha-showcase__card-media img,
+.dha-showcase--projects .dha-showcase__card-media img {
+  transform-origin: center center;
+}
+
+.dha-showcase--phases .dha-showcase__card::after,
+.dha-showcase--projects .dha-showcase__card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 50% 18%,
+    rgba(187, 156, 70, 0.22) 0%,
+    rgba(187, 156, 70, 0) 58%
+  );
+  transition: opacity 0.45s ease;
+}
+
+.dha-showcase--phases .dha-showcase__card-index,
+.dha-showcase--projects .dha-showcase__card-index {
+  transition: color 0.35s ease, transform 0.35s ease;
+}
+
+.dha-showcase--phases .dha-showcase__tag,
+.dha-showcase--projects .dha-showcase__tag {
+  transition: background-color 0.35s ease, border-color 0.35s ease, transform 0.35s ease;
+}
+
+.dha-showcase--phases .dha-showcase__card-title,
+.dha-showcase--projects .dha-showcase__card-title {
+  transition: color 0.35s ease, transform 0.35s ease;
+}
+
+.dha-showcase--phases .dha-showcase__card-content,
+.dha-showcase--projects .dha-showcase__card-content {
+  transition: transform 0.42s ease;
+}
+
+.dha-showcase--phases .dha-showcase__card-media img,
+.dha-showcase--projects .dha-showcase__card-media img {
+  transition: transform 0.72s ease, filter 0.72s ease;
+}
+
+.dha-showcase--phases .dha-showcase__card,
+.dha-showcase--projects .dha-showcase__card {
+  transition:
+    transform 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.48s ease,
+    border-color 0.35s ease;
+}
+
+.dha-showcase--phases .dha-showcase__card:hover,
+.dha-showcase--projects .dha-showcase__card:hover,
+.dha-showcase--phases .dha-showcase__card:focus-visible,
+.dha-showcase--projects .dha-showcase__card:focus-visible {
+  transform: translateY(-14px) scale(1.025);
+  border-radius: 2.8rem;
+  overflow: hidden;
+  border-color: rgba(200, 162, 76, 0.42);
+  box-shadow:
+    0 2.8rem 6.2rem rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(200, 162, 76, 0.14),
+    0 0 48px rgba(187, 156, 70, 0.18);
+}
+
+.dha-showcase--phases .dha-showcase__card:hover::before,
+.dha-showcase--projects .dha-showcase__card:hover::before,
+.dha-showcase--phases .dha-showcase__card:focus-visible::before,
+.dha-showcase--projects .dha-showcase__card:focus-visible::before {
+  background: linear-gradient(
+    180deg,
+    rgba(8, 8, 8, 0.06) 0%,
+    rgba(8, 8, 8, 0.18) 38%,
+    rgba(6, 6, 6, 0.72) 100%
+  );
+}
+
+.dha-showcase--phases .dha-showcase__card:hover::after,
+.dha-showcase--projects .dha-showcase__card:hover::after,
+.dha-showcase--phases .dha-showcase__card:focus-visible::after,
+.dha-showcase--projects .dha-showcase__card:focus-visible::after {
+  opacity: 1;
+}
+
+.dha-showcase--phases .dha-showcase__card:hover .dha-showcase__card-media img,
+.dha-showcase--projects .dha-showcase__card:hover .dha-showcase__card-media img,
+.dha-showcase--phases .dha-showcase__card:focus-visible .dha-showcase__card-media img,
+.dha-showcase--projects .dha-showcase__card:focus-visible .dha-showcase__card-media img {
+  transform: scale(1.14);
+  filter: saturate(1.08) contrast(1.06) brightness(1.06);
+}
+
+.dha-showcase--phases .dha-showcase__card:hover .dha-showcase__card-content,
+.dha-showcase--projects .dha-showcase__card:hover .dha-showcase__card-content,
+.dha-showcase--phases .dha-showcase__card:focus-visible .dha-showcase__card-content,
+.dha-showcase--projects .dha-showcase__card:focus-visible .dha-showcase__card-content {
+  transform: translateY(-10px);
+}
+
+.dha-showcase--phases .dha-showcase__card:hover .dha-showcase__card-index,
+.dha-showcase--projects .dha-showcase__card:hover .dha-showcase__card-index,
+.dha-showcase--phases .dha-showcase__card:focus-visible .dha-showcase__card-index,
+.dha-showcase--projects .dha-showcase__card:focus-visible .dha-showcase__card-index {
+  color: rgba(187, 156, 70, 0.62);
+  transform: translateX(6px);
+}
+
+.dha-showcase--phases .dha-showcase__card:hover .dha-showcase__tag,
+.dha-showcase--projects .dha-showcase__card:hover .dha-showcase__tag,
+.dha-showcase--phases .dha-showcase__card:focus-visible .dha-showcase__tag,
+.dha-showcase--projects .dha-showcase__card:focus-visible .dha-showcase__tag {
+  background-color: rgba(187, 156, 70, 0.24);
+  border-color: rgba(200, 162, 76, 0.58);
+  transform: scale(1.04);
+}
+
+.dha-showcase--phases .dha-showcase__card:hover .dha-showcase__card-title,
+.dha-showcase--projects .dha-showcase__card:hover .dha-showcase__card-title,
+.dha-showcase--phases .dha-showcase__card:focus-visible .dha-showcase__card-title,
+.dha-showcase--projects .dha-showcase__card:focus-visible .dha-showcase__card-title {
+  color: #f2ddaa;
+  transform: translateY(-2px);
+}
+
+.dha-showcase--phases.is-pin-active,
+.dha-showcase--projects.is-pin-active {
+  z-index: 5;
+}
+
+.dha-showcase--projects.is-pin-active {
+  z-index: 4;
+}

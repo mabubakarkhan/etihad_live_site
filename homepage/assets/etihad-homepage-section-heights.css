@@ -1,0 +1,115 @@
+/* Contemporary + Why: exact viewport height, no extra padding void (desktop) */
+
+@media (min-width: 992px) {
+  section.contemporary {
+    box-sizing: border-box !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    padding-block: 0 !important;
+    overflow: visible !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    isolation: isolate;
+    z-index: 2;
+  }
+
+  section.contemporary .contemporary__content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    flex: 1 1 auto;
+  }
+
+  section.contemporary .contemporary__heading {
+    margin-top: 0 !important;
+  }
+
+  section.why {
+    box-sizing: border-box !important;
+    height: auto !important;
+    min-height: 72vh !important;
+    max-height: none !important;
+    padding-block: 0 !important;
+    overflow: visible !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative;
+    z-index: 2;
+  }
+
+  section.why .why__floating-wrapper {
+    position: absolute;
+    inset: 0;
+    height: 100% !important;
+    min-height: 100% !important;
+    pointer-events: none;
+  }
+
+  section.why .why-flex {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: auto !important;
+    height: auto !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dha-showcase--phases.dha-showcase--gsap-scroll {
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .dha-showcase--phases.is-pin-active {
+    z-index: 4;
+  }
+
+  section.choice,
+  section.engineers,
+  section.clients,
+  section.reviews,
+  section.dha-map {
+    position: relative;
+    z-index: 2;
+    isolation: isolate;
+  }
+
+  .dha-showcase--projects.is-pin-active {
+    z-index: 4;
+  }
+
+  .pin-spacer:has(.dha-showcase--projects) + section.dha-map,
+  .pin-spacer:has(.dha-showcase--projects) + .dha-map,
+  section.dha-map + section.engineers {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+@media (min-width: 992px) and (orientation: portrait) {
+  section.contemporary {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    padding-block: 0 !important;
+  }
+
+  section.why {
+    height: auto !important;
+    min-height: 72vh !important;
+    padding-block: 0 !important;
+  }
+}
+
+/* Prevent GSAP pin-spacer from adding phantom bottom gap after DHA */
+.dha-showcase--phases + .pin-spacer,
+.pin-spacer:has(+ .popular-listings),
+.pin-spacer:has(+ section.popular-listings) {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}

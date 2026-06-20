@@ -44,3 +44,9 @@
   display: flex !important;
   align-items: stretch;
 }
+
+.dha-showcase__card,
+.popular-listings__card {
+  margin-left: 10px;
+  margin-right: 10px;
+}

@@ -20,16 +20,14 @@
         $metaTwo = 'Est. ' . trim((string) $phase->stat_year_developed);
     }
 @endphp
-                <article class="dha-showcase__card">
+                <a href="{{ route('dha.phase.show', $phase->slug) }}" class="dha-showcase__card">
                   <div class="dha-showcase__card-media">
                     <img src="{{ $imageUrl }}" alt="{{ $phase->title }} preview" loading="lazy" />
                   </div>
                   <div class="dha-showcase__card-content">
                     <span class="dha-showcase__card-index">{{ $phase->cardPhaseNumber() }}</span>
                     <span class="dha-showcase__tag">{{ $tag }}</span>
-                    <h3 class="dha-showcase__card-title">
-                      <a href="{{ route('dha.phase.show', $phase->slug) }}">{{ $phase->title }}</a>
-                    </h3>
+                    <h3 class="dha-showcase__card-title">{{ $phase->title }}</h3>
                     @if($excerpt !== '')
                     <p class="dha-showcase__card-text">{{ $excerpt }}</p>
                     @endif
@@ -44,5 +42,5 @@
                     </div>
                     @endif
                   </div>
-                </article>
+                </a>
 @endforeach

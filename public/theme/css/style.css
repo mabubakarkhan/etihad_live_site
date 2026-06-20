@@ -233,6 +233,17 @@ blockquote p {
 	height: 100%;
 	width: auto;
 }
+@media only screen and (min-width: 1269px) {
+.logo-holder {
+	position: relative;
+	float: left;
+	top: 50%;
+	margin-left: 0px;
+	height: 40px;
+	line-height: 12px;
+	margin-top: -19px;
+}
+}
 .progress-bar-wrap {
 	position:fixed;
 	top:0;

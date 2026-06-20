@@ -6,10 +6,26 @@
   gap: min(1.4rem, 1.4vh);
 }
 
+/* Larger homepage navbar logo — does not change .navbar-flex padding / header height */
+.navbar .navbar-flex .navbar-logo {
+  width: 18rem;
+  height: 6.2rem;
+}
+
+.navbar .navbar-flex .navbar-logo img {
+  object-fit: contain;
+  object-position: center;
+}
+
 @media screen and (orientation: portrait) {
   .footer-navigation.footer-navigation--legal {
     margin-left: 1.5rem;
     margin-bottom: 1rem;
     gap: 1.7rem;
+  }
+
+  .navbar .navbar-flex .navbar-logo {
+    width: 11.5rem;
+    height: 3.6rem;
   }
 }

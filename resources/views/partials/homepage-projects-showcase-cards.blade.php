@@ -44,16 +44,14 @@
         $metaTwo = '';
     }
 @endphp
-                <article class="dha-showcase__card">
+                <a href="{{ route('project.show', $project->slug) }}" class="dha-showcase__card">
                   <div class="dha-showcase__card-media">
                     <img src="{{ $imageUrl }}" alt="{{ $project->title }} preview" loading="lazy" />
                   </div>
                   <div class="dha-showcase__card-content">
                     <span class="dha-showcase__card-index">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                     <span class="dha-showcase__tag">{{ $tag }}</span>
-                    <h3 class="dha-showcase__card-title">
-                      <a href="{{ route('project.show', $project->slug) }}">{{ $project->title }}</a>
-                    </h3>
+                    <h3 class="dha-showcase__card-title">{{ $project->title }}</h3>
                     @if($excerpt !== '')
                     <p class="dha-showcase__card-text">{{ $excerpt }}</p>
                     @endif
@@ -68,5 +66,5 @@
                     </div>
                     @endif
                   </div>
-                </article>
+                </a>
 @endforeach

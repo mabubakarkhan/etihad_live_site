@@ -11,21 +11,22 @@ __HOMEPAGE_HEAD_SEO__
     <link
       rel="apple-touch-icon"
       sizes="180x180"
-      href="assets/apple-touch-icon-Cl2TW7YV.png"
+      href="assets/favicon_io/apple-touch-icon.png"
     />
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="assets/favicon-32x32-BL25MEGr.png"
+      href="assets/favicon_io/favicon-32x32.png"
     />
     <link
       rel="icon"
       type="image/png"
       sizes="16x16"
-      href="assets/favicon-16x16-DPudXOeL.png"
+      href="assets/favicon_io/favicon-16x16.png"
     />
-    <link rel="manifest" href="assets/site-CowvP55N.webmanifest" />
+    <link rel="shortcut icon" href="assets/favicon_io/favicon.ico" />
+    <link rel="manifest" href="assets/favicon_io/site.webmanifest" />
     <link rel="stylesheet" href="dist/swiper-bundle.min.css" />
     <link rel="preload" as="style" href="assets/app-ehDD15A5.css" />
     <link rel="stylesheet" href="assets/app-ehDD15A5.css" />
@@ -39,6 +40,7 @@ __HOMEPAGE_HEAD_SEO__
     <link rel="modulepreload" href="assets/drag-follower-CaHV_THh.js" />
     <link rel="stylesheet" href="assets/homepage-DUfNMqJf.css" />
     <link rel="stylesheet" href="assets/etihad-homepage-overrides.css" />
+    <link rel="stylesheet" href="assets/etihad-homepage-section-heights.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
     <link rel="stylesheet" href="assets/etihad-homepage-slick.css" />
     <script type="module" defer src="assets/homepage-D6GbVUca.js"></script>
@@ -1240,8 +1242,8 @@ __HOMEPAGE_HEAD_SEO__
       .dha-map__container {
         position: relative;
         display: grid;
-        grid-template-columns: 1fr 25rem;
-        gap: 3rem;
+        grid-template-columns: minmax(0, 1fr) minmax(34rem, 38rem);
+        gap: 2.4rem;
         align-items: stretch;
       }
 
@@ -1466,31 +1468,64 @@ __HOMEPAGE_HEAD_SEO__
         display: flex;
         flex-direction: column;
         min-height: 50rem;
-        padding: 2rem;
-        background: rgba(20, 20, 30, 0.6);
-        border: 1px solid rgba(187, 156, 70, 0.2);
-        border-radius: 1.2rem;
-        backdrop-filter: blur(1rem);
+        padding: 2.4rem 2.2rem 2rem;
+        background:
+          linear-gradient(165deg, rgba(28, 26, 22, 0.96) 0%, rgba(14, 14, 18, 0.92) 55%, rgba(20, 18, 14, 0.94) 100%);
+        border: 1px solid rgba(187, 156, 70, 0.28);
+        border-radius: 2rem;
+        backdrop-filter: blur(1.2rem);
         box-sizing: border-box;
+        box-shadow:
+          0 2.4rem 5rem rgba(0, 0, 0, 0.28),
+          inset 0 1px 0 rgba(255, 255, 255, 0.06),
+          0 0 0 1px rgba(187, 156, 70, 0.06);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .dha-map__legend::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent 0%, #bb9c46 18%, #e8d08a 50%, #bb9c46 82%, transparent 100%);
+        opacity: 0.9;
       }
 
       .dha-map__legend-title {
-        margin: 0 0 1.5rem;
+        margin: 0 0 1.8rem;
+        padding: 0 0 1.4rem;
         color: #fff;
-        font-size: 1.2rem;
+        font-size: 1.55rem;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.12rem;
+        letter-spacing: 0.14rem;
+        line-height: 1.2;
+        border-bottom: 1px solid rgba(187, 156, 70, 0.22);
+        position: relative;
+      }
+
+      .dha-map__legend-title::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -1px;
+        width: 4.8rem;
+        height: 2px;
+        background: linear-gradient(90deg, #bb9c46 0%, rgba(187, 156, 70, 0.15) 100%);
+        border-radius: 999px;
       }
 
       .dha-map__communities-container {
         display: flex;
         flex-direction: column;
         flex: 1 1 auto;
-        gap: 1.5rem;
+        gap: 1rem;
         min-height: 0;
         overflow-y: auto;
-        padding-right: 0.5rem;
+        padding-right: 0.35rem;
       }
 
       .dha-map__communities-container::-webkit-scrollbar {
@@ -1576,48 +1611,59 @@ __HOMEPAGE_HEAD_SEO__
         padding: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.6rem;
+        gap: 0.85rem;
       }
 
       .dha-map__location-item {
         display: flex;
-        align-items: center;
-        gap: 0.8rem;
-        padding: 0.6rem 0.8rem 0.6rem 2rem;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.1rem 1.2rem 1.1rem 1.4rem;
         cursor: pointer;
-        border-radius: 0.6rem;
-        transition: all 0.3s ease;
+        border-radius: 1.1rem;
+        transition: all 0.28s ease;
         position: relative;
         overflow: hidden;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.07);
       }
 
       .dha-map__location-item::before {
         content: '';
         position: absolute;
-        left: 0.8rem;
-        width: 0.5rem;
-        height: 0.5rem;
-        background: currentColor;
-        border-radius: 50%;
-        flex-shrink: 0;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, #bb9c46 0%, rgba(187, 156, 70, 0.35) 100%);
+        opacity: 0.55;
+        border-radius: 1.1rem 0 0 1.1rem;
       }
 
       .dha-map__location-item:hover {
-        background: rgba(187, 156, 70, 0.12);
+        background: rgba(187, 156, 70, 0.1);
+        border-color: rgba(187, 156, 70, 0.28);
+        transform: translateX(4px);
+        box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.18);
       }
 
       .dha-map__location-pin {
-        width: 0.6rem;
-        height: 0.6rem;
+        width: 0.72rem;
+        height: 0.72rem;
         border-radius: 50%;
         flex-shrink: 0;
+        margin-top: 0.35rem;
+        box-shadow: 0 0 0.8rem currentColor;
       }
 
       .dha-map__location-text {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.85rem;
-        line-height: 1.3;
-        transition: color 0.3s ease;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 1.08rem;
+        line-height: 1.45;
+        transition: color 0.28s ease;
+        flex: 1 1 auto;
+        min-width: 0;
+        word-break: break-word;
       }
 
       .dha-map__location-item:hover .dha-map__location-text {
@@ -1625,11 +1671,18 @@ __HOMEPAGE_HEAD_SEO__
       }
 
       .dha-map__location-item.is-active {
-        background: rgba(187, 156, 70, 0.14);
+        background: linear-gradient(135deg, rgba(187, 156, 70, 0.16) 0%, rgba(187, 156, 70, 0.06) 100%);
+        border-color: rgba(187, 156, 70, 0.42);
+        box-shadow: 0 0.8rem 2.2rem rgba(187, 156, 70, 0.12);
+      }
+
+      .dha-map__location-item.is-active::before {
+        opacity: 1;
       }
 
       .dha-map__location-item.is-active .dha-map__location-text {
         color: #fff;
+        font-weight: 600;
       }
 
       .dha-map__empty-note {
@@ -1755,10 +1808,10 @@ __HOMEPAGE_HEAD_SEO__
 
         .dha-map__legend {
           min-height: 40rem;
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-          gap: 1rem;
-          padding: 1.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+          padding: 2rem 1.8rem;
         }
 
         .dha-map__legend-list {
@@ -1794,7 +1847,7 @@ __HOMEPAGE_HEAD_SEO__
 
         .dha-map__legend {
           min-height: 35rem;
-          padding: 1.5rem;
+          padding: 1.8rem 1.5rem;
         }
 
         .dha-map__tooltip {
@@ -1825,10 +1878,16 @@ __HOMEPAGE_HEAD_SEO__
 
         .dha-map__legend {
           min-height: 30rem;
-          padding: 1rem;
+          padding: 1.5rem 1.2rem;
         }
 
         .dha-map__legend-title {
+          font-size: 1.25rem;
+          margin-bottom: 1.4rem;
+          padding-bottom: 1.1rem;
+        }
+
+        .dha-map__location-text {
           font-size: 1rem;
         }
 
@@ -2705,6 +2764,7 @@ __HOMEPAGE_HEAD_SEO__
         }
       }
     </style>
+    <link rel="stylesheet" href="assets/etihad-homepage-dha-scroll.css?v=4" />
 
     <!-- Etihad map helpers (same as listing page) -->
     <script src="../theme/js/etihad-map-styles.js"></script>
@@ -2737,7 +2797,7 @@ __HOMEPAGE_NAVBAR_NAV__
             </ul>
 
             <a href="index.html" class="navbar-logo" aria-label="Etihad Logo">
-              <img src="assets/eti.png" alt="Etihad Logo" />
+              <img src="assets/logo.png" alt="Etihad Logo" />
             </a>
 
             <div class="navbar-hamburger" data-menu-toggle>
@@ -4708,6 +4768,8 @@ __HOMEPAGE_FOOTER_LEGAL__
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
     <script src="assets/etihad-homepage-slick.js"></script>
+    <script src="assets/etihad-homepage-contemporary-fix.js?v=5"></script>
+    <script src="assets/etihad-homepage-dha-scroll.js?v=9"></script>
     
     <!-- Loader Script -->
     <script>
@@ -4729,6 +4791,17 @@ __HOMEPAGE_FOOTER_LEGAL__
             onComplete: () => {
               progressBar.style.display = 'none'; // Remove the progress bar completely
               document.body.style.overflowY = 'auto'; // Enable body scroll
+              window.setTimeout(function () {
+                if (typeof window.EtihadHomepageScrollSetup === 'function') {
+                  window.EtihadHomepageScrollSetup();
+                } else if (window.EtihadHomepageDhaScroll && typeof window.EtihadHomepageDhaScroll.init === 'function') {
+                  window.EtihadHomepageDhaScroll.init();
+                  if (window.ScrollTrigger) {
+                    window.ScrollTrigger.refresh(true);
+                  }
+                  window.dispatchEvent(new Event('resize'));
+                }
+              }, 100);
             },
           });
         },

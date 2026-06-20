@@ -2,7 +2,7 @@
     $setting = $setting ?? \App\Models\HomepageDhaSectionSetting::instance();
     $phases = $phases ?? collect();
 @endphp
-        <section class="dha-showcase">
+        <section class="dha-showcase dha-showcase--phases">
           <div class="dha-showcase__inner">
             <div class="dha-showcase__header">
               <div class="dha-showcase__eyebrow">{{ e($setting->eyebrow) }}</div>

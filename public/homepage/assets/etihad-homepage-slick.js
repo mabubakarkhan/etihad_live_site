@@ -92,6 +92,11 @@
   }
 
   function initShowcaseSection(section) {
+    /* Explore Projects uses GSAP horizontal scroll — see etihad-homepage-dha-scroll.js */
+    if (section.classList.contains('dha-showcase--projects') || section.classList.contains('dha-showcase--phases')) {
+      return;
+    }
+
     const track = section.querySelector('.dha-showcase__cards');
     if (!track || track.classList.contains('slick-initialized')) {
       return;
@@ -201,10 +206,7 @@
     );
 
     bindControls(section, $slider, '[data-dealers-prev]', '[data-dealers-next]');
-
-    window.setTimeout(function () {
-      $slider.slick('setPosition');
-    }, 100);
+    $slider.slick('setPosition');
 
     if (!prefersReducedMotion) {
       section.querySelectorAll('.popular-listings__card').forEach(function (card) {
@@ -289,10 +291,6 @@
       if (!isVisible) {
         $slider.slick('slickPause');
       }
-
-      window.setTimeout(function () {
-        $slider.slick('setPosition');
-      }, 100);
     });
   }
 
@@ -315,7 +313,7 @@
       return;
     }
 
-    document.querySelectorAll('.dha-showcase').forEach(function (section) {
+    document.querySelectorAll('.dha-showcase--projects').forEach(function (section) {
       const intro = section.querySelector('.dha-showcase__header');
       const orbs = section.querySelectorAll('.dha-showcase__orb');
 
