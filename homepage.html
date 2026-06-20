@@ -1467,8 +1467,7 @@ __HOMEPAGE_HEAD_SEO__
       .dha-map__legend {
         display: flex;
         flex-direction: column;
-        height: 50rem;
-        max-height: 50rem;
+        min-height: 50rem;
         padding: 2.4rem 2.2rem 2rem;
         background:
           linear-gradient(165deg, rgba(28, 26, 22, 0.96) 0%, rgba(14, 14, 18, 0.92) 55%, rgba(20, 18, 14, 0.94) 100%);
@@ -1498,7 +1497,6 @@ __HOMEPAGE_HEAD_SEO__
       .dha-map__legend-title {
         margin: 0 0 1.8rem;
         padding: 0 0 1.4rem;
-        flex-shrink: 0;
         color: #fff;
         font-size: 1.55rem;
         font-weight: 700;
@@ -1526,29 +1524,26 @@ __HOMEPAGE_HEAD_SEO__
         flex: 1 1 auto;
         gap: 1rem;
         min-height: 0;
-        overflow-x: hidden;
         overflow-y: auto;
-        padding-right: 0.5rem;
-        scrollbar-width: thin;
-        scrollbar-color: #bb9c46 rgba(187, 156, 70, 0.08);
+        padding-right: 0.35rem;
       }
 
       .dha-map__communities-container::-webkit-scrollbar {
-        width: 0.35rem;
+        width: 0.4rem;
       }
 
       .dha-map__communities-container::-webkit-scrollbar-track {
-        background: rgba(187, 156, 70, 0.06);
-        border-radius: 999px;
+        background: rgba(187, 156, 70, 0.05);
+        border-radius: 0.2rem;
       }
 
       .dha-map__communities-container::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, #e8d08a 0%, #bb9c46 100%);
-        border-radius: 999px;
+        background: rgba(187, 156, 70, 0.3);
+        border-radius: 0.2rem;
       }
 
       .dha-map__communities-container::-webkit-scrollbar-thumb:hover {
-        background: #bb9c46;
+        background: rgba(187, 156, 70, 0.5);
       }
 
       .dha-map__community-group {
@@ -1812,8 +1807,7 @@ __HOMEPAGE_HEAD_SEO__
         }
 
         .dha-map__legend {
-          height: 40rem;
-          max-height: 40rem;
+          min-height: 40rem;
           display: flex;
           flex-direction: column;
           gap: 0;
@@ -1852,8 +1846,7 @@ __HOMEPAGE_HEAD_SEO__
         }
 
         .dha-map__legend {
-          height: 35rem;
-          max-height: 35rem;
+          min-height: 35rem;
           padding: 1.8rem 1.5rem;
         }
 
@@ -1884,8 +1877,7 @@ __HOMEPAGE_HEAD_SEO__
         }
 
         .dha-map__legend {
-          height: 30rem;
-          max-height: 30rem;
+          min-height: 30rem;
           padding: 1.5rem 1.2rem;
         }
 

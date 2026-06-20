@@ -328,8 +328,8 @@ Route::get('/', function () {
         ->active()
         ->whereNotNull('latitude')
         ->whereNotNull('longitude')
-        ->frontOrdered()
-        ->limit(100)
+        ->latest()
+        ->limit(7)
         ->get()
         ->map(function (Property $p) {
             $address = trim(implode(', ', array_filter([
