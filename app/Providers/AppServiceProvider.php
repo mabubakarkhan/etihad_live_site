@@ -2,8 +2,16 @@
 
 namespace App\Providers;
 
+use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Filesystem\LocalFilesystemAdapter;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use League\Flysystem\Local\LocalFilesystemAdapter as FlysystemLocalAdapter;
+use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
+use League\Flysystem\Visibility;
+use League\MimeTypeDetection\ExtensionMimeTypeDetector;
+use ReflectionMethod;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -81,8 +89,56 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->configureFilesystemWithoutFileinfo();
         $this->registerAdminViewComposer();
         $this->registerFrontViewComposer();
+    }
+
+    /**
+     * Hosts without PHP fileinfo break Flysystem's default FinfoMimeTypeDetector.
+     */
+    protected function configureFilesystemWithoutFileinfo(): void
+    {
+        if (extension_loaded('fileinfo') && class_exists(\finfo::class, false)) {
+            return;
+        }
+
+        Storage::extend('local', function ($app, array $config) {
+            /** @var FilesystemManager $manager */
+            $manager = $app->make('filesystem');
+
+            $visibility = PortableVisibilityConverter::fromArray(
+                $config['permissions'] ?? [],
+                $config['directory_visibility'] ?? $config['visibility'] ?? Visibility::PRIVATE
+            );
+
+            $links = ($config['links'] ?? null) === 'skip'
+                ? FlysystemLocalAdapter::SKIP_LINKS
+                : FlysystemLocalAdapter::DISALLOW_LINKS;
+
+            $adapter = new FlysystemLocalAdapter(
+                $config['root'],
+                $visibility,
+                $config['lock'] ?? LOCK_EX,
+                $links,
+                new ExtensionMimeTypeDetector()
+            );
+
+            $createFlysystem = new ReflectionMethod($manager, 'createFlysystem');
+            $createFlysystem->setAccessible(true);
+            $driver = $createFlysystem->invoke($manager, $adapter, $config);
+
+            $filesystem = new LocalFilesystemAdapter($driver, $adapter, $config);
+
+            if (! empty($config['serve'])) {
+                $filesystem->shouldServeSignedUrls(
+                    true,
+                    fn () => $app['url'],
+                );
+            }
+
+            return $filesystem;
+        });
     }
 
     /**
