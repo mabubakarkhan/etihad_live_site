@@ -615,9 +615,8 @@
                         @foreach($videoGalleryItems as $vIdx => $videoItem)
                             <div class="swiper-slide">
                                 <a href="#" class="project-new-video-gallery-card project-new-open-video-gallery" data-index="{{ $vIdx }}">
-                                    <img src="{{ $videoItem['thumb'] }}" alt="{{ $videoItem['title'] }}" loading="lazy">
+                                    <img src="{{ $videoItem['thumb'] }}" alt="Gallery video" loading="lazy">
                                     <span class="project-new-video-gallery-play"><i class="fa-solid fa-play"></i></span>
-                                    <span class="project-new-video-gallery-title">{{ $videoItem['title'] }}</span>
                                 </a>
                             </div>
                         @endforeach
