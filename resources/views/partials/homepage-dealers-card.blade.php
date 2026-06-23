@@ -13,10 +13,6 @@
         trim((string) ($dealer->state ?? '')),
     ])));
 
-    $excerpt = $dealer->info_detail
-        ? \Illuminate\Support\Str::limit(strip_tags($dealer->info_detail), 120)
-        : '';
-
     $propsCount = (int) ($dealer->properties_count ?? 0);
     $viewsCount = (int) ($dealer->view_count ?? 0);
     $highlight = $propsCount === 1 ? '1 Property' : number_format($propsCount) . ' Properties';
@@ -35,9 +31,6 @@
                         <a href="{{ route('dealer.show', $dealer->slug) }}">{{ $dealer->name }}</a>
                       </h3>
                       <p class="popular-listings__price">{{ $highlight }}</p>
-                      @if($excerpt !== '')
-                      <p class="popular-listings__text">{{ $excerpt }}</p>
-                      @endif
                       <div class="popular-listings__meta">
                         <div><span class="popular-listings__meta-value">{{ number_format($propsCount) }}</span><span class="popular-listings__meta-label">Properties</span></div>
                         <div><span class="popular-listings__meta-value">{{ number_format($viewsCount) }}</span><span class="popular-listings__meta-label">Views</span></div>

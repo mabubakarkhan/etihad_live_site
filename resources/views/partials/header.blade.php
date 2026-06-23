@@ -3,7 +3,7 @@
 <header class="main-header">
     <div class="container">
         <div class="header-inner">
-            <a href="{{ route('portal') }}" class="logo-holder"><img src="{{ asset('theme/images/logo.png') }}" alt="{{ config('app.name') }}"></a>
+            <a href="{{ route('portal') }}" class="logo-holder"><img src="{{ asset('theme/images/logo.png') }}" alt="{{ config('app.name') }}" class="etihad-lazy-skip" data-lazy-eager="1"></a>
             <!--  navigation -->
             <div class="nav-holder main-menu">
                 <nav>

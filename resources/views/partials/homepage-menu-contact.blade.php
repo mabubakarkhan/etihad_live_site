@@ -6,7 +6,7 @@
 @include('partials.homepage-social-links', ['cs' => $cs, 'linkClass' => $linkClass])
                 </div>
 
-              <a class="CTA-btn" href="javascript:void(0);">
+              <a class="CTA-btn" href="{{ route('projects') }}">
                 <div class="CTA-btn__border">
                 </div>
                 <div class="CTA-btn__blur">
@@ -16,7 +16,7 @@
 
                 <div class="CTA-btn__inner">
                   <span class="CTA-btn__icon"></span>
-                  <span class="CTA-btn__text">Got a project in mind?</span>
+                  <span class="CTA-btn__text">Want to know about our projects</span>
                 </div>
               </a>
 

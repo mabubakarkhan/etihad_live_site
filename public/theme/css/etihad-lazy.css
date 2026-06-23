@@ -1,0 +1,93 @@
+/* Etihad portal — lazy image placeholders (gold / dark theme) */
+
+.etihad-lazy,
+.etihad-lazy-wrap,
+.etihad-lazy-bg,
+.property-lazy-wrap.etihad-lazy {
+  position: relative;
+  overflow: hidden;
+  background-color: #131313;
+}
+
+.etihad-lazy-bg {
+  background-color: #131313;
+}
+
+.etihad-lazy__shimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    #141414 0%,
+    #1c1c1c 38%,
+    rgba(187, 156, 70, 0.16) 50%,
+    #1c1c1c 62%,
+    #141414 100%
+  );
+  background-size: 220% 100%;
+  animation: etihadLazyShimmer 1.35s ease-in-out infinite;
+  transition: opacity 0.45s ease;
+}
+
+.etihad-lazy__shimmer::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin: -1.3rem 0 0 -1.3rem;
+  border: 2px solid rgba(187, 156, 70, 0.22);
+  border-top-color: #bb9c46;
+  border-radius: 50%;
+  animation: etihadLazySpin 0.8s linear infinite;
+}
+
+.etihad-lazy.is-loaded .etihad-lazy__shimmer,
+.etihad-lazy-wrap.is-loaded .etihad-lazy__shimmer,
+.etihad-lazy-bg.is-loaded .etihad-lazy__shimmer,
+.property-lazy-wrap.is-loaded .etihad-lazy__shimmer {
+  opacity: 0;
+}
+
+.etihad-lazy-img {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.etihad-lazy-img.is-visible,
+.etihad-lazy-wrap.is-loaded .etihad-lazy-img,
+.property-lazy-wrap.is-loaded .etihad-lazy-img {
+  opacity: 1;
+}
+
+.etihad-lazy .property-lazy-loader {
+  display: none;
+}
+
+.etihad-lazy-bg.is-loaded {
+  background-color: transparent;
+}
+
+.etihad-lazy.is-error,
+.etihad-lazy-bg.is-error,
+.etihad-lazy-wrap.is-error {
+  background: linear-gradient(145deg, #161616 0%, #1f1f1f 100%);
+}
+
+@keyframes etihadLazyShimmer {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes etihadLazySpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

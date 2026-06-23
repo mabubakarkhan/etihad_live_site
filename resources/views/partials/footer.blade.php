@@ -78,7 +78,7 @@
         </div>
         <div class="footer-bottom">
             <a href="{{ url('/') }}" class="footer-home_link"><i class="fa-regular fa-house"></i></a>
-            <div class="copyright"><span>&#169; {{ date('Y') }} Etihad Marketing</span> · Developed by <a href="https://hildes.io" target="_blank" rel="noopener" class="footer-dev-link">HilDes</a></div>
+            <div class="copyright"><span>&#169; {{ date('Y') }} Etihad Marketing</span> · By Etihad</div>
             <div class="footer-social">
                 <span class="footer-social-title">Follow Us</span>
                 <div class="footer-social-wrap">

@@ -757,7 +757,7 @@
 }
 .portal-ad-btn:hover { color: #0f172a; opacity: 0.94; }
 .portal-ad-card-dealers.has-ad-avatars .portal-ad-content--with-avatars {
-    padding-left: 240px;
+    padding-left: 205px;
 }
 .portal-ad-avatar-stack {
     position: absolute;
@@ -789,9 +789,10 @@
     overflow: visible;
 }
 .portal-ad-card-dealers .portal-ad-avatar-item {
-    width: 70px;
-    height: 70px;
-    margin-left: -18px;
+    width: 56px;
+    height: 56px;
+    margin-left: -12px;
+    border-width: 2px;
 }
 .portal-ad-avatar-item:first-child { margin-left: 0; }
 .portal-ad-avatar-item:hover,
@@ -850,9 +851,9 @@
         border-width: 2px;
     }
     .portal-ad-card-dealers .portal-ad-avatar-item {
-        width: 60px;
-        height: 60px;
-        margin-left: -14px;
+        width: 48px;
+        height: 48px;
+        margin-left: -10px;
         border-width: 2px;
     }
     .portal-ad-avatar-tooltip {

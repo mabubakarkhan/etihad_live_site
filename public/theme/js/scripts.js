@@ -5,10 +5,14 @@ function initRenstate() {
             opacity: "1"
         }, 600);
     });
-    //   Background image ------------------
+    //   Background image — deferred to etihad-lazy.js
     var a = $(".bg");
-    a.each(function (a) {
-        if ($(this).attr("data-bg")) $(this).css("background-image", "url(" + $(this).data("bg") + ")");
+    a.each(function () {
+        var $el = $(this);
+        var bg = $el.attr("data-bg");
+        if (bg) {
+            $el.addClass("etihad-lazy etihad-lazy-bg").attr("data-lazy-bg", bg).removeAttr("data-bg");
+        }
     });
     //   Isotope------------------
     function n() {

@@ -244,6 +244,10 @@
       window.EtihadHomepageDhaScroll.init();
     }
 
+    if (window.EtihadHomepageDealersScroll && typeof window.EtihadHomepageDealersScroll.init === 'function') {
+      window.EtihadHomepageDealersScroll.init();
+    }
+
     window.requestAnimationFrame(function () {
       refreshOnce();
     });

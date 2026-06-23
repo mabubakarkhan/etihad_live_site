@@ -9,10 +9,6 @@
         ?: implode(', ', array_filter([trim((string) ($property->town ?? '')), trim((string) ($property->city ?? ''))]))
     ));
 
-    $excerpt = $property->description
-        ? \Illuminate\Support\Str::limit(strip_tags($property->description), 120)
-        : '';
-
     $price = format_price($property->price_digits, $property->price_string);
 
     $areaParts = [];
@@ -45,9 +41,6 @@
                         <a href="{{ route('property.show', $property->slug) }}">{{ $property->title }}</a>
                       </h3>
                       <p class="popular-listings__price">{{ $price }}</p>
-                      @if($excerpt !== '')
-                      <p class="popular-listings__text">{{ $excerpt }}</p>
-                      @endif
                       <div class="popular-listings__meta">
                         @if($areaLabel)
                         <div><span class="popular-listings__meta-value">{{ $areaLabel }}</span><span class="popular-listings__meta-label">Plot Size</span></div>

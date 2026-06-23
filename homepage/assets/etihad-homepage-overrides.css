@@ -17,6 +17,64 @@
   object-position: center;
 }
 
+/* Menu sidebar: CTA + contact links on one bottom row */
+.menu .menu-flex .menu-socials {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto auto;
+  align-items: end;
+}
+
+.menu .menu-flex .menu-socials__title,
+.menu .menu-flex .menu-socials__container {
+  grid-column: 1 / -1;
+}
+
+.menu .menu-flex .menu-socials__container {
+  margin-bottom: min(3rem, 3vh);
+}
+
+.menu .menu-flex .menu-socials > .CTA-btn {
+  grid-column: 1;
+  grid-row: 3;
+  align-self: center;
+  justify-self: start;
+  margin: 0;
+  width: fit-content;
+}
+
+.menu .menu-flex .menu-socials > .menu-terms {
+  grid-column: 2;
+  grid-row: 3;
+  align-self: center;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+/* Footer CTA — match sidebar menu button */
+.footer .CTA-btn {
+  width: fit-content;
+  max-width: none;
+  margin: 0;
+  justify-self: start;
+}
+
+.footer .CTA-btn .CTA-btn__icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.footer .CTA-btn .CTA-btn__background {
+  -webkit-backdrop-filter: var(--filter);
+  backdrop-filter: var(--filter);
+}
+
+.footer .CTA-btn .CTA-btn__text {
+  font-size: min(1.8rem, 1.8vh);
+}
+
 @media screen and (orientation: portrait) {
   .footer-navigation.footer-navigation--legal {
     margin-left: 1.5rem;
@@ -27,5 +85,21 @@
   .navbar .navbar-flex .navbar-logo {
     width: 11.5rem;
     height: 3.6rem;
+  }
+
+  .footer .CTA-btn {
+    width: fit-content;
+    max-width: calc(100% - 4rem);
+    margin: 4rem 2rem 4.5rem;
+    justify-self: start;
+  }
+
+  .footer .CTA-btn .CTA-btn__icon {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  .footer .CTA-btn .CTA-btn__text {
+    font-size: 1.8rem;
   }
 }

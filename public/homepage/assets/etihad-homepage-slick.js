@@ -6,6 +6,7 @@
   }
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let slidersInitialized = false;
 
   function buildSettings(overrides) {
     return $.extend(
@@ -44,6 +45,22 @@
     );
   }
 
+  function buildListingSettings(slideCount, overrides) {
+    return buildSettings(
+      $.extend(
+        {
+          variableWidth: true,
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: slideCount > 2,
+          autoplay: !prefersReducedMotion && slideCount > 1,
+          responsive: [],
+        },
+        overrides || {}
+      )
+    );
+  }
+
   function updateProgress(section, slick, currentIndex) {
     const fill = section.querySelector('.dha-showcase__progress span, .popular-listings__progress span');
     if (!fill || !slick || !slick.slideCount) {
@@ -65,9 +82,20 @@
       fill.style.width = width + '%';
     }
 
-    section.querySelectorAll('.dha-showcase__card, .popular-listings__card').forEach(function (card, cardIndex) {
-      card.classList.toggle('is-active', cardIndex === normalized);
+    section.querySelectorAll('.dha-showcase__card, .popular-listings__card').forEach(function (card) {
+      card.classList.remove('is-active');
     });
+
+    if (slick.$slides && slick.$slides.length) {
+      const activeSlide = slick.$slides.get(normalized);
+      const card = activeSlide
+        ? activeSlide.querySelector('.popular-listings__card, .dha-showcase__card')
+        : null;
+
+      if (card) {
+        card.classList.add('is-active');
+      }
+    }
   }
 
   function bindControls(section, $slider, prevSelector, nextSelector) {
@@ -178,85 +206,6 @@
     }
   }
 
-  function initDealersSection(section) {
-    const track = section.querySelector('.popular-listings__grid');
-    if (!track || track.classList.contains('slick-initialized')) {
-      return;
-    }
-
-    const slideCount = track.children.length;
-    if (slideCount < 1) {
-      return;
-    }
-
-    const rail = section.querySelector('.popular-listings__rail');
-    if (rail) {
-      rail.classList.add('homepage-slick-rail');
-    }
-
-    track.classList.add('homepage-slick');
-
-    const $slider = $(track);
-    $slider.slick(
-      buildSettings({
-        infinite: slideCount > 3,
-        autoplay: !prefersReducedMotion && slideCount > 1,
-        initialSlide: 0,
-      })
-    );
-
-    bindControls(section, $slider, '[data-dealers-prev]', '[data-dealers-next]');
-    $slider.slick('setPosition');
-
-    if (!prefersReducedMotion) {
-      section.querySelectorAll('.popular-listings__card').forEach(function (card) {
-        const image = card.querySelector('.popular-listings__media img');
-
-        card.addEventListener('mouseenter', function () {
-          if (!window.gsap) {
-            return;
-          }
-
-          window.gsap.to(card, {
-            y: -12,
-            borderColor: 'rgba(200, 162, 76, 0.28)',
-            duration: 0.35,
-            ease: 'power2.out',
-          });
-
-          if (image) {
-            window.gsap.to(image, {
-              scale: 1.08,
-              duration: 0.5,
-              ease: 'power2.out',
-            });
-          }
-        });
-
-        card.addEventListener('mouseleave', function () {
-          if (!window.gsap) {
-            return;
-          }
-
-          window.gsap.to(card, {
-            y: 0,
-            borderColor: 'rgba(255, 255, 255, 0.08)',
-            duration: 0.35,
-            ease: 'power2.out',
-          });
-
-          if (image) {
-            window.gsap.to(image, {
-              scale: 1,
-              duration: 0.5,
-              ease: 'power2.out',
-            });
-          }
-        });
-      });
-    }
-  }
-
   const hotOffersSliders = new Map();
 
   function initHotOffersSection() {
@@ -270,23 +219,31 @@
         return;
       }
 
+      const rail = track.closest('.popular-listings__rail');
+      if (rail) {
+        rail.classList.add('homepage-slick-rail');
+      }
+
       track.classList.add('homepage-slick');
 
       const panel = track.closest('.popular-listings__panel');
       const $slider = $(track);
       const isVisible = panel && !panel.hidden;
+      const slideCount = track.children.length;
 
       $slider.slick(
-        buildSettings({
-          infinite: track.children.length > 3,
-          autoplay: !prefersReducedMotion && isVisible && track.children.length > 1,
+        buildListingSettings(slideCount, {
           initialSlide: 0,
+          autoplay: !prefersReducedMotion && isVisible && slideCount > 1,
         })
       );
 
       if (panel) {
         hotOffersSliders.set(panel.id, $slider);
       }
+
+      $slider.slick('slickGoTo', 0, true);
+      $slider.slick('setPosition');
 
       if (!isVisible) {
         $slider.slick('slickPause');
@@ -386,11 +343,24 @@
     });
   }
 
+  function refreshSliders() {
+    $('.slick-initialized').each(function () {
+      $(this).slick('setPosition');
+    });
+  }
+
   function initAll() {
+    if (slidersInitialized) {
+      refreshSliders();
+      return;
+    }
+
+    slidersInitialized = true;
+
     document.querySelectorAll('.dha-showcase').forEach(initShowcaseSection);
-    document.querySelectorAll('.popular-listings--dealers').forEach(initDealersSection);
     initHotOffersSection();
     initGsapSectionMotion();
+    refreshSliders();
 
     document.addEventListener('visibilitychange', function () {
       $('.slick-initialized').each(function () {
@@ -401,14 +371,29 @@
         }
       });
     });
+
+    window.addEventListener('resize', function () {
+      window.clearTimeout(window.__etihadSliderResizeTimer);
+      window.__etihadSliderResizeTimer = window.setTimeout(refreshSliders, 150);
+    });
   }
 
   window.EtihadHomepageSliders = {
+    init: initAll,
     onHotOffersTabChange: onHotOffersTabChange,
     refresh: function () {
-      $('.slick-initialized').slick('setPosition');
+      if (!slidersInitialized) {
+        initAll();
+        return;
+      }
+
+      refreshSliders();
     },
   };
 
-  $(initAll);
+  $(function () {
+    if (!document.querySelector('.progress-bar')) {
+      initAll();
+    }
+  });
 })(window.jQuery);

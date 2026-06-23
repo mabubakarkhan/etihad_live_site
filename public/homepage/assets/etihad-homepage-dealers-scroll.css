@@ -1,0 +1,53 @@
+/* GSAP horizontal scroll — Agents / dealers (same pattern as DHA phases + projects) */
+
+.popular-listings--dealers.popular-listings--gsap-scroll .popular-listings__rail {
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  scroll-snap-type: none;
+  pointer-events: auto;
+  padding-top: 0.6rem;
+  padding-bottom: 1.2rem;
+  box-sizing: content-box;
+}
+
+.popular-listings--dealers.popular-listings--gsap-scroll .popular-listings__grid {
+  --hscroll-card-w: min(32rem, 88vw);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--hscroll-card-w);
+  gap: 2.4rem;
+  width: max-content;
+  padding-left: calc(50vw - var(--hscroll-card-w) / 2);
+  padding-right: calc(50vw - var(--hscroll-card-w) / 2);
+  box-sizing: content-box;
+}
+
+@media (min-width: 992px) {
+  .popular-listings--dealers.popular-listings--gsap-scroll .popular-listings__grid {
+    --hscroll-card-w: 40rem;
+  }
+}
+
+.popular-listings--dealers.popular-listings--gsap-scroll .popular-listings__grid {
+  will-change: transform;
+  pointer-events: auto;
+}
+
+.popular-listings--dealers.popular-listings--gsap-scroll .popular-listings__card {
+  scroll-snap-align: unset;
+  width: var(--hscroll-card-w);
+  max-width: var(--hscroll-card-w);
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.popular-listings--dealers.is-pin-active {
+  z-index: 4;
+}
+
+.popular-listings--dealers.popular-listings--gsap-scroll {
+  box-sizing: border-box;
+  overflow: hidden;
+}

@@ -433,6 +433,8 @@ Route::get('/', function () {
     ])->render(), $html);
 
     $html = str_replace('__HOMEPAGE_FOOTER_CONTACT__', View::make('partials.homepage-footer-contact', ['cs' => $homepageContact])->render(), $html);
+    $html = str_replace('__HOMEPAGE_FOOTER_CTA__', View::make('partials.homepage-footer-cta')->render(), $html);
+    $html = str_replace('__HOMEPAGE_COPYRIGHT_YEAR__', (string) date('Y'), $html);
     $html = str_replace('__HOMEPAGE_FOOTER_LEGAL__', View::make('partials.homepage-footer-legal')->render(), $html);
     $html = str_replace('__HOMEPAGE_FOOTER_SOCIALS__', View::make('partials.homepage-footer-socials', ['cs' => $homepageContact])->render(), $html);
 
@@ -628,7 +630,7 @@ Route::get('/portal', function () {
         ->whereNotNull('profile_pic')
         ->where('profile_pic', '!=', '')
         ->orderBy('name', 'asc')
-        ->limit(5)
+        ->limit(4)
         ->get(['id', 'name', 'profile_pic']), collect());
 
     $portalPartners = db_safe('portal.partners', fn () => Partner::query()

@@ -39,10 +39,10 @@ __HOMEPAGE_HEAD_SEO__
     <link rel="modulepreload" href="assets/marquee-DoEEElvA.js" />
     <link rel="modulepreload" href="assets/drag-follower-CaHV_THh.js" />
     <link rel="stylesheet" href="assets/homepage-DUfNMqJf.css" />
-    <link rel="stylesheet" href="assets/etihad-homepage-overrides.css" />
+    <link rel="stylesheet" href="assets/etihad-homepage-overrides.css?v=5" />
     <link rel="stylesheet" href="assets/etihad-homepage-section-heights.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
-    <link rel="stylesheet" href="assets/etihad-homepage-slick.css" />
+    <link rel="stylesheet" href="assets/etihad-homepage-slick.css?v=4" />
     <script type="module" defer src="assets/homepage-D6GbVUca.js"></script>
     
     <!-- Loader Styles -->
@@ -821,7 +821,6 @@ __HOMEPAGE_HEAD_SEO__
       }
 
       .popular-listings__grid {
-        display: grid;
         gap: 2.4rem;
       }
 
@@ -1043,7 +1042,8 @@ __HOMEPAGE_HEAD_SEO__
         transform: translateY(-2px);
       }
 
-      .popular-listings--dealers .popular-listings__rail {
+      .popular-listings--dealers .popular-listings__rail,
+      .popular-listings--hot-offers .popular-listings__rail {
         position: relative;
         overflow-x: auto;
         overflow-y: hidden;
@@ -1056,11 +1056,13 @@ __HOMEPAGE_HEAD_SEO__
         -webkit-overflow-scrolling: touch;
       }
 
-      .popular-listings--dealers .popular-listings__rail::-webkit-scrollbar {
+      .popular-listings--dealers .popular-listings__rail::-webkit-scrollbar,
+      .popular-listings--hot-offers .popular-listings__rail::-webkit-scrollbar {
         display: none;
       }
 
-      .popular-listings--dealers .popular-listings__grid {
+      .popular-listings--dealers .popular-listings__grid,
+      .popular-listings--hot-offers .popular-listings__grid {
         display: grid;
         grid-auto-flow: column;
         grid-auto-columns: minmax(27rem, 84vw);
@@ -1068,7 +1070,8 @@ __HOMEPAGE_HEAD_SEO__
         width: max-content;
       }
 
-      .popular-listings--dealers .popular-listings__card {
+      .popular-listings--dealers .popular-listings__card,
+      .popular-listings--hot-offers .popular-listings__card {
         scroll-snap-align: start;
         transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
       }
@@ -1131,11 +1134,8 @@ __HOMEPAGE_HEAD_SEO__
           width: 100%;
         }
 
-        .popular-listings__grid {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-
-        .popular-listings--dealers .popular-listings__grid {
+        .popular-listings--dealers .popular-listings__grid,
+        .popular-listings--hot-offers .popular-listings__grid {
           grid-auto-columns: minmax(32rem, 46rem);
           width: max-content;
         }
@@ -2765,6 +2765,7 @@ __HOMEPAGE_HEAD_SEO__
       }
     </style>
     <link rel="stylesheet" href="assets/etihad-homepage-dha-scroll.css?v=4" />
+    <link rel="stylesheet" href="assets/etihad-homepage-dealers-scroll.css?v=4" />
 
     <!-- Etihad map helpers (same as listing page) -->
     <script src="../theme/js/etihad-map-styles.js"></script>
@@ -4708,33 +4709,18 @@ __HOMEPAGE_FOOTER_SOCIALS__
           </div>
 
           <!-- call to action  -->
-          <a class="CTA-btn" href="javascript:void(0);">
-            <div class="CTA-btn__border">
-            </div>
-            <div class="CTA-btn__blur">
-            </div>
-            <div class="CTA-btn__background">
-            </div>
-
-            <div class="CTA-btn__inner">
-              <span class="CTA-btn__icon"></span>
-              <span class="CTA-btn__text">Got a project in mind?</span>
-            </div>
-          </a>
+__HOMEPAGE_FOOTER_CTA__
 
           <!-- copyright  -->
           <p class="footer-copyright">
-            <span>©</span>2025 ETIHAD. All Rights Reserved
+            <span>©</span>__HOMEPAGE_COPYRIGHT_YEAR__ ETIHAD. All Rights Reserved
           </p>
 
           <!-- legal  -->
 __HOMEPAGE_FOOTER_LEGAL__
 
           <!-- MDX  -->
-          <p class="footer-by-mdx">
-            By
-            <a href="javascript://" target="_blank">Hildes</a>
-          </p>
+          <p class="footer-by-mdx">By Etihad</p>
         </div>
 
         <!--  lines  -->
@@ -4767,9 +4753,10 @@ __HOMEPAGE_FOOTER_LEGAL__
     <script src="dist/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-    <script src="assets/etihad-homepage-slick.js"></script>
-    <script src="assets/etihad-homepage-contemporary-fix.js?v=5"></script>
+    <script src="assets/etihad-homepage-slick.js?v=12"></script>
+    <script src="assets/etihad-homepage-contemporary-fix.js?v=6"></script>
     <script src="assets/etihad-homepage-dha-scroll.js?v=9"></script>
+    <script src="assets/etihad-homepage-dealers-scroll.js?v=6"></script>
     
     <!-- Loader Script -->
     <script>
@@ -4792,10 +4779,16 @@ __HOMEPAGE_FOOTER_LEGAL__
               progressBar.style.display = 'none'; // Remove the progress bar completely
               document.body.style.overflowY = 'auto'; // Enable body scroll
               window.setTimeout(function () {
+                if (window.EtihadHomepageSliders && typeof window.EtihadHomepageSliders.refresh === 'function') {
+                  window.EtihadHomepageSliders.refresh();
+                }
                 if (typeof window.EtihadHomepageScrollSetup === 'function') {
                   window.EtihadHomepageScrollSetup();
                 } else if (window.EtihadHomepageDhaScroll && typeof window.EtihadHomepageDhaScroll.init === 'function') {
                   window.EtihadHomepageDhaScroll.init();
+                  if (window.EtihadHomepageDealersScroll && typeof window.EtihadHomepageDealersScroll.init === 'function') {
+                    window.EtihadHomepageDealersScroll.init();
+                  }
                   if (window.ScrollTrigger) {
                     window.ScrollTrigger.refresh(true);
                   }

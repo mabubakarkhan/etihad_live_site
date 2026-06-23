@@ -66,7 +66,7 @@
                                     <input type="checkbox" name="show_homepage_ad" value="1" {{ old('show_homepage_ad') ? 'checked' : '' }} class="rounded border-slate-300 dark:border-slate-700 text-emerald-500 focus:ring-emerald-500">
                                     <span>Show on homepage Ad</span>
                                 </label>
-                                <p class="text-xs text-slate-500 dark:text-slate-400">Shows dealer photo in the “Find a Trusted Agent” banner (max 5). Default is No (unchecked).</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Shows dealer photo in the “Find a Trusted Agent” banner (max 4). Default is No (unchecked).</p>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="space-y-1.5">

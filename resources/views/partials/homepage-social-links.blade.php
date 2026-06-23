@@ -1,23 +1,23 @@
 @php
     $cs = $cs ?? \App\Models\ContactSetting::instance();
     $linkClass = $linkClass ?? 'menu-socials__link';
-    $socials = [
-        'facebook' => ['url' => $cs->facebook ?? '', 'label' => 'facebook link'],
-        'instagram' => ['url' => $cs->instagram ?? '', 'label' => 'instagram link'],
-        'linkedin' => ['url' => $cs->linkedin ?? '', 'label' => 'LinkedIn link'],
-        'youtube' => ['url' => $cs->youtube ?? '', 'label' => 'YouTube link'],
-        'twitter' => ['url' => $cs->twitter ?? '', 'label' => 'Twitter link'],
-        'tiktok' => ['url' => $cs->tiktok ?? '', 'label' => 'TikTok link'],
+    $networks = [
+        'facebook' => $cs->facebook ?? null,
+        'instagram' => $cs->instagram ?? null,
+        'linkedin' => $cs->linkedin ?? null,
+        'youtube' => $cs->youtube ?? null,
+        'twitter' => $cs->twitter ?? null,
+        'tiktok' => $cs->tiktok ?? null,
     ];
 @endphp
-@foreach($socials as $network => $social)
-    @if(!empty($social['url']))
+@foreach($networks as $network => $url)
+    @if(!empty($url))
                   <a
                     class="{{ $linkClass }}"
-                    href="{{ e($social['url']) }}"
+                    href="{{ e($url) }}"
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="{{ $social['label'] }}"
+                    aria-label="{{ $network }} link"
                   >
                     @include('partials.homepage-social-icon', ['network' => $network])
                   </a>

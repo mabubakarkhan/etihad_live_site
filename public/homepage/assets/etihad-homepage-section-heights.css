@@ -70,6 +70,15 @@
     z-index: 4;
   }
 
+  .popular-listings--dealers.popular-listings--gsap-scroll {
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .popular-listings--dealers.is-pin-active {
+    z-index: 4;
+  }
+
   section.choice,
   section.engineers,
   section.clients,

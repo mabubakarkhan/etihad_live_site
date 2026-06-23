@@ -12,6 +12,7 @@
     <link type="text/css" rel="stylesheet" href="{{ asset('theme/css/style.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ asset('theme/css/db-style.css') }}">
     <link type="text/css" rel="stylesheet" href="{{ asset('theme/css/etihad-front.css') }}">
+    <link type="text/css" rel="stylesheet" href="{{ asset('theme/css/etihad-lazy.css') }}">
     @stack('styles')
 
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('theme/images/favicon_io/apple-touch-icon.png') }}">
@@ -74,6 +75,7 @@
     <script src="{{ asset('theme/js/scripts.js') }}"></script>
     <script src="{{ asset('theme/js/etihad-map-styles.js') }}"></script>
     <script src="{{ asset('theme/js/etihad-common.js') }}"></script>
+    <script src="{{ asset('theme/js/etihad-lazy.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

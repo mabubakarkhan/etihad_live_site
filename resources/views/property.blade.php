@@ -749,30 +749,6 @@
         }
     }
 })();
-
-(function() {
-    function loadAfterPageReady() {
-        document.querySelectorAll('.property-lazy-img[data-src]').forEach(function(img) {
-            var wrap = img.closest('.property-lazy-wrap');
-            var src = img.getAttribute('data-src');
-            if (!src) return;
-            img.onload = function() { if (wrap) wrap.classList.add('loaded'); };
-            img.src = src;
-        });
-        document.querySelectorAll('.property-video-embed iframe[data-src]').forEach(function(iframe) {
-            var wrap = iframe.closest('.property-lazy-wrap');
-            var src = iframe.getAttribute('data-src');
-            if (!src) return;
-            iframe.onload = function() { if (wrap) wrap.classList.add('loaded'); };
-            iframe.src = src;
-        });
-    }
-    if (document.readyState === 'complete') {
-        loadAfterPageReady();
-    } else {
-        window.addEventListener('load', loadAfterPageReady);
-    }
-})();
 </script>
 @if($property->latitude && $property->longitude)
 @php $googleMapsKey = config('app.google_maps_api_key') ?: 'AIzaSyAYrLB-ltxWv32OFEF6c07B376JNrDyOIA'; @endphp

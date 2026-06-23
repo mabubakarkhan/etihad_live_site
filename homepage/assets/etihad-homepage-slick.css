@@ -11,36 +11,40 @@
 }
 
 .dha-showcase__cards.slick-initialized,
-.popular-listings--hot-offers .popular-listings__grid.slick-initialized,
-.popular-listings--dealers .popular-listings__grid.slick-initialized {
+.popular-listings--hot-offers .popular-listings__grid.slick-initialized {
   display: block;
   width: 100%;
   max-width: none;
 }
 
 .dha-showcase__cards.slick-initialized .slick-list,
-.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-list,
-.popular-listings--dealers .popular-listings__grid.slick-initialized .slick-list {
+.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-list {
   overflow: hidden;
   margin: 0 -1.2rem;
 }
 
 .dha-showcase__cards.slick-initialized .slick-slide,
-.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-slide,
-.popular-listings--dealers .popular-listings__grid.slick-initialized .slick-slide {
+.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-slide {
   height: auto;
+  width: min(40rem, 88vw);
+  max-width: 46rem;
   padding: 0 1.2rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 992px) {
+  .popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-slide {
+    width: 40rem;
+  }
 }
 
 .dha-showcase__cards.slick-initialized .slick-slide > article,
-.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-slide > article,
-.popular-listings--dealers .popular-listings__grid.slick-initialized .slick-slide > article {
+.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-slide > article {
   height: 100%;
 }
 
 .dha-showcase__cards.slick-initialized .slick-track,
-.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-track,
-.popular-listings--dealers .popular-listings__grid.slick-initialized .slick-track {
+.popular-listings--hot-offers .popular-listings__grid.slick-initialized .slick-track {
   display: flex !important;
   align-items: stretch;
 }
@@ -49,4 +53,14 @@
 .popular-listings__card {
   margin-left: 10px;
   margin-right: 10px;
+  height: 100%;
+}
+
+.popular-listings__card .popular-listings__body {
+  flex: 1 1 auto;
+}
+
+.popular-listings__card .popular-listings__cta {
+  margin-top: auto;
+  padding-top: 2rem;
 }

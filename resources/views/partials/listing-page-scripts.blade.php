@@ -259,7 +259,7 @@ window.initMap = initMap;
         var url = (p.dealer_url || '').trim();
         if (!name || !img || !url) return '';
         return '<a href="' + esc(url) + '" class="listing-card-dealer-avatar" aria-label="' + esc(name) + '">' +
-            '<img src="' + esc(img) + '" alt="' + esc(name) + '" loading="lazy" decoding="async">' +
+            '<img src="' + esc(img) + '" alt="' + esc(name) + '" class="etihad-lazy-skip" loading="lazy" decoding="async">' +
             '<span class="listing-card-dealer-tooltip">' + esc(name) + '</span>' +
             '</a>';
     }
@@ -268,7 +268,9 @@ window.initMap = initMap;
         if (!$grid) return;
         $grid.innerHTML = '';
         properties.forEach(function(p) {
-            var imgStyle = p.featured_image_url ? 'background-image:url(' + esc(p.featured_image_url) + ')' : '';
+            var imgBg = p.featured_image_url
+                ? ' data-lazy-bg="' + esc(p.featured_image_url) + '"'
+                : '';
             var lat = p.latitude || 40.7;
             var lng = p.longitude || -73.1;
             var latLngAttrs = (p.latitude != null && p.longitude != null && !isNaN(parseFloat(p.latitude)) && !isNaN(parseFloat(p.longitude)))
@@ -277,7 +279,7 @@ window.initMap = initMap;
                 '<div class="geodir-category-listing">' +
                 '<div class="geodir-category-img">' +
                 '<a href="' + esc(p.detail_url) + '" class="geodir-category-img_item">' +
-                '<div class="bg" style="' + imgStyle + '"></div>' +
+                '<div class="bg etihad-lazy etihad-lazy-bg"' + imgBg + '></div>' +
                 '<div class="overlay"></div>' +
                 '</a>' +
                 (p.short_address ? '<div class="geodir-category-location">' +
@@ -305,6 +307,9 @@ window.initMap = initMap;
                 '</div></div>';
             $grid.insertAdjacentHTML('beforeend', card);
         });
+        if (window.EtihadLazy && typeof window.EtihadLazy.scan === 'function') {
+            window.EtihadLazy.scan($grid);
+        }
     }
 
     function hasMoreOptionsActive() {

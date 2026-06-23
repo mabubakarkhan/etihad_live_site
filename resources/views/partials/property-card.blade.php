@@ -19,7 +19,7 @@
     <div class="geodir-category-listing etihad-property-card">
         <div class="geodir-category-img">
             <a href="{{ $p['detail_url'] ?? '#' }}" class="geodir-category-img_item">
-                <div class="bg" style="background-image:url({{ $p['featured_image_url'] ?? '' }})"></div>
+                <div class="bg etihad-lazy etihad-lazy-bg"@if(!empty($p['featured_image_url'])) data-lazy-bg="{{ $p['featured_image_url'] }}"@endif></div>
                 <div class="overlay"></div>
             </a>
             @if(!empty($p['short_address']))
@@ -49,12 +49,12 @@
             @if($showDealerAvatar)
             @if($dealerUrl !== '')
             <a href="{{ $dealerUrl }}" class="listing-card-dealer-avatar" aria-label="{{ $dealerName }}">
-                <img src="{{ $dealerImageUrl }}" alt="{{ $dealerName }}" loading="lazy" decoding="async">
+                <img src="{{ $dealerImageUrl }}" alt="{{ $dealerName }}" class="etihad-lazy-skip" loading="lazy" decoding="async">
                 <span class="listing-card-dealer-tooltip">{{ $dealerName }}</span>
             </a>
             @else
             <span class="listing-card-dealer-avatar" title="{{ $dealerName }}">
-                <img src="{{ $dealerImageUrl }}" alt="{{ $dealerName }}" loading="lazy" decoding="async">
+                <img src="{{ $dealerImageUrl }}" alt="{{ $dealerName }}" class="etihad-lazy-skip" loading="lazy" decoding="async">
             </span>
             @endif
             @endif
