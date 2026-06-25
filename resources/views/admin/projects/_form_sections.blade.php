@@ -13,9 +13,14 @@
         'tab-media' => 'Hero section',
         'tab-featured-video' => 'Featured video',
         'tab-vr-tour' => 'VR Tour',
+        'tab-booking-procedure' => 'Booking Procedure',
         'tab-features' => 'Unique features',
         'tab-pricing-place' => 'Pricing place',
+        'tab-price-slider' => 'Price Slider',
         'tab-social-proof' => 'Testimonials + Invest',
+        'tab-map-section' => 'Interactive map',
+        'tab-detail-tabs' => 'Detail tabs',
+        'tab-tabs-follow-content' => 'After tabs content',
         'tab-videos' => 'Videos',
         'tab-gallery' => 'Gallery',
         'tab-seo' => 'SEO',
@@ -58,6 +63,12 @@
 @endif
 @if($showSection('social-proof') || $onlySection === null)
 <input type="hidden" name="invest_image_path" value="{{ old('invest_image_path', $project->invest_image ?? '') }}" />
+@endif
+@if($showSection('map-section') || $onlySection === null)
+<input type="hidden" name="map_section_image_path" value="{{ old('map_section_image_path', $project->map_section_image ?? '') }}" />
+@endif
+@if($showSection('vr-tour') || $onlySection === null)
+<input type="hidden" name="vr_tour_image_path" value="{{ old('vr_tour_image_path', $project->vr_tour_image ?? '') }}" />
 @endif
 
 @if($onlySection === null)
@@ -421,6 +432,18 @@
             <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">If filled, a VR Tour button will appear on the project detail page.</p>
         </div>
 
+        <div data-media-wrap>
+            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">VR Tour preview image (optional)</label>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Shown on the project page below the location section when a VR URL is set. Recommended wide image.</p>
+            @if(!empty($project->vr_tour_image))
+                <div class="mb-2"><img src="{{ asset('storage/' . ltrim($project->vr_tour_image, '/')) }}" alt="VR tour preview" class="max-h-40 rounded-lg border border-slate-300 dark:border-slate-700" /></div>
+            @endif
+            <input type="file" accept="image/*" class="project-media-upload block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" data-upload-type="vr_tour_image" data-path-name="vr_tour_image_path">
+            <label class="mt-2 inline-flex items-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 cursor-pointer">
+                <input type="checkbox" name="remove_vr_tour_image" value="1" class="rounded border-slate-400" /> Remove current image
+            </label>
+        </div>
+
         <div class="pt-3 border-t border-slate-200 dark:border-slate-700">
             <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-3">VR Tour SEO</h3>
             <div class="space-y-4">
@@ -445,6 +468,85 @@
     </div>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
         <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-featured-video">Back</button>
+        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-booking-procedure">Next</button>
+    </div>
+</div>
+
+@endif
+@if($showSection('booking-procedure'))
+@php
+    $bp = is_array(old('booking_step_titles')) ? null : ($project->booking_procedure ?? []);
+    if (is_array(old('booking_step_titles'))) {
+        $bpSteps = [];
+        foreach (old('booking_step_titles') as $idx => $st) {
+            $bpSteps[] = ['title' => $st, 'description' => old('booking_step_descriptions')[$idx] ?? ''];
+        }
+        $bpDocs = [];
+        foreach (old('booking_document_labels', []) as $idx => $lbl) {
+            $bpDocs[] = ['label' => $lbl, 'icon' => old('booking_document_icons')[$idx] ?? 'fa-circle-check'];
+        }
+        $bpHeading = old('booking_procedure_heading', '');
+        $bpContent = old('booking_procedure_content', '');
+        $bpDocsHeading = old('booking_procedure_documents_heading', 'Required Documents');
+    } else {
+        $bp = is_array($bp) ? $bp : [];
+        $bpHeading = old('booking_procedure_heading', $bp['heading'] ?? '');
+        $bpContent = old('booking_procedure_content', $bp['content'] ?? '');
+        $bpDocsHeading = old('booking_procedure_documents_heading', $bp['documents_heading'] ?? 'Required Documents');
+        $bpSteps = $bp['steps'] ?? [['title' => '', 'description' => '']];
+        $bpDocs = $bp['documents'] ?? [['icon' => 'fa-circle-check', 'label' => '']];
+        if ($bpSteps === []) {
+            $bpSteps = [['title' => '', 'description' => '']];
+        }
+        if ($bpDocs === []) {
+            $bpDocs = [['icon' => 'fa-circle-check', 'label' => '']];
+        }
+    }
+@endphp
+<div id="tab-booking-procedure" class="tab-panel {{ $sectionPanelClass('booking-procedure') }} rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-lg shadow-slate-200/80 dark:shadow-slate-950/50 transition-colors p-6 mb-6" role="tabpanel">
+    <h2 class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-4">Booking Procedure</h2>
+    <div class="space-y-5">
+        <div>
+            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Section heading</label>
+            <input type="text" name="booking_procedure_heading" value="{{ $bpHeading }}" placeholder="e.g. Project Name Booking Procedure" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+        </div>
+        <div>
+            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Intro content</label>
+            <div class="richtext-wrap bg-slate-50 dark:bg-slate-950/60 rounded-lg border border-slate-300 dark:border-slate-700 min-h-[160px]">
+                <textarea name="booking_procedure_content" id="booking_procedure_content" rows="6" class="richtext hidden">{{ $bpContent }}</textarea>
+            </div>
+        </div>
+        <div>
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2">Booking steps</h3>
+            <div id="booking-steps-container" class="space-y-3">
+                @foreach($bpSteps as $stepIdx => $step)
+                    <div class="booking-step-row border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-2">
+                        <input type="text" name="booking_step_titles[]" value="{{ $step['title'] ?? '' }}" placeholder="Step title" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+                        <textarea name="booking_step_descriptions[]" rows="2" placeholder="Step description" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100">{{ $step['description'] ?? '' }}</textarea>
+                        <button type="button" class="remove-booking-step text-rose-600 dark:text-rose-400 hover:text-rose-500 dark:hover:text-rose-300 text-xs">Remove step</button>
+                    </div>
+                @endforeach
+            </div>
+            <button type="button" id="add-booking-step" class="mt-2 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">+ Add step</button>
+        </div>
+        <div class="pt-3 border-t border-slate-200 dark:border-slate-700">
+            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Required documents heading</label>
+            <input type="text" name="booking_procedure_documents_heading" value="{{ $bpDocsHeading }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 mb-3" />
+            <div id="booking-documents-container" class="space-y-2">
+                @foreach($bpDocs as $docIdx => $doc)
+                    <div class="booking-document-row flex flex-wrap gap-2 items-center">
+                        <input type="text" name="booking_document_labels[]" value="{{ $doc['label'] ?? '' }}" placeholder="Document label" class="flex-1 min-w-[200px] rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+                        <input type="text" name="booking_document_icons[]" value="{{ $doc['icon'] ?? 'fa-circle-check' }}" placeholder="Icon" id="booking_doc_icon_{{ $docIdx }}" class="w-32 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+                        <button type="button" class="icon-picker-btn px-2 py-1 rounded border border-slate-400 text-slate-600 dark:text-slate-400 text-xs hover:bg-slate-200 dark:hover:bg-slate-700" data-target="booking_doc_icon_{{ $docIdx }}">Pick</button>
+                        <button type="button" class="remove-booking-document text-rose-600 dark:text-rose-400 hover:text-rose-500 dark:hover:text-rose-300 text-xs">Remove</button>
+                    </div>
+                @endforeach
+            </div>
+            <button type="button" id="add-booking-document" class="mt-2 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">+ Add document</button>
+        </div>
+    </div>
+    <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-vr-tour">Back</button>
         <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-features">Next</button>
     </div>
 </div>
@@ -592,7 +694,7 @@
     </div>
     <button type="button" id="add-feature" class="mt-2 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">+ Add feature</button>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
-        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-vr-tour">Back</button>
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-booking-procedure">Back</button>
         <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-pricing-place">Next</button>
     </div>
 </div>
@@ -786,6 +888,39 @@
     <button type="button" id="add-pricing-place" class="mt-2 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">+ Add pricing card</button>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
         <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-features">Back</button>
+        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-price-slider">Next</button>
+    </div>
+</div>
+
+@endif
+@if($showSection('price-slider'))
+@php
+    $priceSliderImages = old('price_slider_image_paths', $project->price_slider_images ?? []);
+    if (! is_array($priceSliderImages)) {
+        $priceSliderImages = [];
+    }
+@endphp
+<div id="tab-price-slider" class="tab-panel {{ $sectionPanelClass('price-slider') }} rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-lg shadow-slate-200/80 dark:shadow-slate-950/50 transition-colors p-6 mb-6" role="tabpanel">
+    <h2 class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-2">Price Slider</h2>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Upload images only. They appear on the project page in a slider directly below the pricing cards section.</p>
+    <div class="price-slider-media-wrap">
+        <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Slider images (upload multiple)</label>
+        <div id="price-slider-images-list" class="flex flex-wrap gap-2 mb-2">
+            @foreach($priceSliderImages as $imgPath)
+                @if(trim((string) $imgPath) !== '')
+                    <div class="price-slider-image-item relative inline-block shrink-0" data-path="{{ $imgPath }}">
+                        <img src="{{ asset('storage/' . ltrim($imgPath, '/')) }}" alt="" class="h-16 w-16 object-cover rounded-lg border border-slate-300 dark:border-slate-700" />
+                        <input type="hidden" name="price_slider_image_paths[]" value="{{ $imgPath }}" />
+                        <button type="button" class="remove-price-slider-image absolute -top-1 -right-1 z-10 w-5 h-5 rounded-full bg-rose-600 text-white text-xs leading-none shadow hover:bg-rose-500" aria-label="Remove image">&times;</button>
+                    </div>
+                @endif
+            @endforeach
+        </div>
+        <p class="price-slider-upload-msg hidden text-xs mt-1"></p>
+        <input type="file" accept="image/*" multiple class="price-slider-media-upload block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" data-upload-type="price_slider_image" />
+    </div>
+    <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-pricing-place">Back</button>
         <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-social-proof">Next</button>
     </div>
 </div>
@@ -843,7 +978,154 @@
         </div>
     </div>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
-        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-pricing-place">Back</button>
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-price-slider">Back</button>
+        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-map-section">Next</button>
+    </div>
+</div>
+
+@endif
+@if($showSection('map-section'))
+{{-- Interactive map preview --}}
+<div id="tab-map-section" class="tab-panel {{ $sectionPanelClass('map-section') }} rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-lg shadow-slate-200/80 dark:shadow-slate-950/50 transition-colors p-6 mb-6" role="tabpanel">
+    <h2 class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-4">Interactive map preview</h2>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Shown on the project page before testimonials. Clicking the image opens the map link in a new tab.</p>
+    <div class="space-y-4">
+        <div>
+            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Heading</label>
+            <input type="text" name="map_section_heading" value="{{ old('map_section_heading', $project->map_section_heading ?? '') }}" placeholder="e.g. Master Plan Map" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+        </div>
+        <div>
+            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Tagline</label>
+            <input type="text" name="map_section_tagline" value="{{ old('map_section_tagline', $project->map_section_tagline ?? '') }}" placeholder="e.g. Explore the layout in detail" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+        </div>
+        <div>
+            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Map link URL</label>
+            <input type="url" name="map_section_url" value="{{ old('map_section_url', $project->map_section_url ?? '') }}" placeholder="https://..." class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+        </div>
+        <div data-media-wrap>
+            @if(!empty($project->map_section_image))
+                <div class="mb-2"><img src="{{ asset('storage/' . ltrim($project->map_section_image, '/')) }}" alt="" class="max-h-40 rounded-lg border border-slate-300 dark:border-slate-700" /></div>
+            @endif
+            <input type="file" accept="image/*" class="project-media-upload block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" data-upload-type="map_section_image" data-path-name="map_section_image_path">
+            <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-500 cursor-pointer">
+                <input type="checkbox" name="remove_map_section_image" value="1" class="rounded border-slate-400" /> Remove current image
+            </label>
+        </div>
+        <div class="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-4">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Map viewer SEO</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Meta tags for the interactive map page (opens in new tab). Leave blank to auto-generate from heading and tagline.</p>
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Meta title</label>
+                <input type="text" name="map_section_meta_title" value="{{ old('map_section_meta_title', $project->map_section_meta_title ?? '') }}" placeholder="e.g. DHA Phase 1 Master Plan Map | Etihad Marketing" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Meta description</label>
+                <textarea name="map_section_meta_description" rows="2" placeholder="Short description for search engines and social sharing (max 500 chars)" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100">{{ old('map_section_meta_description', $project->map_section_meta_description ?? '') }}</textarea>
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Meta keywords</label>
+                <input type="text" name="map_section_meta_keywords" value="{{ old('map_section_meta_keywords', $project->map_section_meta_keywords ?? '') }}" placeholder="DHA map, master plan, Lahore plots, Etihad Marketing" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+            </div>
+        </div>
+    </div>
+    <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-social-proof">Back</button>
+        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-detail-tabs">Next</button>
+    </div>
+</div>
+
+@endif
+@if($showSection('detail-tabs'))
+@php
+    $detailTabsExisting = old('detail_tab_labels') !== null ? null : ($project->project_detail_tabs ?? []);
+    if (is_array(old('detail_tab_labels'))) {
+        $detailTabRows = [];
+        foreach (old('detail_tab_labels') as $idx => $lbl) {
+            $detailTabRows[] = [
+                'label' => $lbl,
+                'icon' => old('detail_tab_icons')[$idx] ?? 'fa-circle-info',
+                'heading' => old('detail_tab_headings')[$idx] ?? '',
+                'detail' => old('detail_tab_details')[$idx] ?? '',
+                'bullets' => old('detail_tab_bullets')[$idx] ?? '',
+                'images' => old('detail_tab_image_paths')[$idx] ?? [],
+            ];
+        }
+    } elseif (is_array($detailTabsExisting) && $detailTabsExisting !== []) {
+        $detailTabRows = $detailTabsExisting;
+    } else {
+        $detailTabRows = [['label' => '', 'icon' => 'fa-circle-info', 'heading' => '', 'detail' => '', 'bullets' => '', 'images' => []]];
+    }
+@endphp
+<div id="tab-detail-tabs" class="tab-panel {{ $sectionPanelClass('detail-tabs') }} rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-lg shadow-slate-200/80 dark:shadow-slate-950/50 transition-colors p-6 mb-6" role="tabpanel">
+    <h2 class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-4">Detail tabs (project page)</h2>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Tabbed section shown on the project page under media + highlights. Each tab can have optional heading, rich detail, comma-separated bullet list, and images (slider when multiple).</p>
+    <div id="detail-tabs-container" class="space-y-4">
+        @foreach($detailTabRows as $tabIdx => $tabRow)
+            @php
+                $tabImages = is_array($tabRow['images'] ?? null) ? $tabRow['images'] : [];
+            @endphp
+            <div class="detail-tab-row border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3" data-tab-index="{{ $tabIdx }}">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Tab label</label>
+                        <input type="text" name="detail_tab_labels[]" value="{{ $tabRow['label'] ?? '' }}" placeholder="e.g. Master Plan" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Tab icon (Font Awesome class)</label>
+                        <input type="text" name="detail_tab_icons[]" value="{{ $tabRow['icon'] ?? 'fa-circle-info' }}" placeholder="fa-user" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Heading (optional)</label>
+                    <input type="text" name="detail_tab_headings[]" value="{{ $tabRow['heading'] ?? '' }}" placeholder="Section heading" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Detail (rich text, optional)</label>
+                    <div class="richtext-wrap bg-slate-50 dark:bg-slate-950/60 rounded-lg border border-slate-300 dark:border-slate-700 min-h-[100px]">
+                        <textarea name="detail_tab_details[]" rows="4" class="richtext hidden" style="display:none">{{ $tabRow['detail'] ?? '' }}</textarea>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Bullet points (comma separated, optional)</label>
+                    <textarea name="detail_tab_bullets[]" rows="2" placeholder="Faisal Town 1, Faisal Town 2, Faisal Town 3" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100">{{ $tabRow['bullets'] ?? '' }}</textarea>
+                </div>
+                <div class="detail-tab-media-wrap">
+                    <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Tab images (optional, upload multiple)</label>
+                    <div class="detail-tab-images-list flex flex-wrap gap-2 mb-2" data-tab-index="{{ $tabIdx }}">
+                        @foreach($tabImages as $imgPath)
+                            @if(trim((string) $imgPath) !== '')
+                                <div class="detail-tab-image-item relative inline-block shrink-0" data-path="{{ $imgPath }}">
+                                    <img src="{{ asset('storage/' . ltrim($imgPath, '/')) }}" alt="" class="h-16 w-16 object-cover rounded-lg border border-slate-300 dark:border-slate-700" />
+                                    <input type="hidden" name="detail_tab_image_paths[{{ $tabIdx }}][]" value="{{ $imgPath }}" />
+                                    <button type="button" class="remove-detail-tab-image absolute -top-1 -right-1 z-10 w-5 h-5 rounded-full bg-rose-600 text-white text-xs leading-none shadow hover:bg-rose-500" aria-label="Remove image">&times;</button>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                    <p class="detail-tab-upload-msg hidden text-xs mt-1"></p>
+                    <input type="file" accept="image/*" multiple class="detail-tab-media-upload block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" data-upload-type="detail_tab_image" data-tab-index="{{ $tabIdx }}" />
+                </div>
+                <button type="button" class="remove-detail-tab text-rose-600 dark:text-rose-400 hover:text-rose-500 dark:hover:text-rose-300 text-xs">Remove tab</button>
+            </div>
+        @endforeach
+    </div>
+    <button type="button" id="add-detail-tab" class="mt-3 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">+ Add tab</button>
+    <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-map-section">Back</button>
+        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-tabs-follow-content">Next</button>
+    </div>
+</div>
+
+@endif
+@if($showSection('tabs-follow-content'))
+<div id="tab-tabs-follow-content" class="tab-panel {{ $sectionPanelClass('tabs-follow-content') }} rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-lg shadow-slate-200/80 dark:shadow-slate-950/50 transition-colors p-6 mb-6" role="tabpanel">
+    <h2 class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-2">After detail tabs content</h2>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Rich content shown on the project page directly below the detail tabs. Use headings inside the editor — there is no separate section title field.</p>
+    <div class="richtext-wrap bg-slate-50 dark:bg-slate-950/60 rounded-lg border border-slate-300 dark:border-slate-700 min-h-[220px]">
+        <textarea name="tabs_follow_content" id="tabs_follow_content" rows="8" class="richtext hidden">{{ old('tabs_follow_content', $project->tabs_follow_content ?? '') }}</textarea>
+    </div>
+    <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-detail-tabs">Back</button>
         <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-videos">Next</button>
     </div>
 </div>
@@ -885,7 +1167,7 @@
         <button type="button" id="add-td" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">+ Add item</button>
     </div>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
-        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-social-proof">Back</button>
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-map-section">Back</button>
         <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-videos">Next</button>
     </div>
 </div>
@@ -907,7 +1189,7 @@
     </div>
     <button type="button" id="add-video" class="mt-2 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">+ Add video</button>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
-        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-social-proof">Back</button>
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-tabs-follow-content">Back</button>
         <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-gallery">Next</button>
     </div>
 </div>

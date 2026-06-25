@@ -11,6 +11,7 @@ use App\Support\ProjectEditSections;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
@@ -191,7 +192,7 @@ class ProjectController extends Controller
         }
 
         $request->validate([
-            'type' => ['required', 'string', 'in:logo,featured_image,homepage_listing_image,address_image,developer_logo,noc_planning_image,invest_image,project_file_pdf,gallery,plan,pricing_place'],
+            'type' => ['required', 'string', 'in:logo,featured_image,homepage_listing_image,address_image,developer_logo,noc_planning_image,invest_image,map_section_image,vr_tour_image,detail_tab_image,price_slider_image,project_file_pdf,gallery,plan,pricing_place'],
             'file' => $fileRules,
             'project_id' => ['nullable', 'integer', 'exists:projects,id'],
             'upload_token' => ['nullable', 'string', 'max:64'],
@@ -205,6 +206,10 @@ class ProjectController extends Controller
             'developer_logo' => 'developer_logo',
             'noc_planning_image' => 'noc',
             'invest_image' => 'invest',
+            'map_section_image' => 'map-section',
+            'vr_tour_image' => 'vr-tour',
+            'detail_tab_image' => 'detail-tabs',
+            'price_slider_image' => 'price-slider',
             'project_file_pdf' => 'pdf',
             'gallery' => 'gallery',
             'plan' => 'plans',
@@ -223,6 +228,7 @@ class ProjectController extends Controller
         }
 
         $path = $request->file('file')->store($base, 'public');
+        $this->mirrorToPublicStorage($path);
 
         return response()->json([
             'success' => true,
@@ -299,6 +305,8 @@ class ProjectController extends Controller
             'featured_video_title' => ['nullable', 'string', 'max:255'],
             'featured_video_description' => ['nullable', 'string'],
             'vr_tour_url' => ['nullable', 'string', 'max:2000'],
+            'vr_tour_image_path' => ['nullable', 'string', 'max:500'],
+            'remove_vr_tour_image' => ['nullable', 'boolean'],
             'vr_tour_meta_title' => ['nullable', 'string', 'max:255'],
             'vr_tour_meta_description' => ['nullable', 'string', 'max:500'],
             'vr_tour_meta_keywords' => ['nullable', 'string', 'max:500'],
@@ -312,6 +320,15 @@ class ProjectController extends Controller
             'price_plan_section_title' => ['nullable', 'string', 'max:255'],
             'invest_title' => ['nullable', 'string', 'max:255'],
             'meta_title' => ['nullable', 'string', 'max:255'],
+            'map_section_heading' => ['nullable', 'string', 'max:255'],
+            'map_section_tagline' => ['nullable', 'string', 'max:500'],
+            'map_section_url' => ['nullable', 'string', 'max:2000'],
+            'map_section_meta_title' => ['nullable', 'string', 'max:255'],
+            'map_section_meta_description' => ['nullable', 'string', 'max:500'],
+            'map_section_meta_keywords' => ['nullable', 'string', 'max:500'],
+            'map_section_image_path' => ['nullable', 'string', 'max:500'],
+            'remove_map_section_image' => ['nullable', 'boolean'],
+            'tabs_follow_content' => ['nullable', 'string'],
             'meta_description' => ['nullable', 'string', 'max:500'],
             'meta_keywords' => ['nullable', 'string', 'max:500'],
             'canonical_url' => ['nullable', 'string', 'max:500'],
@@ -344,7 +361,63 @@ class ProjectController extends Controller
             'gallery' => $this->normalizeGallery($request, $project),
             'hero_feature_cards' => $this->normalizeHeroFeatureCards($request),
             'hero_stat_cards' => $this->normalizeHeroStatCards($request),
+            'project_detail_tabs' => $this->normalizeDetailTabs($request, $project),
+            'price_slider_images' => $this->normalizePriceSliderImages($request),
+            'booking_procedure' => $this->normalizeBookingProcedure($request),
         ]);
+    }
+
+    protected function normalizeBookingProcedure(Request $request): array
+    {
+        $titles = (array) $request->input('booking_step_titles', []);
+        $descriptions = (array) $request->input('booking_step_descriptions', []);
+        $steps = [];
+        foreach ($titles as $i => $title) {
+            $title = trim((string) $title);
+            $description = trim((string) ($descriptions[$i] ?? ''));
+            if ($title === '' && $description === '') {
+                continue;
+            }
+            $steps[] = [
+                'title' => $title,
+                'description' => $description,
+            ];
+        }
+
+        $labels = (array) $request->input('booking_document_labels', []);
+        $icons = (array) $request->input('booking_document_icons', []);
+        $documents = [];
+        foreach ($labels as $i => $label) {
+            $label = trim((string) $label);
+            if ($label === '') {
+                continue;
+            }
+            $icon = trim((string) ($icons[$i] ?? 'fa-circle-check'));
+            if ($icon !== '' && ! str_contains($icon, 'fa-')) {
+                $icon = 'fa-' . ltrim($icon, '-');
+            }
+            $documents[] = [
+                'icon' => $icon !== '' ? $icon : 'fa-circle-check',
+                'label' => $label,
+            ];
+        }
+
+        return [
+            'heading' => trim((string) $request->input('booking_procedure_heading', '')),
+            'content' => (string) $request->input('booking_procedure_content', ''),
+            'documents_heading' => trim((string) $request->input('booking_procedure_documents_heading', '')) ?: 'Required Documents',
+            'steps' => $steps,
+            'documents' => $documents,
+        ];
+    }
+
+    protected function normalizePriceSliderImages(Request $request): array
+    {
+        $paths = (array) $request->input('price_slider_image_paths', []);
+
+        return array_values(array_filter(array_map(function ($path) {
+            return trim((string) $path);
+        }, $paths)));
     }
 
     protected function normalizePricingPlaceCards(Request $request, ?Project $project): array
@@ -496,6 +569,58 @@ class ProjectController extends Controller
         return array_values(array_filter(array_map('trim', $urls)));
     }
 
+    /** @return list<array{label: string, icon: string, heading: string, detail: string, bullets: string, images: list<string>}>|null */
+    protected function normalizeDetailTabs(Request $request, ?Project $project): ?array
+    {
+        $labels = (array) $request->input('detail_tab_labels', []);
+        $icons = (array) $request->input('detail_tab_icons', []);
+        $headings = (array) $request->input('detail_tab_headings', []);
+        $details = (array) $request->input('detail_tab_details', []);
+        $bullets = (array) $request->input('detail_tab_bullets', []);
+        $imageGroups = (array) $request->input('detail_tab_image_paths', []);
+        $uploadToken = $request->input('upload_token');
+        $projectId = $project?->id ?? 0;
+
+        $tabs = [];
+        foreach ($labels as $i => $label) {
+            $label = trim((string) $label);
+            $heading = trim((string) ($headings[$i] ?? ''));
+            $detail = trim((string) ($details[$i] ?? ''));
+            $bulletRaw = trim((string) ($bullets[$i] ?? ''));
+            $paths = isset($imageGroups[$i]) ? (array) $imageGroups[$i] : [];
+
+            if ($label === '' && $heading === '' && $detail === '' && $bulletRaw === '' && empty(array_filter($paths))) {
+                continue;
+            }
+
+            $images = [];
+            foreach ($paths as $path) {
+                $path = trim((string) $path);
+                if ($path === '') {
+                    continue;
+                }
+                if ($projectId > 0 && $this->isAllowedProjectMediaPath($path, $projectId, $uploadToken)) {
+                    $images[] = $this->finalizeProjectMediaPath($path, $projectId, $uploadToken);
+                } elseif ($projectId === 0 && $uploadToken && str_contains($path, 'projects/staging/' . $uploadToken)) {
+                    $images[] = $path;
+                } elseif ($projectId > 0 && str_starts_with($path, 'projects/' . $projectId . '/')) {
+                    $images[] = $path;
+                }
+            }
+
+            $tabs[] = [
+                'label' => $label !== '' ? $label : ('Tab ' . (count($tabs) + 1)),
+                'icon' => trim((string) ($icons[$i] ?? '')) ?: 'fa-circle-info',
+                'heading' => $heading,
+                'detail' => $detail,
+                'bullets' => $bulletRaw,
+                'images' => array_values(array_unique($images)),
+            ];
+        }
+
+        return $tabs !== [] ? $tabs : null;
+    }
+
     protected function uniqueProjectSlug(string $raw, ?int $ignoreId = null): string
     {
         $slug = Str::slug($raw);
@@ -548,6 +673,8 @@ class ProjectController extends Controller
             'remove_project_file_pdf' => 'project_file_pdf',
             'remove_developer_logo' => 'developer_logo',
             'remove_noc_planning_image' => 'noc_planning_image',
+            'remove_map_section_image' => 'map_section_image',
+            'remove_vr_tour_image' => 'vr_tour_image',
         ];
         foreach ($removeFields as $removeKey => $fieldKey) {
             if ($request->boolean($removeKey)) {
@@ -568,6 +695,8 @@ class ProjectController extends Controller
             'developer_logo_path' => 'developer_logo',
             'noc_planning_image_path' => 'noc_planning_image',
             'invest_image_path' => 'invest_image',
+            'map_section_image_path' => 'map_section_image',
+            'vr_tour_image_path' => 'vr_tour_image',
         ];
         foreach ($singlePathMap as $pathKey => $fieldKey) {
             if (array_key_exists($fieldKey, $updates) && $updates[$fieldKey] === null) {
@@ -769,5 +898,16 @@ class ProjectController extends Controller
             }
         }
         Storage::disk('public')->deleteDirectory('projects/' . $project->id);
+    }
+
+    private function mirrorToPublicStorage(string $storedPath): void
+    {
+        $source = storage_path('app/public/' . ltrim($storedPath, '/'));
+        $destination = public_path('storage/' . ltrim($storedPath, '/'));
+        if (! File::exists($source)) {
+            return;
+        }
+        File::ensureDirectoryExists(dirname($destination));
+        File::copy($source, $destination);
     }
 }

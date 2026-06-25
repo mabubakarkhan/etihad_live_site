@@ -868,17 +868,8 @@ html.project-new-no-scroll {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px 10px;
     }
-    .project-new-kfl-grid { grid-template-columns: 1fr; }
-    .project-new-kfl-location-body {
-        grid-template-columns: 1fr;
-    }
     .project-new-kfl-features-copy {
         max-width: 100%;
-    }
-    .project-new-kfl-map {
-        min-height: 200px;
-        border-left: 0;
-        border-top: 1px solid #e6ebf3;
     }
     .project-new-meta-strip-wrap {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1364,6 +1355,119 @@ html.project-new-no-scroll {
     display: grid;
     gap: 14px;
 }
+.project-new-kfl-section > .container + .container {
+    margin-top: 14px;
+}
+.project-new-kfl-location-hero {
+    margin-top: clamp(24px, 4vw, 40px);
+    min-height: 100svh;
+    display: grid;
+    grid-template-columns: 1fr;
+    background: #f4f6fa;
+}
+@media (min-width: 992px) {
+    .project-new-kfl-location-hero {
+        grid-template-columns: 50vw minmax(0, 1fr);
+        align-items: stretch;
+    }
+}
+.project-new-kfl-location-content {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: clamp(36px, 5vw, 72px) clamp(28px, 4vw, 56px);
+    box-sizing: border-box;
+    min-height: 100%;
+}
+.project-new-kfl-location-content::before {
+    display: none;
+}
+.project-new-kfl-location-content::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(90deg,
+        #f8fafc 0%,
+        #f1f5f9 22%,
+        rgba(241, 245, 249, 0.92) 40%,
+        rgba(226, 232, 240, 0.72) 58%,
+        rgba(148, 163, 184, 0.48) 76%,
+        rgba(71, 85, 105, 0.28) 100%);
+    pointer-events: none;
+}
+.project-new-kfl-location-copy {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 620px;
+    padding: 0;
+    background: transparent;
+    text-align: left;
+}
+.project-new-kfl-location-title {
+    margin: 0 0 12px;
+    font-size: clamp(1.5rem, 2.6vw, 1.85rem);
+    font-weight: 800;
+    line-height: 1.2;
+    color: #0f172a;
+    text-align: left;
+}
+.project-new-kfl-features-wrap {
+    margin-top: clamp(24px, 4vw, 40px);
+}
+.project-new-kfl-features-card {
+    width: 100%;
+}
+.project-new-kfl-features-body {
+    position: relative;
+    overflow: hidden;
+    min-height: 320px;
+}
+.project-new-kfl-features-body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image: var(--project-new-kfl-features-bg);
+    background-size: cover;
+    background-position: center;
+}
+.project-new-kfl-features-body::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(90deg,
+        #f8fafc 0%,
+        #f1f5f9 22%,
+        rgba(241, 245, 249, 0.92) 40%,
+        rgba(226, 232, 240, 0.72) 58%,
+        rgba(148, 163, 184, 0.48) 76%,
+        rgba(71, 85, 105, 0.28) 100%);
+    pointer-events: none;
+}
+@media (min-width: 992px) {
+    .project-new-kfl-features-body {
+        display: flex;
+        align-items: center;
+        min-height: 380px;
+    }
+    .project-new-kfl-features-copy {
+        position: relative;
+        z-index: 2;
+        width: 40%;
+        max-width: 40%;
+        flex: 0 0 40%;
+        padding: clamp(32px, 4vw, 48px);
+        background: transparent;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
 .project-new-kfl-amenities-bar {
     padding: 18px 22px;
     border-radius: 14px;
@@ -1478,80 +1582,36 @@ html.project-new-no-scroll {
     text-align: left;
     color: #111827;
 }
-.project-new-kfl-location-body {
-    min-height: 280px;
-}
-@media (min-width: 992px) {
-    .project-new-kfl-location-body {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
-}
-.project-new-kfl-location-copy {
-    padding: 20px 18px 18px;
-    background: #f4f6fa;
-    text-align: left;
-}
 .project-new-kfl-features-body {
     overflow: hidden;
-}
-@media (min-width: 992px) {
-    .project-new-kfl-features-body {
-        position: relative;
-        min-height: 280px;
-    }
-    .project-new-kfl-features-copy {
-        position: relative;
-        z-index: 2;
-        max-width: 56%;
-        padding: 24px 22px 22px;
-        background: transparent;
-    }
-    .project-new-kfl-features-body::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: 1;
-        background: linear-gradient(90deg,
-            #f7f9fd 0%,
-            #f1f5fc 24%,
-            rgba(241,245,252,.95) 40%,
-            rgba(228,236,250,.72) 54%,
-            rgba(205,220,245,.35) 70%,
-            rgba(180,200,235,0) 88%);
-        pointer-events: none;
-    }
-    .project-new-kfl-features-media {
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-    }
-    .project-new-kfl-features .project-new-kfl-building {
-        width: 100%;
-        height: 100%;
-        min-height: 280px;
-        object-fit: cover;
-        object-position: center right;
-    }
 }
 .project-new-kfl-features-copy {
     text-align: left;
 }
 .project-new-kfl-location-desc {
-    margin: 0 0 12px;
-    color: #475569;
-    font-size: 13px;
-    line-height: 1.5;
+    margin: 0 0 18px;
+    color: #334155;
+    font-size: clamp(1rem, 1.8vw, 1.15rem);
+    line-height: 1.55;
+    font-weight: 500;
 }
 .project-new-kfl-map {
+    width: 100%;
     height: 100%;
     min-height: 280px;
     margin: 0;
     border-radius: 0;
     overflow: hidden;
     border: 0;
-    border-left: 1px solid #e6ebf3;
     background: #eef2f7;
+}
+@media (min-width: 992px) {
+    .project-new-kfl-location-hero .project-new-kfl-map {
+        width: 50vw;
+        min-height: 100svh;
+        height: 100%;
+        margin-left: 0;
+    }
 }
 .project-new-kfl-map iframe {
     width: 100%;
@@ -1571,21 +1631,42 @@ html.project-new-no-scroll {
     padding: 16px;
     box-sizing: border-box;
 }
-.project-new-kfl-location ul,
+.project-new-kfl-location-list {
+    margin: 0 0 22px;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+.project-new-kfl-location-list li {
+    font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+    color: #1f2937;
+    margin-bottom: 12px;
+    line-height: 1.45;
+    font-weight: 600;
+}
+.project-new-kfl-location-list li:last-child {
+    margin-bottom: 0;
+}
+.project-new-kfl-location-list li i {
+    display: inline-block;
+    width: 18px;
+    margin-right: 10px;
+    color: #a9823d;
+    text-align: center;
+    font-size: 1.05em;
+}
 .project-new-kfl-features ul {
     margin: 0;
     padding: 0;
     list-style: none;
     text-align: left;
 }
-.project-new-kfl-location li,
 .project-new-kfl-features li {
     font-size: 13px;
     color: #1f2937;
     margin-bottom: 9px;
     line-height: 1.35;
 }
-.project-new-kfl-location li i,
 .project-new-kfl-features li i {
     display: inline-block;
     width: 16px;
@@ -1594,20 +1675,38 @@ html.project-new-no-scroll {
     text-align: center;
 }
 .project-new-kfl-map-btn {
-    display: inline-block;
-    margin-top: 14px;
-    padding: 10px 16px;
-    background: #141a52;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+    padding: 12px 24px;
+    background: #a9823d;
     color: #fff;
     border: 0;
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: 999px;
+    font-size: 14px;
     font-weight: 700;
+    line-height: 1.2;
     cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 8px 20px rgba(169, 130, 61, 0.22);
 }
-.project-new-kfl-map-btn:hover { background: #0f1443; color: #fff; }
-.project-new-kfl-map-btn:disabled { opacity: .55; cursor: not-allowed; }
-.project-new-kfl-map-btn i { margin-left: 6px; }
+.project-new-kfl-map-btn:hover {
+    background: #8c6b31;
+    color: #fff;
+    transform: translateY(-1px);
+}
+.project-new-kfl-map-btn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+.project-new-kfl-map-btn i {
+    margin-left: 2px;
+    font-size: 1.05em;
+}
 .project-new-kfl-features-media {
     overflow: hidden;
     background: #dce5f2;
@@ -1630,67 +1729,54 @@ html.project-new-no-scroll {
 }
 
 @media (max-width: 991px) {
-    .project-new-kfl-grid {
-        grid-template-columns: 1fr !important;
-        gap: 14px;
-    }
-    .project-new-kfl-location-body {
-        display: flex !important;
-        flex-direction: column !important;
-        grid-template-columns: none !important;
+    .project-new-kfl-location-hero {
         min-height: 0;
+        display: flex;
+        flex-direction: column;
     }
-    .project-new-kfl-location-copy {
+    .project-new-kfl-location-content {
         order: 1;
-        width: 100%;
-        padding: 16px 14px 14px;
-        box-sizing: border-box;
+        align-items: flex-start;
+        padding: 28px 18px 24px;
+        min-height: 320px;
     }
-    .project-new-kfl-map {
+    .project-new-kfl-location-content::after {
+        background: linear-gradient(180deg,
+            #f8fafc 0%,
+            rgba(241, 245, 249, 0.94) 42%,
+            rgba(226, 232, 240, 0.72) 68%,
+            rgba(148, 163, 184, 0.35) 100%);
+    }
+    .project-new-kfl-location-title {
+        font-size: 1.35rem;
+    }
+    .project-new-kfl-location-hero .project-new-kfl-map {
         order: 2;
         width: 100%;
-        height: 220px;
-        min-height: 220px;
-        border-left: 0;
-        border-top: 1px solid #e6ebf3;
+        height: 260px;
+        min-height: 260px;
     }
     .project-new-kfl-map-fallback {
-        min-height: 220px;
+        min-height: 260px;
     }
     .project-new-kfl-features-body {
-        display: flex !important;
-        flex-direction: column !important;
-        position: relative;
-        min-height: 0;
-    }
-    .project-new-kfl-features-body::before {
-        display: none;
+        min-height: 300px;
     }
     .project-new-kfl-features-copy {
-        order: 1;
         position: relative;
         z-index: 2;
-        max-width: 100% !important;
         width: 100%;
-        padding: 16px 14px 14px;
+        max-width: 100%;
+        padding: 24px 18px;
         box-sizing: border-box;
-        background: #f4f6fa;
+        background: transparent;
     }
-    .project-new-kfl-features-media {
-        order: 2;
-        position: relative;
-        inset: auto;
-        width: 100%;
-        height: 220px;
-        min-height: 220px;
-        flex: 0 0 auto;
-    }
-    .project-new-kfl-features .project-new-kfl-building {
-        width: 100%;
-        height: 220px;
-        min-height: 220px;
-        object-fit: cover;
-        object-position: center;
+    .project-new-kfl-features-body::after {
+        background: linear-gradient(180deg,
+            #f8fafc 0%,
+            rgba(241, 245, 249, 0.94) 42%,
+            rgba(226, 232, 240, 0.72) 68%,
+            rgba(148, 163, 184, 0.35) 100%);
     }
     .project-new-kfl-card h4 {
         font-size: 20px;

@@ -128,6 +128,10 @@
     }
 
     $pricingPlaceCards = is_array($project->pricing_place_cards ?? null) ? array_values($project->pricing_place_cards) : [];
+    $priceSliderImages = is_array($project->price_slider_images ?? null)
+        ? array_values(array_filter($project->price_slider_images))
+        : [];
+    $hasPriceSlider = count($priceSliderImages) > 0;
     $planCards = [];
     $heroLocationLine = trim(implode(', ', array_filter([
         trim((string) ($project->city ?? '')),
@@ -321,6 +325,25 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('theme/css/pages/project-new.css') }}">
+<link rel="stylesheet" href="{{ asset('theme/css/pages/portal-map-section.css') }}?v=2">
+@if((is_array($project->project_detail_tabs ?? null) && count($project->project_detail_tabs) > 0) || $hasPriceSlider)
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css">
+@endif
+@if(is_array($project->project_detail_tabs ?? null) && count($project->project_detail_tabs) > 0)
+<link rel="stylesheet" href="{{ asset('theme/css/pages/project-detail-tabs.css') }}?v=6">
+@endif
+@if($hasPriceSlider)
+<link rel="stylesheet" href="{{ asset('theme/css/pages/project-price-slider.css') }}?v=1">
+@endif
+@if($project->hasVrTourPromo())
+<link rel="stylesheet" href="{{ asset('theme/css/pages/project-vr-tour-promo.css') }}?v=1">
+@endif
+@if($project->hasBookingProcedure())
+<link rel="stylesheet" href="{{ asset('theme/css/pages/project-booking-procedure.css') }}?v=3">
+@endif
+@if(trim(strip_tags((string) ($project->tabs_follow_content ?? ''))) !== '')
+<link rel="stylesheet" href="{{ asset('theme/css/pages/project-tabs-follow-content.css') }}?v=1">
+@endif
 @endpush
 
 @section('content')
@@ -497,67 +520,79 @@
             </section>
             @endif
 
+            @include('partials.project-price-slider', compact('project'))
+
+            @include('partials.portal-map-section', [
+                'heading' => $project->map_section_heading,
+                'tagline' => $project->map_section_tagline,
+                'imageUrl' => $project->mapSectionImageUrl(),
+                'viewerUrl' => $project->mapSectionViewerUrl(),
+            ])
+
+            @include('partials.project-detail-tabs', compact('project', 'projectPhoneClean'))
+
+            @include('partials.project-tabs-follow-content', compact('project'))
+
             <section class="project-new-kfl-section">
                 <div class="container">
-                    <div class="project-new-kfl-layout">
-                        <div class="project-new-kfl-amenities-bar">
-                            <h4>World-Class Amenities</h4>
-                            <ul class="project-new-kfl-amenities-icons">
-                                @foreach($amenityItems as $amenity)
-                                    <li>
-                                        <span class="project-new-kfl-amenity-icon"><i class="fa-light {{ $resolveAmenityIcon($amenity) }}"></i></span>
-                                        <span class="project-new-kfl-amenity-label">{{ $amenity }}</span>
-                                    </li>
+                    <div class="project-new-kfl-amenities-bar">
+                        <h4>World-Class Amenities</h4>
+                        <ul class="project-new-kfl-amenities-icons">
+                            @foreach($amenityItems as $amenity)
+                                <li>
+                                    <span class="project-new-kfl-amenity-icon"><i class="fa-light {{ $resolveAmenityIcon($amenity) }}"></i></span>
+                                    <span class="project-new-kfl-amenity-label">{{ $amenity }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="project-new-kfl-location-hero">
+                    <div class="project-new-kfl-map">
+                        @if($hasMap)
+                            <iframe src="{{ $mapEmbedUrl }}" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        @else
+                            <div class="project-new-kfl-map-fallback">Map will appear when latitude/longitude is added.</div>
+                        @endif
+                    </div>
+                    <div class="project-new-kfl-location-content">
+                        <div class="project-new-kfl-location-copy">
+                            <h4 class="project-new-kfl-location-title">Prime Location</h4>
+                            @if($locationDesc !== '')
+                            <p class="project-new-kfl-location-desc">{{ $locationDesc }}</p>
+                            @endif
+                            <ul class="project-new-kfl-location-list">
+                                @foreach($locationPoints as $point)
+                                    <li><i class="fa-light fa-bullseye"></i> {{ $point }}</li>
                                 @endforeach
                             </ul>
+                            <button type="button" class="project-new-kfl-map-btn project-new-view-map-btn" {{ $hasMap ? '' : 'disabled' }}>
+                                View on Map <i class="fa-light fa-angle-right"></i>
+                            </button>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="project-new-kfl-grid">
-                            <div class="project-new-kfl-card project-new-kfl-location">
-                                <div class="project-new-kfl-location-body">
-                                    <div class="project-new-kfl-location-copy">
-                                        <h4>Prime Location</h4>
-                                        @if($locationDesc !== '')
-                                        <p class="project-new-kfl-location-desc">{{ $locationDesc }}</p>
-                                        @endif
-                                        <ul>
-                                            @foreach($locationPoints as $point)
-                                                <li><i class="fa-light fa-bullseye"></i> {{ $point }}</li>
-                                            @endforeach
-                                        </ul>
-                                        <button type="button" class="project-new-kfl-map-btn project-new-view-map-btn" {{ $hasMap ? '' : 'disabled' }}>
-                                            View on Map <i class="fa-light fa-angle-right"></i>
-                                        </button>
-                                    </div>
-                                    <div class="project-new-kfl-map">
-                                        @if($hasMap)
-                                            <iframe src="{{ $mapEmbedUrl }}" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
-                                        @else
-                                            <div class="project-new-kfl-map-fallback">Map will appear when latitude/longitude is added.</div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="project-new-kfl-card project-new-kfl-features">
-                                <div class="project-new-kfl-features-body">
-                                    <div class="project-new-kfl-features-copy">
-                                        <h4>Key Features</h4>
-                                        <ul>
-                                            @foreach($keyFeatureItems as $feature)
-                                                <li><i class="fa-light {{ $resolveFeatureIcon($feature) }}"></i> {{ $feature }}</li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                    <div class="project-new-kfl-features-media">
-                                        <img src="{{ $featuredUrl }}" alt="{{ $project->title }}" class="project-new-kfl-building" loading="lazy">
-                                    </div>
-                                </div>
+                <div class="container project-new-kfl-features-wrap">
+                    <div class="project-new-kfl-features-card project-new-kfl-card project-new-kfl-features">
+                        <div class="project-new-kfl-features-body" style="--project-new-kfl-features-bg: url('{{ $featuredUrl }}')">
+                            <div class="project-new-kfl-features-copy">
+                                <h4>Key Features</h4>
+                                <ul>
+                                    @foreach($keyFeatureItems as $feature)
+                                        <li><i class="fa-light {{ $resolveFeatureIcon($feature) }}"></i> {{ $feature }}</li>
+                                    @endforeach
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                @include('partials.project-vr-tour-promo', compact('project', 'vrTourPageUrl'))
             </section>
+
+            @include('partials.project-booking-procedure', compact('project'))
 
             <section class="project-new-meta-strip">
                 <div class="container">
@@ -1351,4 +1386,16 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+@if((is_array($project->project_detail_tabs ?? null) && count($project->project_detail_tabs) > 0) || $hasPriceSlider)
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+@endif
+@if(is_array($project->project_detail_tabs ?? null) && count($project->project_detail_tabs) > 0)
+<script src="{{ asset('theme/js/project-detail-tabs.js') }}?v=2"></script>
+@endif
+@if($hasPriceSlider)
+<script src="{{ asset('theme/js/project-price-slider.js') }}?v=1"></script>
+@endif
+@if(trim(strip_tags((string) ($project->tabs_follow_content ?? ''))) !== '')
+<script src="{{ asset('theme/js/project-tabs-follow-content.js') }}?v=1"></script>
+@endif
 @endpush

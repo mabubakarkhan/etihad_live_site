@@ -89,7 +89,9 @@
 
         return uploadFile(file, type).then(function (data) {
             if (pathInput) pathInput.value = data.path || '';
-            var removeName = type === 'card' ? 'remove_card_image' : 'remove_featured_image';
+            var removeName = type === 'card'
+                ? 'remove_card_image'
+                : (type === 'map_section' ? 'remove_map_section_image' : 'remove_featured_image');
             var removeCb = form.querySelector('input[name="' + removeName + '"]');
             if (removeCb) removeCb.checked = false;
 
@@ -107,6 +109,8 @@
                     img.className = imgClass + ' h-20 rounded border border-slate-300 dark:border-slate-700 object-cover';
                     if (type === 'card') {
                         img.classList.add('w-20');
+                    } else if (type === 'map_section') {
+                        img.classList.add('max-h-40', 'w-auto');
                     }
                     img.alt = '';
                     preview.insertBefore(img, preview.firstChild);
@@ -145,6 +149,7 @@
 
     bindRemoveImage('remove_featured_image', 'featured_image_path', ['dha-featured-preview', 'dha-phase-featured-preview'], ['dha-featured-existing', 'dha-phase-featured-existing']);
     bindRemoveImage('remove_card_image', 'card_image_path', ['dha-phase-card-preview'], ['dha-phase-card-existing']);
+    bindRemoveImage('remove_map_section_image', 'map_section_image_path', ['dha-phase-map-section-preview'], []);
 
     var galleryList = document.getElementById('dha-phase-gallery-list');
 
@@ -282,11 +287,17 @@
         var file = files[0];
         if (!file) return;
 
-        if (type === 'featured' || type === 'card') {
-            var pathName = input.getAttribute('data-path-name') || (type === 'card' ? 'card_image_path' : 'featured_image_path');
+        if (type === 'featured' || type === 'card' || type === 'map_section') {
+            var pathName = input.getAttribute('data-path-name') || (type === 'card'
+                ? 'card_image_path'
+                : (type === 'map_section' ? 'map_section_image_path' : 'featured_image_path'));
             var pathInput = ensurePathInput(pathName);
-            var prefix = input.getAttribute('data-status-prefix') || (type === 'card' ? 'dha-phase-card' : 'dha-featured');
-            var previewClass = input.getAttribute('data-preview-class') || 'dha-featured-preview-img';
+            var prefix = input.getAttribute('data-status-prefix') || (type === 'card'
+                ? 'dha-phase-card'
+                : (type === 'map_section' ? 'dha-phase-map-section' : 'dha-featured'));
+            var previewClass = input.getAttribute('data-preview-class') || (type === 'map_section'
+                ? 'dha-map-section-preview-img'
+                : 'dha-featured-preview-img');
             uploadFeatured(file, pathInput, prefix, type, previewClass);
             return;
         }

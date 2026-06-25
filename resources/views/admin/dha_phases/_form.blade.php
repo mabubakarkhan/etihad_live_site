@@ -254,6 +254,60 @@
     </div>
 
     <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg space-y-4">
+        <h2 class="text-sm font-semibold text-emerald-600 uppercase tracking-wider">Interactive map preview (portal section)</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Shown on the phase page before the gallery. Clicking the image opens the map link in a new tab.</p>
+        <div>
+            <label class="block text-sm mb-1">Heading</label>
+            <input type="text" name="map_section_heading" value="{{ old('map_section_heading', $phase->map_section_heading) }}" placeholder="e.g. Master Plan Map" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" />
+        </div>
+        <div>
+            <label class="block text-sm mb-1">Tagline</label>
+            <input type="text" name="map_section_tagline" value="{{ old('map_section_tagline', $phase->map_section_tagline) }}" placeholder="e.g. Explore {{ $phase->title }} in detail" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" />
+        </div>
+        <div>
+            <label class="block text-sm mb-1">Map link URL</label>
+            <input type="url" name="map_section_url" value="{{ old('map_section_url', $phase->map_section_url) }}" placeholder="https://..." class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" />
+        </div>
+        @php $mapSectionPath = old('map_section_image_path', $phase->map_section_image); @endphp
+        <div id="dha-phase-map-section-preview" class="{{ $mapSectionPath ? '' : 'hidden' }} mb-2">
+            @if($mapSectionPath)
+                <img src="{{ asset('storage/' . ltrim($mapSectionPath, '/')) }}" alt="" class="dha-map-section-preview-img max-h-40 rounded-lg border border-slate-300 dark:border-slate-700" />
+            @else
+                <img src="" alt="" class="dha-map-section-preview-img max-h-40 rounded-lg border border-slate-300 dark:border-slate-700 hidden" />
+            @endif
+        </div>
+        <div id="dha-phase-map-section-upload-status" class="hidden mb-2 rounded-lg border border-sky-500/40 bg-sky-500/10 px-3 py-2 text-sm text-sky-800 dark:text-sky-200">
+            <span class="inline-block w-3 h-3 border-2 border-sky-600 border-t-transparent rounded-full animate-spin mr-2 align-middle"></span>
+            Uploading preview image, please wait…
+        </div>
+        <div id="dha-phase-map-section-upload-success" class="hidden mb-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-800 dark:text-emerald-200"></div>
+        <div id="dha-phase-map-section-upload-error" class="hidden mb-2 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-800 dark:text-rose-200"></div>
+        <input type="hidden" name="map_section_image_path" value="{{ $mapSectionPath }}" />
+        <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Preview image (upload immediately)</label>
+        <input type="file" accept="image/*" class="dha-media-upload block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" data-upload-type="map_section" data-path-name="map_section_image_path" data-status-prefix="dha-phase-map-section" data-preview-class="dha-map-section-preview-img" />
+        <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" name="remove_map_section_image" value="1" @checked(old('remove_map_section_image')) class="rounded border-slate-400" />
+            Remove current preview image
+        </label>
+        <div class="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Map viewer SEO</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Meta tags for the interactive map page. Leave blank to auto-generate from heading and tagline.</p>
+            <div>
+                <label class="block text-sm mb-1">Meta title</label>
+                <input type="text" name="map_section_meta_title" value="{{ old('map_section_meta_title', $phase->map_section_meta_title) }}" placeholder="e.g. {{ $phase->title }} Master Plan Map | Etihad Marketing" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" />
+            </div>
+            <div>
+                <label class="block text-sm mb-1">Meta description</label>
+                <textarea name="map_section_meta_description" rows="2" placeholder="Short description for search engines (max 500 chars)" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm">{{ old('map_section_meta_description', $phase->map_section_meta_description) }}</textarea>
+            </div>
+            <div>
+                <label class="block text-sm mb-1">Meta keywords</label>
+                <input type="text" name="map_section_meta_keywords" value="{{ old('map_section_meta_keywords', $phase->map_section_meta_keywords) }}" placeholder="DHA phase map, master plan, Lahore plots" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" />
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg space-y-4">
         <h2 class="text-sm font-semibold text-emerald-600 uppercase tracking-wider">Property types (prominent on phase page)</h2>
         <p class="text-xs text-slate-500">Link categories like Residential, Commercial, Plaza plot.</p>
         <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-2">

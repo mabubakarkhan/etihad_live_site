@@ -1,0 +1,135 @@
+/* Project page — price slider (detail-tabs slider style, 11 columns) */
+.project-price-slider {
+    padding: 0 0 32px;
+    background: #f3f4f6;
+}
+.project-price-slider .container {
+    padding-left: 18px;
+    padding-right: 18px;
+}
+.project-price-slider__frame {
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 32px rgba(15, 23, 42, 0.08);
+}
+.project-price-slider__body {
+    background: #fff;
+    padding: clamp(20px, 3.2vw, 32px);
+    display: flex;
+    justify-content: center;
+}
+.project-price-slider__media {
+    width: min(100%, 91.666%);
+    max-width: 91.666%;
+    margin: 0 auto;
+}
+.project-price-slider__slider,
+.project-price-slider__single {
+    width: 100%;
+    max-width: 100%;
+}
+.project-price-slider__slider {
+    position: relative;
+    padding: 0 52px;
+}
+.project-price-slider__slide {
+    padding: 0 6px;
+}
+.project-price-slider__slider .slick-list {
+    border-radius: 12px;
+    overflow: hidden;
+}
+.project-price-slider__slider img,
+.project-price-slider__single img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    border-radius: 12px;
+    object-fit: cover;
+}
+.project-price-slider__slider .project-price-slider__arrow,
+.project-price-slider__slider .slick-prev,
+.project-price-slider__slider .slick-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: transparent !important;
+    box-shadow: none;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+.project-price-slider__slider .slick-prev {
+    left: 0;
+}
+.project-price-slider__slider .slick-next {
+    right: 0;
+}
+.project-price-slider__slider .slick-prev:before,
+.project-price-slider__slider .slick-next:before {
+    display: none !important;
+    content: none !important;
+}
+.project-price-slider__slider .project-price-slider__arrow i {
+    font-size: clamp(2rem, 4.5vw, 2.75rem);
+    color: #a9823d;
+    display: block;
+    line-height: 1;
+}
+.project-price-slider__slider .project-price-slider__arrow:hover i {
+    color: #8c6b31;
+}
+.project-price-slider__slider .slick-prev:hover,
+.project-price-slider__slider .slick-next:hover {
+    transform: translateY(-50%);
+}
+.project-price-slider__slider .slick-dots {
+    position: static;
+    margin: 16px 0 0;
+    padding: 0;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    list-style: none;
+    width: 100%;
+}
+.project-price-slider__slider .slick-dots li {
+    width: auto;
+    height: auto;
+    margin: 0;
+}
+.project-price-slider__slider .slick-dots li button {
+    width: 28px;
+    height: 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: #d1d5db;
+    font-size: 0;
+    line-height: 0;
+    transition: background 0.2s ease, width 0.2s ease;
+}
+.project-price-slider__slider .slick-dots li.slick-active button {
+    width: 40px;
+    background: #a9823d;
+}
+@media (max-width: 767px) {
+    .project-price-slider__slider {
+        padding: 0 36px;
+    }
+    .project-price-slider__media {
+        width: 100%;
+        max-width: 100%;
+    }
+}

@@ -1,0 +1,175 @@
+/* Project page — booking procedure */
+.project-booking-procedure {
+    --bp-gold: #a9823d;
+    --bp-gold-dark: #6c4815;
+    --bp-light: #f8f6f2;
+    width: 100%;
+    padding: clamp(40px, 5vw, 56px) clamp(20px, 4vw, 40px);
+    margin-bottom: clamp(32px, 5vw, 48px);
+    background: linear-gradient(180deg, #fffdf8 0%, #fff8eb 100%);
+}
+.project-booking-procedure__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.project-booking-procedure__title {
+    margin: 0 0 clamp(18px, 3vw, 28px);
+    text-align: center;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--bp-gold-dark);
+}
+.project-booking-procedure__intro {
+    max-width: 920px;
+    margin: 0 auto clamp(28px, 4vw, 40px);
+    color: #334155;
+    font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+    line-height: 1.75;
+    text-align: left;
+}
+.project-booking-procedure__intro p {
+    margin: 0 0 14px;
+}
+.project-booking-procedure__intro ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.project-booking-procedure__intro li {
+    position: relative;
+    padding-left: 1.35rem;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+.project-booking-procedure__intro li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--bp-gold);
+    font-weight: 700;
+}
+.project-booking-procedure__steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    margin-bottom: clamp(28px, 4vw, 40px);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 14px 36px rgba(108, 72, 21, 0.1);
+}
+.project-booking-procedure__step {
+    padding: clamp(22px, 3vw, 32px) clamp(18px, 2.5vw, 24px);
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+.project-booking-procedure__step.is-light {
+    background: var(--bp-light);
+    color: var(--bp-gold-dark);
+}
+.project-booking-procedure__step.is-accent {
+    background: linear-gradient(160deg, var(--bp-gold) 0%, #b8924f 48%, var(--bp-gold-dark) 100%);
+    color: #ffffff;
+}
+.project-booking-procedure__step.is-accent .project-booking-procedure__step-num,
+.project-booking-procedure__step.is-accent .project-booking-procedure__step-title,
+.project-booking-procedure__step.is-accent .project-booking-procedure__step-desc {
+    color: #ffffff;
+}
+.project-booking-procedure__step-num {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.02em;
+}
+.project-booking-procedure__step.is-light .project-booking-procedure__step-num {
+    color: var(--bp-gold-dark);
+}
+.project-booking-procedure__step-divider {
+    width: 100%;
+    height: 2px;
+    margin: 14px 0 16px;
+    background: currentColor;
+    opacity: 0.35;
+}
+.project-booking-procedure__step-title {
+    margin: 0 0 12px;
+    font-size: clamp(1rem, 1.8vw, 1.15rem);
+    font-weight: 800;
+    line-height: 1.25;
+}
+.project-booking-procedure__step-desc {
+    margin: 0;
+    font-size: clamp(0.88rem, 1.35vw, 0.95rem);
+    line-height: 1.6;
+    opacity: 0.95;
+}
+.project-booking-procedure__step.is-accent .project-booking-procedure__step-desc {
+    opacity: 1;
+}
+.project-booking-procedure__documents {
+    border-top: 3px solid var(--bp-gold);
+    padding-top: clamp(24px, 3.5vw, 32px);
+    text-align: center;
+}
+.project-booking-procedure__documents-title {
+    margin: 0 0 clamp(20px, 3vw, 28px);
+    text-align: center;
+    font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+    font-weight: 800;
+    color: var(--bp-gold-dark);
+}
+.project-booking-procedure__documents-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(16px, 2.5vw, 28px);
+    max-width: 1140px;
+    margin: 0 auto;
+}
+.project-booking-procedure__document {
+    text-align: center;
+}
+.project-booking-procedure__document-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    background: rgba(169, 130, 61, 0.12);
+    color: var(--bp-gold);
+    font-size: 1.5rem;
+}
+.project-booking-procedure__document-label {
+    margin: 0 auto;
+    max-width: 220px;
+    font-size: clamp(0.85rem, 1.25vw, 0.95rem);
+    line-height: 1.45;
+    font-weight: 600;
+    color: #334155;
+    text-align: center;
+}
+@media (max-width: 991px) {
+    .project-booking-procedure__steps {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .project-booking-procedure__documents-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 575px) {
+    .project-booking-procedure__steps {
+        grid-template-columns: 1fr;
+    }
+    .project-booking-procedure__step {
+        min-height: 0;
+    }
+    .project-booking-procedure__documents-grid {
+        grid-template-columns: 1fr;
+    }
+}

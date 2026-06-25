@@ -3,7 +3,7 @@
     if (!form) return;
 
     var uploadUrl = form.getAttribute('data-upload-url') || '';
-    var projectId = form.getAttribute('data-project-id') || '';
+    var projectId = form.getAttribute('data-project-id') || form.getAttribute('data-entity-id') || '';
     var csrf = (form.querySelector('input[name="_token"]') || {}).value || '';
 
     var REMOVE_TO_PATH = {
@@ -165,8 +165,8 @@
             preview = document.createElement('div');
             preview.className = 'project-media-preview mb-2 flex items-center gap-3 flex-wrap';
             var fileInput = wrap.querySelector('.project-media-upload');
-            if (fileInput) {
-                wrap.insertBefore(preview, fileInput);
+            if (fileInput && fileInput.parentElement && fileInput.parentElement.contains(fileInput)) {
+                fileInput.parentElement.insertBefore(preview, fileInput);
             } else {
                 wrap.appendChild(preview);
             }
@@ -199,13 +199,18 @@
     function showRowImagePreview(row, url, pathInput) {
         if (!row || !url) return;
         clearRowImagePreview(row);
-        var uploadInput = row.querySelector('.project-media-upload');
-        var fileCol = uploadInput ? uploadInput.closest('.flex-1') : null;
-        if (!fileCol) return;
+        var uploadInput = row.querySelector('.project-media-upload[data-upload-type="pricing_place"], .project-media-upload[data-upload-type="plan"]');
+        if (!uploadInput) return;
+        var host = uploadInput.parentElement;
+        if (!host) return;
         var preview = document.createElement('div');
         preview.className = 'project-media-preview mb-2 flex items-center gap-3 flex-wrap';
         preview.innerHTML = buildPreviewHtml(url, false, true);
-        fileCol.insertBefore(preview, uploadInput);
+        if (host.contains(uploadInput)) {
+            host.insertBefore(preview, uploadInput);
+        } else {
+            host.appendChild(preview);
+        }
         var removePreviewBtn = preview.querySelector('.project-media-remove-preview');
         if (removePreviewBtn) {
             removePreviewBtn.addEventListener('click', function () {
@@ -223,6 +228,12 @@
     }
 
     function uploadSingle(input, file, type, pathInput, container) {
+        if (input.classList.contains('detail-tab-media-upload') || type === 'detail_tab_image') {
+            return Promise.resolve();
+        }
+        if (input.classList.contains('price-slider-media-upload') || type === 'price_slider_image') {
+            return Promise.resolve();
+        }
         var wrap = container && container.matches('[data-media-wrap]') ? container : (container && container.closest('[data-media-wrap]'));
         var root = getMediaFieldRoot(wrap || container);
 
@@ -298,6 +309,185 @@
         galleryList.appendChild(div);
     }
 
+    function getDetailTabRow(input) {
+        return input ? input.closest('.detail-tab-row') : null;
+    }
+
+    function getDetailTabImagesList(input) {
+        var row = getDetailTabRow(input);
+        return row ? row.querySelector('.detail-tab-images-list') : null;
+    }
+
+    function getDetailTabIndex(input) {
+        var row = getDetailTabRow(input);
+        if (row) {
+            return row.getAttribute('data-tab-index') || '0';
+        }
+        return input.getAttribute('data-tab-index') || '0';
+    }
+
+    function setDetailTabUploadMsg(input, kind, text) {
+        var wrap = input.closest('.detail-tab-media-wrap');
+        if (!wrap) return;
+        var msg = wrap.querySelector('.detail-tab-upload-msg');
+        if (!msg) return;
+        msg.textContent = text || '';
+        msg.classList.toggle('hidden', !text);
+        msg.classList.remove('text-emerald-600', 'dark:text-emerald-400', 'text-rose-600', 'dark:text-rose-400', 'text-sky-600', 'dark:text-sky-400');
+        if (kind === 'ok') {
+            msg.classList.add('text-emerald-600', 'dark:text-emerald-400');
+        } else if (kind === 'err') {
+            msg.classList.add('text-rose-600', 'dark:text-rose-400');
+        } else {
+            msg.classList.add('text-sky-600', 'dark:text-sky-400');
+        }
+    }
+
+    function appendDetailTabImageRow(listEl, tabIndex, path, url) {
+        if (!listEl) return;
+        var div = document.createElement('div');
+        div.className = 'detail-tab-image-item relative inline-block shrink-0';
+        div.setAttribute('data-path', path || '');
+        div.innerHTML =
+            '<img src="' + (url || '').replace(/"/g, '&quot;') + '" alt="" class="h-16 w-16 object-cover rounded-lg border border-slate-300 dark:border-slate-700" />' +
+            '<input type="hidden" name="detail_tab_image_paths[' + tabIndex + '][]" value="' + (path || '').replace(/"/g, '&quot;') + '" />' +
+            '<button type="button" class="remove-detail-tab-image absolute -top-1 -right-1 z-10 w-5 h-5 rounded-full bg-rose-600 text-white text-xs leading-none shadow hover:bg-rose-500" aria-label="Remove image">&times;</button>';
+        listEl.appendChild(div);
+    }
+
+    function uploadDetailTabImages(input, files) {
+        var tabIndex = getDetailTabIndex(input);
+        var listEl = getDetailTabImagesList(input);
+        var list = Array.isArray(files) ? files.slice() : snapshotFiles({ files: files });
+        if (!list.length) return;
+        if (!listEl) {
+            setDetailTabUploadMsg(input, 'err', 'Could not find image list for this tab. Please refresh the page.');
+            return;
+        }
+        if (!uploadUrl) {
+            setDetailTabUploadMsg(input, 'err', 'Upload is not configured on this form.');
+            return;
+        }
+
+        var wrap = input.closest('.detail-tab-media-wrap');
+        if (wrap) {
+            wrap.querySelectorAll('.project-media-preview').forEach(function (el) {
+                el.remove();
+            });
+        }
+
+        var total = list.length;
+        var uploaded = 0;
+        var failed = 0;
+        setDetailTabUploadMsg(input, 'wait', total > 1 ? ('Uploading 0 of ' + total + ' images…') : 'Uploading image…');
+
+        var chain = Promise.resolve();
+        list.forEach(function (file, index) {
+            chain = chain.then(function () {
+                setDetailTabUploadMsg(input, 'wait', total > 1
+                    ? ('Uploading image ' + (index + 1) + ' of ' + total + '…')
+                    : 'Uploading image…');
+                return uploadFile(file, 'detail_tab_image').then(function (data) {
+                    appendDetailTabImageRow(listEl, tabIndex, data.path, data.url);
+                    uploaded++;
+                }).catch(function () {
+                    failed++;
+                });
+            });
+        });
+
+        chain.finally(function () {
+            if (failed > 0 && uploaded === 0) {
+                setDetailTabUploadMsg(input, 'err', 'Image upload failed. Please try again.');
+            } else if (failed > 0) {
+                setDetailTabUploadMsg(input, 'err', failed + ' of ' + total + ' images failed. The rest were added.');
+            } else {
+                setDetailTabUploadMsg(input, 'ok', total > 1
+                    ? (uploaded + ' images uploaded successfully.')
+                    : 'Image uploaded successfully.');
+            }
+        });
+    }
+
+    function getPriceSliderImagesList() {
+        return document.getElementById('price-slider-images-list');
+    }
+
+    function setPriceSliderUploadMsg(input, kind, text) {
+        var wrap = input ? input.closest('.price-slider-media-wrap') : document.querySelector('.price-slider-media-wrap');
+        if (!wrap) return;
+        var msg = wrap.querySelector('.price-slider-upload-msg');
+        if (!msg) return;
+        msg.textContent = text || '';
+        msg.classList.toggle('hidden', !text);
+        msg.classList.remove('text-emerald-600', 'dark:text-emerald-400', 'text-rose-600', 'dark:text-rose-400', 'text-sky-600', 'dark:text-sky-400');
+        if (kind === 'ok') {
+            msg.classList.add('text-emerald-600', 'dark:text-emerald-400');
+        } else if (kind === 'err') {
+            msg.classList.add('text-rose-600', 'dark:text-rose-400');
+        } else {
+            msg.classList.add('text-sky-600', 'dark:text-sky-400');
+        }
+    }
+
+    function appendPriceSliderImageRow(listEl, path, url) {
+        if (!listEl) return;
+        var div = document.createElement('div');
+        div.className = 'price-slider-image-item relative inline-block shrink-0';
+        div.setAttribute('data-path', path || '');
+        div.innerHTML =
+            '<img src="' + (url || '').replace(/"/g, '&quot;') + '" alt="" class="h-16 w-16 object-cover rounded-lg border border-slate-300 dark:border-slate-700" />' +
+            '<input type="hidden" name="price_slider_image_paths[]" value="' + (path || '').replace(/"/g, '&quot;') + '" />' +
+            '<button type="button" class="remove-price-slider-image absolute -top-1 -right-1 z-10 w-5 h-5 rounded-full bg-rose-600 text-white text-xs leading-none shadow hover:bg-rose-500" aria-label="Remove image">&times;</button>';
+        listEl.appendChild(div);
+    }
+
+    function uploadPriceSliderImages(input, files) {
+        var listEl = getPriceSliderImagesList();
+        var list = Array.isArray(files) ? files.slice() : snapshotFiles({ files: files });
+        if (!list.length) return;
+        if (!listEl) {
+            setPriceSliderUploadMsg(input, 'err', 'Could not find image list. Please refresh the page.');
+            return;
+        }
+        if (!uploadUrl) {
+            setPriceSliderUploadMsg(input, 'err', 'Upload is not configured on this form.');
+            return;
+        }
+
+        var total = list.length;
+        var uploaded = 0;
+        var failed = 0;
+        setPriceSliderUploadMsg(input, 'wait', total > 1 ? ('Uploading 0 of ' + total + ' images…') : 'Uploading image…');
+
+        var chain = Promise.resolve();
+        list.forEach(function (file, index) {
+            chain = chain.then(function () {
+                setPriceSliderUploadMsg(input, 'wait', total > 1
+                    ? ('Uploading image ' + (index + 1) + ' of ' + total + '…')
+                    : 'Uploading image…');
+                return uploadFile(file, 'price_slider_image').then(function (data) {
+                    appendPriceSliderImageRow(listEl, data.path, data.url);
+                    uploaded++;
+                }).catch(function () {
+                    failed++;
+                });
+            });
+        });
+
+        chain.finally(function () {
+            if (failed > 0 && uploaded === 0) {
+                setPriceSliderUploadMsg(input, 'err', 'Image upload failed. Please try again.');
+            } else if (failed > 0) {
+                setPriceSliderUploadMsg(input, 'err', failed + ' of ' + total + ' images failed. The rest were added.');
+            } else {
+                setPriceSliderUploadMsg(input, 'ok', total > 1
+                    ? (uploaded + ' images uploaded successfully.')
+                    : 'Image uploaded successfully.');
+            }
+        });
+    }
+
     function showGalleryProgress(current, total) {
         var status = document.getElementById('project-gallery-upload-status');
         var text = document.getElementById('project-gallery-upload-status-text');
@@ -354,8 +544,41 @@
         });
     }
 
+    form.addEventListener('click', function (e) {
+        var removeDetailImgBtn = e.target.closest('.remove-detail-tab-image');
+        if (removeDetailImgBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            var detailItem = removeDetailImgBtn.closest('.detail-tab-image-item');
+            if (detailItem) detailItem.remove();
+            return;
+        }
+
+        var removePriceSliderBtn = e.target.closest('.remove-price-slider-image');
+        if (!removePriceSliderBtn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var priceItem = removePriceSliderBtn.closest('.price-slider-image-item');
+        if (priceItem) priceItem.remove();
+    });
+
     form.addEventListener('change', function (e) {
         var input = e.target;
+
+        if (input.classList.contains('detail-tab-media-upload')) {
+            var detailFiles = snapshotFiles(input);
+            input.value = '';
+            uploadDetailTabImages(input, detailFiles);
+            return;
+        }
+
+        if (input.classList.contains('price-slider-media-upload')) {
+            var priceSliderFiles = snapshotFiles(input);
+            input.value = '';
+            uploadPriceSliderImages(input, priceSliderFiles);
+            return;
+        }
+
         if (!input.classList.contains('project-media-upload')) return;
 
         var type = input.getAttribute('data-upload-type') || '';
@@ -364,6 +587,16 @@
 
         if (type === 'gallery') {
             uploadGalleryFiles(files);
+            return;
+        }
+
+        if (type === 'detail_tab_image') {
+            uploadDetailTabImages(input, files);
+            return;
+        }
+
+        if (type === 'price_slider_image') {
+            uploadPriceSliderImages(input, files);
             return;
         }
 

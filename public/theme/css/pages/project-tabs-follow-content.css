@@ -1,0 +1,88 @@
+/* Project page — rich content block after detail tabs */
+.project-tabs-follow-content {
+    padding: clamp(40px, 5vw, 56px) clamp(20px, 4vw, 40px);
+    background: linear-gradient(180deg, #fffdf8 0%, #fff8eb 100%);
+}
+.project-tabs-follow-content__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.project-tabs-follow-content__body {
+    max-width: 83.333%;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    transition: max-height 0.45s ease;
+}
+.project-tabs-follow-content__body.is-collapsed {
+    max-height: 380px;
+}
+.project-tabs-follow-content__body.is-collapsed.is-collapsible::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 96px;
+    background: linear-gradient(180deg, rgba(255, 253, 248, 0) 0%, #fff8eb 88%);
+    pointer-events: none;
+}
+.project-tabs-follow-content__body.is-expanded {
+    max-height: none;
+}
+.project-tabs-follow-content__body.is-expanded::after {
+    display: none;
+}
+.project-tabs-follow-content__richtext {
+    text-align: left;
+    color: #334155;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+.project-tabs-follow-content__richtext h2,
+.project-tabs-follow-content__richtext h3,
+.project-tabs-follow-content__richtext h4 {
+    margin: 1.75rem 0 0.75rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    color: #0f172a;
+    line-height: 1.3;
+}
+.project-tabs-follow-content__richtext h2:first-child,
+.project-tabs-follow-content__richtext h3:first-child,
+.project-tabs-follow-content__richtext h4:first-child {
+    margin-top: 0;
+}
+.project-tabs-follow-content__richtext p {
+    margin: 0 0 1rem;
+}
+.project-tabs-follow-content__richtext ul,
+.project-tabs-follow-content__richtext ol {
+    margin: 0 0 1rem 1.25rem;
+    padding: 0;
+}
+.project-tabs-follow-content__toggle-wrap {
+    max-width: 83.333%;
+    margin: 1.25rem auto 0;
+    text-align: center;
+}
+.project-tabs-follow-content__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+    padding: 0.65rem 1.5rem;
+    border: 1px solid #a9823d;
+    border-radius: 999px;
+    background: transparent;
+    color: #a9823d;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.project-tabs-follow-content__toggle:hover {
+    background: #a9823d;
+    color: #fff;
+}

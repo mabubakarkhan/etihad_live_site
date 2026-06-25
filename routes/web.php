@@ -734,6 +734,20 @@ Route::get('/dha/{phase:slug}/vr-tour', function (DhaPhase $phase) {
     return view('dha-phase-vr-tour', compact('phase', 'vrTourUrl', 'overlayPhone'));
 })->name('dha.phase.vr-tour');
 
+Route::get('/dha/{phase:slug}/interactive-map', function (DhaPhase $phase) {
+    if ($phase->status !== DhaPhase::STATUS_ACTIVE || ! $phase->hasMapSection()) {
+        abort(404);
+    }
+    $embedUrl = $phase->mapSectionUrl();
+    if ($embedUrl !== null && ! preg_match('/^https?:\/\//i', $embedUrl)) {
+        $embedUrl = 'https://' . $embedUrl;
+    }
+
+    return response()
+        ->view('interactive-map-viewer', compact('phase', 'embedUrl'))
+        ->header('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet, noimageindex');
+})->name('dha.phase.interactive-map');
+
 Route::get('/listing/dealers', function () {
     $q = request()->getQueryString();
     $url = route('listing') . ($q !== null && $q !== '' ? '?' . $q : '');
@@ -858,6 +872,21 @@ Route::get('/project/vr-tour/{project}', function (Project $project) {
     $overlayPhone = is_string($contactSettings->phone ?? null) ? trim((string) $contactSettings->phone) : '';
     return view('project-vr-tour', compact('project', 'vrTourUrl', 'overlayPhone'));
 })->name('project.vr-tour');
+
+Route::get('/project/interactive-map/{project}', function (Project $project) {
+    $project = Project::query()->whereKey($project->id)->active()->firstOrFail();
+    if (! $project->hasMapSection()) {
+        abort(404);
+    }
+    $embedUrl = $project->mapSectionUrl();
+    if ($embedUrl !== null && ! preg_match('/^https?:\/\//i', $embedUrl)) {
+        $embedUrl = 'https://' . $embedUrl;
+    }
+
+    return response()
+        ->view('interactive-map-viewer', compact('project', 'embedUrl'))
+        ->header('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet, noimageindex');
+})->name('project.interactive-map');
 
 Route::post('/careers/job/{slug}/apply', function (Request $request, string $slug) {
     $career = \App\Models\Career::where('slug', $slug)->active()->firstOrFail();

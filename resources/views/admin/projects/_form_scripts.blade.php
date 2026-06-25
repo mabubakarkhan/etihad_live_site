@@ -105,18 +105,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function initQuillInWrap(wrap) {
+        if (typeof Quill === 'undefined' || !wrap) return;
+        if (wrap.dataset.quillInit === '1') return;
+        var ta = wrap.querySelector('textarea.richtext');
+        if (!ta || wrap.querySelector('.quill-editor')) return;
+        var div = document.createElement('div');
+        div.className = 'quill-editor';
+        div.style.minHeight = '120px';
+        wrap.insertBefore(div, ta);
+        var q = new Quill(div, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],[{list:'ordered'},{list:'bullet'}]] } });
+        q.root.innerHTML = ta.value;
+        q.on('text-change', function() { ta.value = q.root.innerHTML; });
+        wrap.dataset.quillInit = '1';
+    }
+
     if (typeof Quill !== 'undefined') {
-        document.querySelectorAll('textarea.richtext').forEach(function(ta) {
-            var wrap = ta.closest('.richtext-wrap');
-            if (!wrap) return;
-            var div = document.createElement('div');
-            div.className = 'quill-editor';
-            div.style.minHeight = '120px';
-            wrap.insertBefore(div, ta);
-            var q = new Quill(div, { theme: 'snow', modules: { toolbar: [['bold','italic','underline'],['link'],[{list:'ordered'},{list:'bullet'}]] } });
-            q.root.innerHTML = ta.value;
-            q.on('text-change', function() { ta.value = q.root.innerHTML; });
-        });
+        document.querySelectorAll('.richtext-wrap').forEach(initQuillInWrap);
     }
 
     window.projectFeatureIconCounter = window.projectFeatureIconCounter || document.querySelectorAll('.feature-row').length;
@@ -209,6 +214,38 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     updatePricingPlaceIndexes();
 
+    window.projectBookingDocIconCounter = window.projectBookingDocIconCounter || document.querySelectorAll('.booking-document-row').length;
+    document.getElementById('add-booking-step')?.addEventListener('click', function() {
+        var c = document.getElementById('booking-steps-container');
+        if (!c) return;
+        var div = document.createElement('div');
+        div.className = 'booking-step-row border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-2';
+        div.innerHTML =
+            '<input type="text" name="booking_step_titles[]" placeholder="Step title" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />' +
+            '<textarea name="booking_step_descriptions[]" rows="2" placeholder="Step description" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"></textarea>' +
+            '<button type="button" class="remove-booking-step text-rose-600 dark:text-rose-400 hover:text-rose-500 dark:hover:text-rose-300 text-xs">Remove step</button>';
+        c.appendChild(div);
+    });
+    document.getElementById('booking-steps-container')?.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-booking-step')) e.target.closest('.booking-step-row')?.remove();
+    });
+    document.getElementById('add-booking-document')?.addEventListener('click', function() {
+        var c = document.getElementById('booking-documents-container');
+        if (!c) return;
+        var id = 'booking_doc_icon_' + (window.projectBookingDocIconCounter++);
+        var div = document.createElement('div');
+        div.className = 'booking-document-row flex flex-wrap gap-2 items-center';
+        div.innerHTML =
+            '<input type="text" name="booking_document_labels[]" placeholder="Document label" class="flex-1 min-w-[200px] rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />' +
+            '<input type="text" name="booking_document_icons[]" value="fa-circle-check" placeholder="Icon" id="' + id + '" class="w-32 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />' +
+            '<button type="button" class="icon-picker-btn px-2 py-1 rounded border border-slate-400 text-slate-600 dark:text-slate-400 text-xs hover:bg-slate-200 dark:hover:bg-slate-700" data-target="' + id + '">Pick</button>' +
+            '<button type="button" class="remove-booking-document text-rose-600 dark:text-rose-400 hover:text-rose-500 dark:hover:text-rose-300 text-xs">Remove</button>';
+        c.appendChild(div);
+    });
+    document.getElementById('booking-documents-container')?.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-booking-document')) e.target.closest('.booking-document-row')?.remove();
+    });
+
     document.getElementById('add-testimonial')?.addEventListener('click', function() {
         var c = document.getElementById('testimonials-container');
         if (!c) return;
@@ -227,6 +264,71 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.classList.contains('remove-testimonial')) {
             e.target.closest('.testimonial-row')?.remove();
         }
+    });
+
+    function updateDetailTabIndexes() {
+        document.querySelectorAll('#detail-tabs-container .detail-tab-row').forEach(function(row, index) {
+            row.setAttribute('data-tab-index', String(index));
+            row.querySelectorAll('.detail-tab-images-list, .detail-tab-media-upload').forEach(function(el) {
+                el.setAttribute('data-tab-index', String(index));
+            });
+            row.querySelectorAll('input[name^="detail_tab_image_paths["]').forEach(function(inp) {
+                inp.name = 'detail_tab_image_paths[' + index + '][]';
+            });
+        });
+    }
+
+    function buildDetailTabRowHtml() {
+        return '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">' +
+            '<div><label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Tab label</label>' +
+            '<input type="text" name="detail_tab_labels[]" placeholder="e.g. Master Plan" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" /></div>' +
+            '<div><label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Tab icon (Font Awesome class)</label>' +
+            '<input type="text" name="detail_tab_icons[]" value="fa-circle-info" placeholder="fa-user" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" /></div></div>' +
+            '<div><label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Heading (optional)</label>' +
+            '<input type="text" name="detail_tab_headings[]" placeholder="Section heading" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" /></div>' +
+            '<div><label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Detail (rich text, optional)</label>' +
+            '<div class="richtext-wrap bg-slate-50 dark:bg-slate-950/60 rounded-lg border border-slate-300 dark:border-slate-700 min-h-[100px]"><textarea name="detail_tab_details[]" rows="4" class="richtext hidden" style="display:none"></textarea></div></div>' +
+            '<div><label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Bullet points (comma separated, optional)</label>' +
+            '<textarea name="detail_tab_bullets[]" rows="2" placeholder="Faisal Town 1, Faisal Town 2" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100"></textarea></div>' +
+            '<div class="detail-tab-media-wrap"><label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Tab images (optional, upload multiple)</label>' +
+            '<div class="detail-tab-images-list flex flex-wrap gap-2 mb-2" data-tab-index="0"></div>' +
+            '<p class="detail-tab-upload-msg hidden text-xs mt-1"></p>' +
+            '<input type="file" accept="image/*" multiple class="detail-tab-media-upload block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" data-upload-type="detail_tab_image" data-tab-index="0" /></div>' +
+            '<button type="button" class="remove-detail-tab text-rose-600 dark:text-rose-400 hover:text-rose-500 dark:hover:text-rose-300 text-xs">Remove tab</button>';
+    }
+
+    function initDetailTabsPanel(root) {
+        var scope = root || document;
+        if (!scope.querySelector('#detail-tabs-container')) return;
+        updateDetailTabIndexes();
+        scope.querySelectorAll('#detail-tabs-container .richtext-wrap').forEach(initQuillInWrap);
+    }
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#add-detail-tab')) {
+            var c = document.getElementById('detail-tabs-container');
+            if (!c) return;
+            var div = document.createElement('div');
+            div.className = 'detail-tab-row border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3';
+            div.innerHTML = buildDetailTabRowHtml();
+            c.appendChild(div);
+            updateDetailTabIndexes();
+            initQuillInWrap(div.querySelector('.richtext-wrap'));
+            return;
+        }
+        var removeTabBtn = e.target.closest('.remove-detail-tab');
+        if (removeTabBtn && removeTabBtn.closest('#detail-tabs-container')) {
+            removeTabBtn.closest('.detail-tab-row')?.remove();
+            updateDetailTabIndexes();
+        }
+    });
+
+    initDetailTabsPanel(document);
+    window.initAdminSectionPanel = function(root) {
+        initDetailTabsPanel(root || document);
+    };
+    document.addEventListener('admin-section-panel-loaded', function(e) {
+        initDetailTabsPanel((e.detail && e.detail.root) || document);
     });
 
     document.getElementById('add-td')?.addEventListener('click', function() {

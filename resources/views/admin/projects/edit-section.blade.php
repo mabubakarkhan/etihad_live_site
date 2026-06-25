@@ -80,7 +80,7 @@
                 </section>
             </main>
         </div>
-        <script src="{{ asset('theme/js/admin-project-media.js') }}"></script>
+        <script src="{{ asset('theme/js/admin-project-media.js') }}?v=5"></script>
         <script src="{{ asset('theme/js/admin-section-edit.js') }}"></script>
         @include('admin.projects._form_scripts')
     </body>

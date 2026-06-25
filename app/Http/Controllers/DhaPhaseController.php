@@ -93,7 +93,7 @@ class DhaPhaseController extends Controller
     public function uploadMedia(Request $request): JsonResponse
     {
         $request->validate([
-            'type' => ['required', 'string', 'in:featured,card,image_gallery,plot_maps,phase_pdf'],
+            'type' => ['required', 'string', 'in:featured,card,image_gallery,plot_maps,phase_pdf,map_section'],
             'file' => ['required', 'file', $request->type === 'phase_pdf' ? 'mimes:pdf' : 'image', 'max:20480'],
             'phase_id' => ['nullable', 'integer', 'exists:dha_phases,id'],
             'upload_token' => ['nullable', 'string', 'max:64'],
@@ -103,6 +103,7 @@ class DhaPhaseController extends Controller
             'featured' => 'featured',
             'card' => 'card',
             'plot_maps' => 'plot-maps',
+            'map_section' => 'map-section',
             'phase_pdf' => 'pdf',
             default => 'gallery',
         };
@@ -201,6 +202,14 @@ class DhaPhaseController extends Controller
             'remove_phase_pdf' => ['nullable', 'boolean'],
             'vr_tour_url' => ['nullable', 'string', 'max:2000'],
             'show_map_button' => ['nullable', 'boolean'],
+            'map_section_heading' => ['nullable', 'string', 'max:255'],
+            'map_section_tagline' => ['nullable', 'string', 'max:500'],
+            'map_section_url' => ['nullable', 'string', 'max:2000'],
+            'map_section_meta_title' => ['nullable', 'string', 'max:255'],
+            'map_section_meta_description' => ['nullable', 'string', 'max:500'],
+            'map_section_meta_keywords' => ['nullable', 'string', 'max:500'],
+            'map_section_image_path' => ['nullable', 'string', 'max:500'],
+            'remove_map_section_image' => ['nullable', 'boolean'],
         ]);
 
         $validated['slug'] = Str::slug($validated['slug'] ?? $validated['title']);
@@ -238,6 +247,15 @@ class DhaPhaseController extends Controller
             $updates['card_image'] = null;
         } elseif ($request->filled('card_image_path')) {
             $updates['card_image'] = $request->input('card_image_path');
+        }
+
+        if ($request->boolean('remove_map_section_image')) {
+            if ($phase->map_section_image) {
+                $this->deleteStoredFile($phase->map_section_image);
+            }
+            $updates['map_section_image'] = null;
+        } elseif ($request->filled('map_section_image_path')) {
+            $updates['map_section_image'] = $request->input('map_section_image_path');
         }
 
         if ($request->boolean('remove_phase_pdf')) {

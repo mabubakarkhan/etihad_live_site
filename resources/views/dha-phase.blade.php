@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="{{ asset('theme/css/pages/dha-lux-hero.css') }}">
 <link rel="stylesheet" href="{{ asset('theme/css/pages/dha-phase-sections.css') }}">
 <link rel="stylesheet" href="{{ asset('theme/css/pages/dha-phase-gallery.css') }}">
+<link rel="stylesheet" href="{{ asset('theme/css/pages/portal-map-section.css') }}?v=2">
 @if(!empty($hasPhaseListings))
 <link rel="stylesheet" href="{{ asset('theme/css/pages/listing.css') }}">
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
@@ -45,6 +46,12 @@
             <div class="dha-phase-page">
             @include('partials.dha-phase-hero', compact('phase', 'hasGallery', 'hasPhaseListings'))
             @include('partials.dha-phase-sections', compact('phase', 'cs', 'waUrl', 'hasGallery'))
+            @include('partials.portal-map-section', [
+                'heading' => $phase->map_section_heading,
+                'tagline' => $phase->map_section_tagline,
+                'imageUrl' => $phase->mapSectionImageUrl(),
+                'viewerUrl' => $phase->mapSectionViewerUrl(),
+            ])
             @include('partials.dha-phase-gallery', compact('phase', 'galleryImages'))
 
             @if(!empty($hasPhaseListings))

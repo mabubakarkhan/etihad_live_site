@@ -111,7 +111,7 @@
                 </section>
             </main>
         </div>
-        <script src="{{ asset('theme/js/admin-project-media.js') }}"></script>
+        <script src="{{ asset('theme/js/admin-project-media.js') }}?v=5"></script>
         @include('admin.projects._form_scripts')
     </body>
 </html>

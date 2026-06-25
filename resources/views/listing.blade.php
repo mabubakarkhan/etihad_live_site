@@ -75,7 +75,7 @@
                 <div class="main-content ms_vir_height">
                     <div class="boxed-container">
                         @include('partials.listing-search-block', array_merge(compact('projectTypes', 'dhaPhases', 'lahoreCityId'), ['hideListingFilters' => true]))
-                    </div>
+                                    </div>
                 </div>
 
                 <div class="to_top-btn-wrap">

@@ -72,10 +72,20 @@ trait HandlesProjectSectionUpdates
                 return;
 
             case 'vr-tour':
-                $project->update(array_intersect_key($validated, array_flip([
+                $updates = array_intersect_key($validated, array_flip([
                     'vr_tour_url', 'vr_tour_meta_title', 'vr_tour_meta_description',
                     'vr_tour_meta_keywords', 'vr_tour_canonical_url',
-                ])));
+                ]));
+                $updates = array_merge($updates, $this->processProjectSingleMedia($request, $project, [
+                    'vr_tour_image_path' => 'vr_tour_image',
+                ], [
+                    'remove_vr_tour_image' => 'vr_tour_image',
+                ], $uploadToken));
+                $project->update($updates);
+                return;
+
+            case 'booking-procedure':
+                $project->update(['booking_procedure' => $this->normalizeBookingProcedure($request)]);
                 return;
 
             case 'about':
@@ -131,6 +141,10 @@ trait HandlesProjectSectionUpdates
                 $project->update($this->processProjectPricingOnly($request, $project, $uploadToken));
                 return;
 
+            case 'price-slider':
+                $project->update(['price_slider_images' => $this->normalizePriceSliderImages($request)]);
+                return;
+
             case 'social-proof':
                 $updates = [
                     'testimonial_items' => $this->normalizeTestimonialItems($request),
@@ -141,6 +155,33 @@ trait HandlesProjectSectionUpdates
                     'invest_image_path' => 'invest_image',
                 ], [], $uploadToken));
                 $project->update($updates);
+                return;
+
+            case 'map-section':
+                $updates = array_intersect_key($validated, array_flip([
+                    'map_section_heading',
+                    'map_section_tagline',
+                    'map_section_url',
+                    'map_section_meta_title',
+                    'map_section_meta_description',
+                    'map_section_meta_keywords',
+                ]));
+                $updates = array_merge($updates, $this->processProjectSingleMedia($request, $project, [
+                    'map_section_image_path' => 'map_section_image',
+                ], [
+                    'remove_map_section_image' => 'map_section_image',
+                ], $uploadToken));
+                $project->update($updates);
+                return;
+
+            case 'detail-tabs':
+                $project->update(['project_detail_tabs' => $this->normalizeDetailTabs($request, $project)]);
+                return;
+
+            case 'tabs-follow-content':
+                $project->update(array_intersect_key($validated, array_flip([
+                    'tabs_follow_content',
+                ])));
                 return;
 
             case 'title-desc':

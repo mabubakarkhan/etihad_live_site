@@ -38,6 +38,13 @@ class DhaPhase extends Model
         'phase_pdf',
         'vr_tour_url',
         'show_map_button',
+        'map_section_heading',
+        'map_section_tagline',
+        'map_section_image',
+        'map_section_url',
+        'map_section_meta_title',
+        'map_section_meta_description',
+        'map_section_meta_keywords',
         'latitude',
         'longitude',
         'map_zoom',
@@ -187,6 +194,34 @@ class DhaPhase extends Model
         }
 
         return route('dha.phase.vr-tour', ['phase' => $this->slug]);
+    }
+
+    public function mapSectionImageUrl(): ?string
+    {
+        $path = trim((string) ($this->map_section_image ?? ''));
+
+        return $path !== '' ? url('storage/' . ltrim($path, '/')) : null;
+    }
+
+    public function mapSectionUrl(): ?string
+    {
+        $url = trim((string) ($this->map_section_url ?? ''));
+
+        return $url !== '' ? $url : null;
+    }
+
+    public function hasMapSection(): bool
+    {
+        return $this->mapSectionImageUrl() !== null && $this->mapSectionUrl() !== null;
+    }
+
+    public function mapSectionViewerUrl(): ?string
+    {
+        if (! $this->hasMapSection()) {
+            return null;
+        }
+
+        return route('dha.phase.interactive-map', ['phase' => $this->slug]);
     }
 
     public function hasMapData(): bool
