@@ -140,3 +140,101 @@
   position: relative;
   z-index: 2;
 }
+
+/* Dealers listing — square agent photos + theme accents */
+.popular-listings--dealers .popular-listings__media {
+  height: auto;
+  aspect-ratio: 1 / 1;
+}
+
+.popular-listings--dealers .popular-listings__eyebrow,
+.popular-listings--dealers .popular-listings__heading span,
+.popular-listings--dealers .popular-listings__price {
+  color: #a9823d;
+}
+
+.popular-listings--dealers .popular-listings__eyebrow::before {
+  background: linear-gradient(90deg, rgba(169, 130, 61, 0) 0%, #a9823d 100%);
+}
+
+.popular-listings--dealers .popular-listings__view-all {
+  color: #a9823d;
+  border-color: rgba(169, 130, 61, 0.28);
+}
+
+.popular-listings--dealers .popular-listings__view-all:hover {
+  background: rgba(169, 130, 61, 0.1);
+}
+
+.popular-listings--dealers .popular-listings__control:hover,
+.popular-listings--dealers .popular-listings__control:focus-visible {
+  border-color: rgba(169, 130, 61, 0.42);
+  color: #a9823d;
+}
+
+.popular-listings--dealers .popular-listings__title a:hover {
+  color: #a9823d;
+}
+
+.popular-listings--dealers .popular-listings__badge {
+  border-color: rgba(169, 130, 61, 0.32);
+  background: rgba(169, 130, 61, 0.16);
+  color: #e8d4b0;
+}
+
+.popular-listings--dealers .popular-listings__card.is-active {
+  border-color: rgba(169, 130, 61, 0.28);
+}
+
+.popular-listings--dealers .popular-listings__progress span {
+  background: linear-gradient(90deg, #7a5c2a 0%, #a9823d 100%);
+}
+
+.popular-listings--dealers .popular-listings__cta::after {
+  background: linear-gradient(135deg, #7a5c2a 0%, #a9823d 100%);
+}
+
+.popular-listings--dealers .popular-listings__panel-glow {
+  background: radial-gradient(circle, rgba(169, 130, 61, 0.12) 0%, transparent 72%);
+}
+
+/* Map popup — larger readable text */
+.dha-map__info-window {
+  width: 32rem;
+  max-width: 32rem;
+}
+
+.dha-map__info-title {
+  font-size: 1.65rem !important;
+}
+
+.dha-map__info-text {
+  font-size: 1.2rem !important;
+}
+
+.dha-map__info-badge {
+  font-size: 0.95rem !important;
+}
+
+.dha-map__info-meta span {
+  font-size: 1.15rem !important;
+}
+
+.dha-map__info-meta span strong {
+  font-size: 1.15rem !important;
+}
+
+/* Achievements + Journey heading highlights */
+.stats-title span,
+.timeline-title span {
+  color: #a9823d !important;
+}
+
+.stats-title,
+.stats-title span,
+.timeline-title,
+.timeline-title span {
+  pointer-events: none !important;
+  cursor: default !important;
+  user-select: none !important;
+}

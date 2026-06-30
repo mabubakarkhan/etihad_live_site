@@ -9,5 +9,12 @@ Today's updates (Etihad Marketing)
 - Make Your Choice section: each of the three stat cards can have its own background image
 - Make Your Choice section: soft dark overlay on card images
 - Make Your Choice section: empty cards keep the same dark look as before
+- Dealers listing section: agent photos are now square
+- Dealers listing section: headings and accents use theme gold color
+- Dealers listing section: special characters display correctly in text
+- Our Achievements section: Achievements heading uses theme gold color
+- Investment Journey section: Journey heading uses theme gold color
+- Our Achievements and Investment Journey headings are not clickable
+- Homepage map popup: larger text for easier reading on property cards
 - Sample project ready: full demo project with text images and all sections filled in for review
 - Admin panel: homepage section menu follows the same order as on the live homepage
