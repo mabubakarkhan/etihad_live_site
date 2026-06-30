@@ -449,6 +449,11 @@ Route::get('/', function () {
     ])->render(), $html);
 
     $homepageWhy = db_safe('home.why', fn () => HomepageWhySetting::instance(), new HomepageWhySetting());
+    $contemporaryHeading = trim((string) ($homepageWhy->contemporary_heading ?? ''));
+    if ($contemporaryHeading === '') {
+        $contemporaryHeading = 'CONTEMPORARY';
+    }
+    $html = str_replace('__HOMEPAGE_WHY_CONTEMPORARY_HEADING__', e($contemporaryHeading), $html);
     $html = str_replace([
         '__HOMEPAGE_WHY_IMAGE_LEFT__',
         '__HOMEPAGE_WHY_IMAGE_CENTER__',

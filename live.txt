@@ -1,0 +1,13 @@
+Today's updates (Etihad Marketing)
+
+- Homepage CEO / Vision section: message text is normal weight
+- Homepage CEO / Vision section: CEO photo area is slightly wider
+- Homepage CEO / Vision section: quotation marks display correctly
+- Homepage CEO / Vision section: background glow uses theme gold color instead of green
+- Why Choose Etihad section: Contemporary heading can be changed in admin
+- Why Choose Etihad section: default Contemporary heading stays CONTEMPORARY
+- Make Your Choice section: each of the three stat cards can have its own background image
+- Make Your Choice section: soft dark overlay on card images
+- Make Your Choice section: empty cards keep the same dark look as before
+- Sample project ready: full demo project with text images and all sections filled in for review
+- Admin panel: homepage section menu follows the same order as on the live homepage

@@ -27,6 +27,7 @@ class HomepageWhySettingController extends Controller
             'heading_line_2' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:5000'],
             'scroll_label' => ['required', 'string', 'max:64'],
+            'contemporary_heading' => ['required', 'string', 'max:255'],
             'image_left_path' => ['nullable', 'string', 'max:500'],
             'image_center_path' => ['nullable', 'string', 'max:500'],
             'image_right_path' => ['nullable', 'string', 'max:500'],

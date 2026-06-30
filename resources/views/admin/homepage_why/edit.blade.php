@@ -62,6 +62,12 @@
                                 <label for="scroll_label" class="block text-slate-700 dark:text-slate-300">Scroll indicator label</label>
                                 <input id="scroll_label" name="scroll_label" type="text" value="{{ old('scroll_label', $setting->scroll_label) }}" class="block w-full max-w-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm" />
                             </div>
+
+                            <div class="space-y-1.5">
+                                <label for="contemporary_heading" class="block text-slate-700 dark:text-slate-300">Contemporary block heading</label>
+                                <input id="contemporary_heading" name="contemporary_heading" type="text" value="{{ old('contemporary_heading', $setting->contemporary_heading ?: 'CONTEMPORARY') }}" class="block w-full max-w-md rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm" />
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Large centered title above the four-image collage. Default: <em>CONTEMPORARY</em></p>
+                            </div>
                         </div>
 
                         <div class="rounded-2xl border border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10 p-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
