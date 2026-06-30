@@ -27,7 +27,6 @@
                     </div>
                 </header>
                 <section class="px-6 md:px-8 py-6 md:py-8 space-y-4">
-                    @php use App\Support\ProjectEditSections; @endphp
                     @if (session('status'))
                         <div class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">{{ session('status') }}</div>
                     @endif
@@ -113,11 +112,7 @@
                                         <td class="px-4 py-2 text-slate-700 dark:text-slate-300">{{ $project->price ?? '—' }}</td>
                                         <td class="px-4 py-2 text-slate-700 dark:text-slate-300">{{ $project->city ?? '—' }}</td>
                                         <td class="px-4 py-2">
-                                            <div class="flex flex-wrap gap-1 max-w-md">
-                                                @foreach(ProjectEditSections::all() as $slug => $meta)
-                                                    <a href="{{ route('admin.projects.edit-section', [$project, $slug]) }}" class="text-[10px] leading-tight px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">{{ $meta['label'] }}</a>
-                                                @endforeach
-                                            </div>
+                                            @include('admin.projects._section_links', ['project' => $project, 'projectSections' => $projectSections])
                                         </td>
                                         <td class="px-4 py-2 text-left">
                                             <a href="{{ route('admin.projects.preview', $project) }}" target="_blank" rel="noopener noreferrer" class="text-[11px] px-2 py-1 rounded border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">View</a>

@@ -33,7 +33,9 @@ class ProjectController extends Controller
         $projectTypes = ProjectType::orderBy('name')->get();
         $filterStatus = request('status');
         $filterProjectType = request('project_type');
-        return view('admin.projects.index', compact('projects', 'projectTypes', 'filterStatus', 'filterProjectType'));
+        $projectSections = ProjectEditSections::all();
+
+        return view('admin.projects.index', compact('projects', 'projectTypes', 'filterStatus', 'filterProjectType', 'projectSections'));
     }
 
     public function create()
