@@ -227,7 +227,11 @@ Route::get('/', function () {
 
     $homepageHeroSetting = db_safe('home.hero_setting', fn () => HomepageHeroSetting::instance(), new HomepageHeroSetting());
     $homepageHeroImage = homepage_asset_url($homepageHeroSetting->hero_image ?? null, $base, 'hero-screen-1-D7I92d4H.webp');
-    $html = str_replace('__HOMEPAGE_HERO_IMAGE__', $homepageHeroImage, $html);
+    $html = str_replace('__HOMEPAGE_HERO_SCREEN_1__', View::make('partials.homepage-hero-screen-1', [
+        'hero' => $homepageHeroSetting,
+        'assetBase' => $base,
+        'heroImage' => $homepageHeroImage,
+    ])->render(), $html);
 
     $html = str_replace('__HOMEPAGE_SIDEBAR_NAV__', View::make('partials.homepage-sidebar-nav')->render(), $html);
     $html = str_replace('__HOMEPAGE_NAVBAR_NAV__', View::make('partials.homepage-navbar-nav')->render(), $html);

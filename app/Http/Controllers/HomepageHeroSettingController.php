@@ -22,19 +22,32 @@ class HomepageHeroSettingController extends Controller
     {
         $setting = HomepageHeroSetting::instance();
 
-        $request->validate([
+        $validated = $request->validate([
             'hero_image_path' => ['nullable', 'string', 'max:500'],
             'remove_hero_image' => ['nullable', 'boolean'],
+            'hero_image_alt' => ['required', 'string', 'max:255'],
+            'tagline' => ['required', 'string', 'max:500'],
+            'heading_line_1' => ['required', 'string', 'max:255'],
+            'heading_line_2' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:2000'],
+            'cta_text' => ['required', 'string', 'max:255'],
+            'cta_url' => ['nullable', 'string', 'max:2048'],
+            'scroll_text' => ['required', 'string', 'max:255'],
         ]);
+
+        $setting->fill(collect($validated)->except([
+            'hero_image_path',
+            'remove_hero_image',
+        ])->all());
 
         $this->applyHomepageMediaPath($request, $setting, 'hero_image');
 
         $setting->save();
 
         if ($admin = admin_user()) {
-            ActivityLog::record($admin, 'homepage_hero_updated', 'Homepage main hero image updated.');
+            ActivityLog::record($admin, 'homepage_hero_updated', 'Homepage main hero section updated.');
         }
 
-        return redirect()->route('admin.homepage-hero.edit')->with('status', 'Homepage hero image saved.');
+        return redirect()->route('admin.homepage-hero.edit')->with('status', 'Homepage hero saved.');
     }
 }

@@ -29,6 +29,7 @@ database/migrations/2026_06_16_101000_add_advanced_seo_fields_to_cms_pages_table
 database/migrations/2026_06_17_120000_create_homepage_vision_settings_table.php
 database/migrations/2026_06_17_130000_create_homepage_why_settings_table.php
 database/migrations/2026_06_17_140000_create_homepage_about_settings_table.php
+database/migrations/2026_06_20_100000_add_hero_text_fields_to_homepage_hero_settings_table.php
 database/migrations/2026_06_17_150000_create_homepage_investment_journey_tables.php
 app/Models/HomepageHeroSetting.php
 app/Models/HomepageVisionSetting.php
@@ -46,6 +47,7 @@ resources/views/admin/homepage_vision/edit.blade.php
 resources/views/admin/homepage_why/edit.blade.php
 resources/views/admin/homepage_about/edit.blade.php
 resources/views/admin/homepage_investment_journey/edit.blade.php
+resources/views/partials/homepage-hero-screen-1.blade.php
 resources/views/partials/homepage-vision-section.blade.php
 resources/views/partials/homepage-why-section.blade.php
 resources/views/partials/homepage-about-hero-screen.blade.php
@@ -78,7 +80,7 @@ Dynamic homepage sections:
 - Testimonials carousel (admin Testimonials)
 - Contact info + socials (menu, location card, footer)
 - SEO meta + tracking scripts
-- Homepage → Hero image (admin/homepage-hero)
+- Homepage → Main hero (admin/homepage-hero) — background image, headings, description, CTA, scroll text
 - Homepage → Vision / CEO message (admin/homepage-vision)
 - Homepage → Why Choose Etihad (admin/homepage-why) — text + 4 collage images
 - Homepage → About Etihad (admin/homepage-about) — text, video, center + secondary images
