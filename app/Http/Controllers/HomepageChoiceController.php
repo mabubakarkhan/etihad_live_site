@@ -39,6 +39,8 @@ class HomepageChoiceController extends Controller
             'slides.*.counter_to' => ['required', 'integer', 'min:0', 'max:999999999'],
             'slides.*.counter_text' => ['required', 'string', 'max:64'],
             'slides.*.description' => ['required', 'string', 'max:255'],
+            'slides.*.card_image_path' => ['nullable', 'string', 'max:500'],
+            'slides.*.remove_card_image' => ['nullable', 'boolean'],
         ]);
 
         $setting->fill(collect($validated)->only([
@@ -52,7 +54,7 @@ class HomepageChoiceController extends Controller
 
         $setting->save();
 
-        DB::transaction(function () use ($validated) {
+        DB::transaction(function () use ($request, $validated) {
             $keptIds = [];
 
             foreach ($validated['slides'] as $index => $slideData) {
@@ -66,17 +68,38 @@ class HomepageChoiceController extends Controller
 
                 if (! empty($slideData['id'])) {
                     $slide = HomepageChoiceSlide::query()->findOrFail($slideData['id']);
-                    $slide->update($payload);
-                    $keptIds[] = $slide->id;
+                    $slide->fill($payload);
                 } else {
-                    $slide = HomepageChoiceSlide::query()->create($payload);
-                    $keptIds[] = $slide->id;
+                    $slide = new HomepageChoiceSlide($payload);
                 }
+
+                if ($request->boolean("slides.{$index}.remove_card_image") && $slide->card_image) {
+                    public_storage_delete($slide->card_image);
+                    $slide->card_image = null;
+                } elseif ($request->filled("slides.{$index}.card_image_path")) {
+                    $newPath = $request->input("slides.{$index}.card_image_path");
+                    if ($this->isValidHomepageStoragePath($newPath)) {
+                        if ($slide->card_image && $slide->card_image !== $newPath) {
+                            public_storage_delete($slide->card_image);
+                        }
+                        $slide->card_image = $newPath;
+                    }
+                }
+
+                $slide->save();
+                $keptIds[] = $slide->id;
             }
 
-            HomepageChoiceSlide::query()
+            $slidesToDelete = HomepageChoiceSlide::query()
                 ->whereNotIn('id', $keptIds)
-                ->delete();
+                ->get();
+
+            foreach ($slidesToDelete as $slide) {
+                if ($slide->card_image) {
+                    public_storage_delete($slide->card_image);
+                }
+                $slide->delete();
+            }
         });
 
         if ($admin = admin_user()) {

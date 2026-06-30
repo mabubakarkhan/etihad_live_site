@@ -103,3 +103,40 @@
     font-size: 1.8rem;
   }
 }
+
+/* Make Your Choice — optional panel background images */
+.choice .choice-swiper-slide {
+  position: relative;
+  overflow: hidden;
+}
+
+.choice .choice-swiper-slide--has-image::before,
+.choice .choice-swiper-slide--has-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.choice .choice-swiper-slide--has-image::before {
+  z-index: 0;
+  background-image: var(--choice-slide-bg-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.choice .choice-swiper-slide--has-image::after {
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(0, 0, 0, 0.55) 45%,
+    rgba(23, 23, 23, 0.88) 100%
+  );
+}
+
+.choice .choice-swiper-slide--has-image > * {
+  position: relative;
+  z-index: 2;
+}

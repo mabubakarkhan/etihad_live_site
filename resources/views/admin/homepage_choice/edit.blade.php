@@ -80,11 +80,11 @@
                         </div>
 
                         <div class="rounded-2xl border border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10 p-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                            <strong class="text-slate-800 dark:text-slate-100">Slides</strong> — Up to 6 panels. <code class="text-[11px]">Counter to</code> drives the count-up animation; <code class="text-[11px]">Counter text</code> is what displays (e.g. <em>10+ </em>).
+                            <strong class="text-slate-800 dark:text-slate-100">Slides</strong> — Up to 6 panels. <code class="text-[11px]">Counter to</code> drives the count-up animation; <code class="text-[11px]">Counter text</code> is what displays (e.g. <em>10+ </em>). Each panel can have an optional background image with a dark gradient overlay; if empty, the default charcoal panel color is used. Recommended card image: <strong>800×1050 px</strong> (portrait, ~3:4 ratio). JPG, PNG, WebP, or AVIF.
                         </div>
 
                         <div id="slides-list" class="space-y-4">
-                            @php $oldSlides = old('slides', $slides->map(fn ($s) => ['id' => $s->id, 'heading_text' => $s->heading_text, 'counter_to' => $s->counter_to, 'counter_text' => $s->counter_text, 'description' => $s->description])->all()); @endphp
+                            @php $oldSlides = old('slides', $slides->map(fn ($s) => ['id' => $s->id, 'heading_text' => $s->heading_text, 'counter_to' => $s->counter_to, 'counter_text' => $s->counter_text, 'description' => $s->description, 'card_image' => $s->card_image])->all()); @endphp
                             @foreach ($oldSlides as $index => $slide)
                                 <div class="slide-row rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg transition-colors space-y-3">
                                     <div class="flex items-center justify-between gap-3">
@@ -111,6 +111,17 @@
                                     <div class="space-y-1.5">
                                         <label class="block text-slate-700 dark:text-slate-300">Description (follows counter)</label>
                                         <input name="slides[{{ $index }}][description]" type="text" value="{{ $slide['description'] ?? '' }}" required class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm" placeholder="successful projects" />
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="block text-slate-700 dark:text-slate-300">Panel background image (optional)</label>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400">Recommended: <strong>800×1050 px</strong> portrait — dark gradient overlay is applied automatically on the homepage.</p>
+                                        @include('admin.partials.homepage_media_field', [
+                                            'name' => 'card_image',
+                                            'path' => $slide['card_image'] ?? null,
+                                            'pathName' => 'slides[' . $index . '][card_image_path]',
+                                            'removeName' => 'slides[' . $index . '][remove_card_image]',
+                                            'previewClass' => 'max-h-40 w-full max-w-xs rounded-lg border border-slate-200 dark:border-slate-600 object-cover',
+                                        ])
                                     </div>
                                 </div>
                             @endforeach
@@ -150,6 +161,16 @@
                     <label class="block text-slate-700 dark:text-slate-300">Description (follows counter)</label>
                     <input type="text" required class="slide-description block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm" />
                 </div>
+                <div class="space-y-1.5">
+                    <label class="block text-slate-700 dark:text-slate-300">Panel background image (optional)</label>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Recommended: <strong>800×1050 px</strong> portrait.</p>
+                    <div data-homepage-media-wrap data-remove-name="slides[0][remove_card_image]" data-preview-class="max-h-40 w-full max-w-xs rounded-lg border border-slate-200 dark:border-slate-600 object-cover">
+                        <input type="hidden" name="slides[0][card_image_path]" value="" />
+                        <div data-homepage-media-preview class="hidden mb-3"></div>
+                        <input type="file" accept="image/*" class="homepage-media-upload slide-card-image block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" data-upload-type="card_image" data-path-name="slides[0][card_image_path]" data-media-kind="image" />
+                        <p data-homepage-media-status class="mt-2 text-xs text-slate-500 dark:text-slate-400"></p>
+                    </div>
+                </div>
             </div>
         </template>
 
@@ -176,6 +197,14 @@
                         });
                         const idInput = row.querySelector('input[name*="[id]"]');
                         if (idInput) idInput.name = `slides[${index}][id]`;
+                        const pathInput = row.querySelector('input[name*="[card_image_path]"]');
+                        if (pathInput) pathInput.name = `slides[${index}][card_image_path]`;
+                        const uploadInput = row.querySelector('.homepage-media-upload');
+                        if (uploadInput) uploadInput.setAttribute('data-path-name', `slides[${index}][card_image_path]`);
+                        const mediaWrap = row.querySelector('[data-homepage-media-wrap]');
+                        if (mediaWrap) mediaWrap.setAttribute('data-remove-name', `slides[${index}][remove_card_image]`);
+                        const removeImage = row.querySelector('input[name*="[remove_card_image]"]');
+                        if (removeImage) removeImage.name = `slides[${index}][remove_card_image]`;
                         const removeBtn = row.querySelector('.remove-slide');
                         if (removeBtn) removeBtn.hidden = rows.length <= 1;
                     });

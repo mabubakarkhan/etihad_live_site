@@ -31,15 +31,15 @@
                   <div class="ceo-message__description">
 @if(!empty($vision->message_paragraph_1))
                     <p class="ceo-message__text">
-                      <span>{{ e($vision->message_paragraph_1) }}</span>
+                      <span>{{ $vision->message_paragraph_1 }}</span>
                     </p>
 @endif
 @if(!empty($vision->message_paragraph_2_body) || !empty($vision->message_paragraph_2_highlight))
                     <p class="ceo-message__text">
 @if(!empty($vision->message_paragraph_2_highlight))
-                      <span>{{ e($vision->message_paragraph_2_highlight) }}</span>
+                      <span>{{ $vision->message_paragraph_2_highlight }}</span>
 @endif
-@if(!empty($vision->message_paragraph_2_body)) {{ e($vision->message_paragraph_2_body) }}@endif
+@if(!empty($vision->message_paragraph_2_body)) {{ $vision->message_paragraph_2_body }}@endif
                     </p>
 @endif
                   </div>
@@ -49,7 +49,7 @@
                     <div class="ceo-message__name">{{ e($vision->ceo_name) }}</div>
 @endif
 @if(!empty($vision->ceo_title))
-                    <div class="ceo-message__title">{{ e($vision->ceo_title) }}</div>
+                    <div class="ceo-message__title">{{ $vision->ceo_title }}</div>
 @endif
                   </div>
                 </div>

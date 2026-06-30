@@ -32,7 +32,10 @@
           >
             <div class="choice-swiper-wrapper">
 @foreach($slides as $index => $slide)
-              <div class="choice-swiper-slide">
+@php
+    $cardImageUrl = ! empty($slide->card_image) ? public_storage_url($slide->card_image) : null;
+@endphp
+              <div class="choice-swiper-slide{{ $cardImageUrl ? ' choice-swiper-slide--has-image' : '' }}"@if($cardImageUrl) style="--choice-slide-bg-image: url('{{ e($cardImageUrl) }}');"@endif>
                 <div class="choice-swiper-slide__number">
                   <span>{{ $index + 1 }}</span>/{{ $slideTotal }}
                 </div>

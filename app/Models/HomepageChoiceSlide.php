@@ -12,6 +12,7 @@ class HomepageChoiceSlide extends Model
         'counter_to',
         'counter_text',
         'description',
+        'card_image',
     ];
 
     protected $casts = [

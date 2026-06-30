@@ -24,6 +24,7 @@ class HomepageMediaController extends Controller
         'pin_image' => ['dir' => 'homepage-location', 'kind' => 'image', 'max_kb' => 4096],
         'background_image' => ['dir' => 'homepage-choice', 'kind' => 'image', 'max_kb' => 10240],
         'background_image_portrait' => ['dir' => 'homepage-choice', 'kind' => 'image', 'max_kb' => 10240],
+        'card_image' => ['dir' => 'homepage-choice', 'kind' => 'image', 'max_kb' => 8192],
         'icon_image' => ['dir' => 'homepage-what-sets-apart', 'kind' => 'image', 'max_kb' => 2048],
     ];
 
