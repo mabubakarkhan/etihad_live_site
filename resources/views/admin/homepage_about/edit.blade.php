@@ -170,8 +170,8 @@
                                     <input id="cta_url" name="cta_url" type="text" value="{{ old('cta_url', $setting->cta_url) }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm" placeholder="javascript:void(0);" />
                                 </div>
                                 <div class="space-y-1.5">
-                                    <label for="affiliated_text" class="block text-slate-700 dark:text-slate-300">Affiliated link text</label>
-                                    <input id="affiliated_text" name="affiliated_text" type="text" value="{{ old('affiliated_text', $setting->affiliated_text) }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm" />
+                                    <label for="affiliated_text" class="block text-slate-700 dark:text-slate-300">Affiliated button text</label>
+                                    <input id="affiliated_text" name="affiliated_text" type="text" value="{{ old('affiliated_text', $setting->affiliated_text) }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2.5 text-sm" placeholder="Affiliated pages" />
                                 </div>
                                 <div class="space-y-1.5">
                                     <label for="affiliated_url" class="block text-slate-700 dark:text-slate-300">Affiliated link URL</label>

@@ -22,3 +22,18 @@ if (! function_exists('homepage_asset_url')) {
         return rtrim($assetBase, '/') . '/assets/' . ltrim($fallbackFilename, '/');
     }
 }
+
+if (! function_exists('homepage_about_copy')) {
+    /**
+     * Normalize About/Vision copy for display (spacing after sentence punctuation).
+     */
+    function homepage_about_copy(?string $text): string
+    {
+        $text = trim((string) $text);
+        if ($text === '') {
+            return '';
+        }
+
+        return preg_replace('/([.!?])([^\s])/', '$1 $2', $text) ?? $text;
+    }
+}

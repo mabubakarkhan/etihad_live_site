@@ -7,6 +7,7 @@
     $videoUrl = $about->mediaUrl('video', $assetBase, 'uptown-showcase-SvDi3Pul.mp4');
     $ctaUrl = trim((string) ($about->cta_url ?? '')) !== '' ? $about->cta_url : 'javascript:void(0);';
     $affiliatedUrl = trim((string) ($about->affiliated_url ?? '')) !== '' ? $about->affiliated_url : 'javascript://';
+    $aboutCopy = fn (?string $text): string => homepage_about_copy($text);
 @endphp
           <div class="hero__screen hero__screen-2">
             <!-- hero clip  -->
@@ -75,22 +76,22 @@
                     <!-- first text block  -->
                     <div class="hero__flex-block hero__flex-block-1">
                       <p class="hero__description">
-                        {{ e($about->about_para_1_lead) }}<span>{{ e($about->about_para_1_highlight) }}</span>
+                        {{ $aboutCopy($about->about_para_1_lead) }}@if($aboutCopy($about->about_para_1_highlight) !== '') <span>{{ $aboutCopy($about->about_para_1_highlight) }}</span>@endif
                       </p>
 
                       <p class="hero__description">
-                        {{ e($about->about_para_2_lead) }}<span>{{ e($about->about_para_2_highlight) }}</span>
+                        {{ $aboutCopy($about->about_para_2_lead) }}@if($aboutCopy($about->about_para_2_highlight) !== '') <span>{{ $aboutCopy($about->about_para_2_highlight) }}</span>@endif
                       </p>
                     </div>
 
                     <!-- second text block  -->
                     <div class="hero__flex-block hero__flex-block-2">
                       <p class="hero__description">
-                        <span>{{ e($about->vision_para_1_highlight) }}</span>{{ e($about->vision_para_1_body) }}
+                        @if($aboutCopy($about->vision_para_1_highlight) !== '')<span>{{ $aboutCopy($about->vision_para_1_highlight) }}</span>@endif @if($aboutCopy($about->vision_para_1_body) !== ''){{ $aboutCopy($about->vision_para_1_body) }}@endif
                       </p>
 
                       <p class="hero__description">
-                        {{ e($about->vision_para_2_lead) }}<span>{{ e($about->vision_para_2_highlight) }}</span>{{ e($about->vision_para_2_body) }}
+                        {{ $aboutCopy($about->vision_para_2_lead) }}@if($aboutCopy($about->vision_para_2_highlight) !== '') <span>{{ $aboutCopy($about->vision_para_2_highlight) }}</span>@endif @if($aboutCopy($about->vision_para_2_body) !== ''){{ $aboutCopy($about->vision_para_2_body) }}@endif
                       </p>
 
                       <a
@@ -100,7 +101,7 @@
                         rel="noopener noreferrer"
                       >
                         <span class="hero__affiliated-icon"></span>
-                        <span class="hero__affiliated-text">{{ e($about->affiliated_text) }}</span>
+                        <span class="hero__affiliated-text">{{ $aboutCopy($about->affiliated_text) }}</span>
                         <span class="hero__affiliated-line"></span>
                       </a>
                     </div>
