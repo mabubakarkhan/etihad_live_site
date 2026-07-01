@@ -176,6 +176,13 @@
                     <span class="text-sm">Location section</span>
                 </span>
             </a>
+            <a href="{{ route('admin.homepage-footer.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.homepage-footer.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-[10px] font-semibold {{ request()->routeIs('admin.homepage-footer.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">F</span>
+                    <span class="text-sm">Footer image</span>
+                </span>
+            </a>
                 </div>
             </div>
 

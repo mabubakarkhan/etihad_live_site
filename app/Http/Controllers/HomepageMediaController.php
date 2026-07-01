@@ -10,7 +10,7 @@ class HomepageMediaController extends Controller
 {
     /** @var array<string, array{dir: string, kind: string, max_kb: int}> */
     private const UPLOAD_TYPES = [
-        'hero_image' => ['dir' => 'homepage-hero', 'kind' => 'image', 'max_kb' => 8192],
+        'footer_image' => ['dir' => 'homepage-footer', 'kind' => 'image', 'max_kb' => 10240],
         'ceo_image' => ['dir' => 'homepage-vision', 'kind' => 'image', 'max_kb' => 8192],
         'image_left' => ['dir' => 'homepage-why', 'kind' => 'image', 'max_kb' => 8192],
         'image_center' => ['dir' => 'homepage-why', 'kind' => 'image', 'max_kb' => 8192],

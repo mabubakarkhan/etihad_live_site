@@ -23,6 +23,7 @@ use App\Http\Controllers\HomepageMediaController;
 use App\Http\Controllers\HomepageHeroSettingController;
 use App\Http\Controllers\HomepageDhaSectionController;
 use App\Http\Controllers\HomepageDealersSectionController;
+use App\Http\Controllers\HomepageFooterSettingController;
 use App\Support\SafeMigrationRunner;
 use App\Http\Controllers\HomepageChoiceController;
 use App\Http\Controllers\HomepageAchievementsController;
@@ -55,6 +56,7 @@ use App\Http\Controllers\AdminNotificationController;
 use App\Models\PropertyRequest;
 use App\Models\HomepageHeroSetting;
 use App\Models\HomepageDhaSectionSetting;
+use App\Models\HomepageFooterSetting;
 use App\Models\HomepageDealersSectionSetting;
 use App\Models\HomepageLocationSectionSetting;
 use App\Models\HomepageChoiceSetting;
@@ -441,6 +443,12 @@ Route::get('/', function () {
     $html = str_replace('__HOMEPAGE_COPYRIGHT_YEAR__', (string) date('Y'), $html);
     $html = str_replace('__HOMEPAGE_FOOTER_LEGAL__', View::make('partials.homepage-footer-legal')->render(), $html);
     $html = str_replace('__HOMEPAGE_FOOTER_SOCIALS__', View::make('partials.homepage-footer-socials', ['cs' => $homepageContact])->render(), $html);
+
+    $homepageFooter = db_safe('home.footer', fn () => HomepageFooterSetting::instance(), new HomepageFooterSetting());
+    $html = str_replace('__HOMEPAGE_FOOTER_IMAGE__', View::make('partials.homepage-footer-image', [
+        'footer' => $homepageFooter,
+        'assetBase' => $base,
+    ])->render(), $html);
 
     $homepageVision = db_safe('home.vision', fn () => HomepageVisionSetting::instance(), new HomepageVisionSetting());
     $html = str_replace('__HOMEPAGE_VISION_SECTION__', View::make('partials.homepage-vision-section', [
@@ -1601,6 +1609,8 @@ Route::middleware('admin')->group(function () {
     Route::put('/admin/homepage-dealers-section', [HomepageDealersSectionController::class, 'update'])->name('admin.homepage-dealers-section.update');
     Route::get('/admin/homepage-location-section', [HomepageLocationSectionController::class, 'edit'])->name('admin.homepage-location-section.edit');
     Route::put('/admin/homepage-location-section', [HomepageLocationSectionController::class, 'update'])->name('admin.homepage-location-section.update');
+    Route::get('/admin/homepage-footer', [HomepageFooterSettingController::class, 'edit'])->name('admin.homepage-footer.edit');
+    Route::put('/admin/homepage-footer', [HomepageFooterSettingController::class, 'update'])->name('admin.homepage-footer.update');
     Route::get('/admin/portal-hero', [PortalHeroSlideController::class, 'index'])->name('admin.portal-hero.index');
     Route::get('/admin/portal-hero/create', [PortalHeroSlideController::class, 'create'])->name('admin.portal-hero.create');
     Route::post('/admin/portal-hero', [PortalHeroSlideController::class, 'store'])->name('admin.portal-hero.store');
