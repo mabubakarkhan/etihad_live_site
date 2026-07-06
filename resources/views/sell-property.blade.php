@@ -32,23 +32,10 @@
             <div class="sell-property-page">
                 <div class="sell-property-page__layout">
                     <div class="sell-property-page__scroll">
-                        <section class="sell-property-hero" id="sell-property-hero">
-                            <h1 class="sell-property-hero__title">{{ $cmsPage->heading ?? 'Sell or rent your property with confidence!' }}</h1>
-                            <p class="sell-property-hero__lead">{{ !empty($cmsPage->content) ? strip_tags($cmsPage->content) : 'Expert help, zero hassle. We\'ll match you with a trusted real estate agent to lead your sale from start to finish in DHA Lahore.' }}</p>
-                            <div class="sell-property-hero__illus">
-                                @if($pageSettings->hasHeroImage() && $pageSettings->heroImageUrl())
-                                <img
-                                    src="{{ $pageSettings->heroImageUrl() }}"
-                                    alt="{{ $cmsPage->heading ?? 'Sell or rent property in DHA Lahore' }}"
-                                    class="sell-property-hero__visual"
-                                    loading="lazy"
-                                    decoding="async"
-                                >
-                                @else
-                                <div class="sell-property-hero__visual sell-property-hero__visual--placeholder" aria-hidden="true"></div>
-                                @endif
-                            </div>
-                        </section>
+                        <div class="cms-page-head cms-page-head--compact">
+                            <h1>{{ $cmsPage->heading ?? 'Sell or rent your property with confidence!' }}</h1>
+                            <p class="cms-page-head__lead">{{ !empty($cmsPage->content) ? strip_tags($cmsPage->content) : 'Expert help, zero hassle. We\'ll match you with a trusted real estate agent to lead your sale from start to finish in DHA Lahore.' }}</p>
+                        </div>
 
                         @if($pageSettings->valuation_heading || $pageSettings->valuation_price)
                         <section class="sell-property-block sell-property-valuation" id="sell-property-valuation">

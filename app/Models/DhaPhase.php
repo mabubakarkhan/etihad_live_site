@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class DhaPhase extends Model
@@ -212,16 +213,11 @@ class DhaPhase extends Model
 
     public function hasMapSection(): bool
     {
-        return $this->mapSectionImageUrl() !== null && $this->mapSectionUrl() !== null;
-    }
+        $map = $this->relationLoaded('interactiveMap')
+            ? $this->interactiveMap
+            : $this->interactiveMap()->first();
 
-    public function mapSectionViewerUrl(): ?string
-    {
-        if (! $this->hasMapSection()) {
-            return null;
-        }
-
-        return route('dha.phase.interactive-map', ['phase' => $this->slug]);
+        return $map !== null && $map->isReadyForFront();
     }
 
     public function hasMapData(): bool
@@ -383,6 +379,11 @@ class DhaPhase extends Model
     public function properties(): HasMany
     {
         return $this->hasMany(Property::class, 'dha_phase_id');
+    }
+
+    public function interactiveMap(): HasOne
+    {
+        return $this->hasOne(InteractiveMap::class);
     }
 
     public function projectTypes(): BelongsToMany

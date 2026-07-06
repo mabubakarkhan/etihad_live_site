@@ -49,9 +49,6 @@
 @if($showSection('social-proof') || $onlySection === null)
 <input type="hidden" name="invest_image_path" value="{{ old('invest_image_path', $project->invest_image ?? '') }}" />
 @endif
-@if($showSection('map-section') || $onlySection === null)
-<input type="hidden" name="map_section_image_path" value="{{ old('map_section_image_path', $project->map_section_image ?? '') }}" />
-@endif
 @if($showSection('vr-tour') || $onlySection === null)
 <input type="hidden" name="vr_tour_image_path" value="{{ old('vr_tour_image_path', $project->vr_tour_image ?? '') }}" />
 @endif
@@ -972,8 +969,8 @@
 @if($showSection('map-section'))
 {{-- Interactive map preview --}}
 <div id="tab-map-section" class="tab-panel {{ $sectionPanelClass('map-section') }} rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-lg shadow-slate-200/80 dark:shadow-slate-950/50 transition-colors p-6 mb-6" role="tabpanel">
-    <h2 class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-4">Interactive map preview</h2>
-    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Shown on the project page before testimonials. Clicking the image opens the map link in a new tab.</p>
+    <h2 class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-4">Interactive map section</h2>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Heading and tagline for the map section on the project page. Configure the ground overlay below.</p>
     <div class="space-y-4">
         <div>
             <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Heading</label>
@@ -982,19 +979,6 @@
         <div>
             <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Tagline</label>
             <input type="text" name="map_section_tagline" value="{{ old('map_section_tagline', $project->map_section_tagline ?? '') }}" placeholder="e.g. Explore the layout in detail" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
-        </div>
-        <div>
-            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Map link URL</label>
-            <input type="url" name="map_section_url" value="{{ old('map_section_url', $project->map_section_url ?? '') }}" placeholder="https://..." class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
-        </div>
-        <div data-media-wrap>
-            @if(!empty($project->map_section_image))
-                <div class="mb-2"><img src="{{ asset('storage/' . ltrim($project->map_section_image, '/')) }}" alt="" class="max-h-40 rounded-lg border border-slate-300 dark:border-slate-700" /></div>
-            @endif
-            <input type="file" accept="image/*" class="project-media-upload block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-slate-200 dark:file:bg-slate-700 file:px-3 file:py-1.5 file:text-slate-800 dark:file:text-slate-200" data-upload-type="map_section_image" data-path-name="map_section_image_path">
-            <label class="mt-2 inline-flex items-center gap-2 text-xs text-slate-500 cursor-pointer">
-                <input type="checkbox" name="remove_map_section_image" value="1" class="rounded border-slate-400" /> Remove current image
-            </label>
         </div>
         <div class="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-4">
             <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Map viewer SEO</h3>
@@ -1013,6 +997,19 @@
             </div>
         </div>
     </div>
+
+    @if(!empty($project?->id))
+        @php
+            $interactiveMap = app(\App\Services\InteractiveMap\InteractiveMapService::class)->findOrCreateForOwner('projects', (int) $project->id);
+        @endphp
+        @include('admin.interactive-map._editor', [
+            'ownerType' => 'projects',
+            'ownerId' => (int) $project->id,
+            'map' => $interactiveMap,
+            'standaloneUrl' => route('admin.projects.interactive-map', $project),
+        ])
+    @endif
+
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
         <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-price-slider">Back</button>
         <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-detail-tabs">Next</button>

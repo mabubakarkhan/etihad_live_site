@@ -325,7 +325,9 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('theme/css/pages/project-new.css') }}">
-<link rel="stylesheet" href="{{ asset('theme/css/pages/portal-map-section.css') }}?v=2">
+@if($project->hasMapSection())
+<link rel="stylesheet" href="{{ asset('theme/css/pages/portal-map-section.css') }}?v=3">
+@endif
 @if((is_array($project->project_detail_tabs ?? null) && count($project->project_detail_tabs) > 0) || $hasPriceSlider)
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css">
 @endif
@@ -525,8 +527,7 @@
             @include('partials.portal-map-section', [
                 'heading' => $project->map_section_heading,
                 'tagline' => $project->map_section_tagline,
-                'imageUrl' => $project->mapSectionImageUrl(),
-                'viewerUrl' => $project->mapSectionViewerUrl(),
+                'interactiveMap' => $project->interactiveMap,
             ])
 
             @include('partials.project-detail-tabs', compact('project', 'projectPhoneClean'))

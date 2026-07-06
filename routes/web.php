@@ -41,6 +41,7 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\ListingSortController;
 use App\Http\Controllers\DhaSettingController;
 use App\Http\Controllers\DhaPhaseController;
+use App\Http\Controllers\InteractiveMapController;
 use App\Models\DhaSetting;
 use App\Models\DhaPhase;
 use App\Http\Controllers\ReportController;
@@ -708,7 +709,7 @@ Route::get('/dha/{phase:slug}', function (DhaPhase $phase) {
     if ($phase->status !== DhaPhase::STATUS_ACTIVE) {
         abort(404);
     }
-    $phase->load(['projectTypes:id,name,slug']);
+    $phase->load(['projectTypes:id,name,slug', 'interactiveMap']);
     $projectTypes = db_safe('dha_phase.project_types', fn () => ProjectType::orderBy('name')->get(['id', 'name', 'slug']), collect());
     $dhaPhases = db_safe('dha_phase.dha_phases', fn () => DhaPhase::active()->frontOrdered()->get(['id', 'title', 'slug']), collect());
     $lahoreCityId = db_safe('dha_phase.lahore_city', fn () => City::whereRaw('LOWER(name) = ?', ['lahore'])->value('id'));
@@ -751,21 +752,7 @@ Route::get('/dha/{phase:slug}/vr-tour', function (DhaPhase $phase) {
     return view('dha-phase-vr-tour', compact('phase', 'vrTourUrl', 'overlayPhone'));
 })->name('dha.phase.vr-tour');
 
-Route::get('/dha/{phase:slug}/interactive-map', function (DhaPhase $phase) {
-    if ($phase->status !== DhaPhase::STATUS_ACTIVE || ! $phase->hasMapSection()) {
-        abort(404);
-    }
-    $embedUrl = $phase->mapSectionUrl();
-    if ($embedUrl !== null && ! preg_match('/^https?:\/\//i', $embedUrl)) {
-        $embedUrl = 'https://' . $embedUrl;
-    }
-
-    return response()
-        ->view('interactive-map-viewer', compact('phase', 'embedUrl'))
-        ->header('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet, noimageindex');
-})->name('dha.phase.interactive-map');
-
-Route::get('/listing/dealers', function () {
+Route::get('/dha/{phase:slug}/vr-tour', function (DhaPhase $phase) {
     $q = request()->getQueryString();
     $url = route('listing') . ($q !== null && $q !== '' ? '?' . $q : '');
 
@@ -890,21 +877,6 @@ Route::get('/project/vr-tour/{project}', function (Project $project) {
     return view('project-vr-tour', compact('project', 'vrTourUrl', 'overlayPhone'));
 })->name('project.vr-tour');
 
-Route::get('/project/interactive-map/{project}', function (Project $project) {
-    $project = Project::query()->whereKey($project->id)->active()->firstOrFail();
-    if (! $project->hasMapSection()) {
-        abort(404);
-    }
-    $embedUrl = $project->mapSectionUrl();
-    if ($embedUrl !== null && ! preg_match('/^https?:\/\//i', $embedUrl)) {
-        $embedUrl = 'https://' . $embedUrl;
-    }
-
-    return response()
-        ->view('interactive-map-viewer', compact('project', 'embedUrl'))
-        ->header('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet, noimageindex');
-})->name('project.interactive-map');
-
 Route::post('/careers/job/{slug}/apply', function (Request $request, string $slug) {
     $career = \App\Models\Career::where('slug', $slug)->active()->firstOrFail();
     $validated = $request->validate([
@@ -956,7 +928,7 @@ Route::post('/careers/job/{slug}/apply', function (Request $request, string $slu
 })->name('careers.apply');
 
 Route::get('/project/{slug}', function ($slug) {
-    $project = Project::with('projectTypes')->where('slug', $slug)->active()->firstOrFail();
+    $project = Project::with('projectTypes', 'interactiveMap')->where('slug', $slug)->active()->firstOrFail();
     $daily = VisitorDailyCount::firstOrCreate(
         ['date' => now()->toDateString()],
         ['count' => 0, 'count_own_listing' => 0, 'count_dealer_listing' => 0, 'count_projects' => 0]
@@ -968,7 +940,7 @@ Route::get('/project/{slug}', function ($slug) {
 })->name('project.show');
 
 Route::get('/project-new/{slug}', function ($slug) {
-    $project = Project::with('projectTypes')->where('slug', $slug)->active()->firstOrFail();
+    $project = Project::with('projectTypes', 'interactiveMap')->where('slug', $slug)->active()->firstOrFail();
     return view('project-new', compact('project'));
 })->name('project.new.show');
 
@@ -1633,6 +1605,7 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/dha-phases/{dhaPhase}/edit', [DhaPhaseController::class, 'edit'])->name('admin.dha-phases.edit');
     Route::put('/admin/dha-phases/{dhaPhase}', [DhaPhaseController::class, 'update'])->name('admin.dha-phases.update');
     Route::delete('/admin/dha-phases/{dhaPhase}', [DhaPhaseController::class, 'destroy'])->name('admin.dha-phases.destroy');
+    Route::get('/admin/dha-phases/{dhaPhase}/interactive-map', [InteractiveMapController::class, 'editDhaPhase'])->name('admin.dha-phases.interactive-map');
 
     Route::get('/admin/projects', [ProjectController::class, 'index'])->name('admin.projects.index');
     Route::get('/admin/projects/create', [ProjectController::class, 'create'])->name('admin.projects.create');
@@ -1646,6 +1619,18 @@ Route::middleware('admin')->group(function () {
     Route::put('/admin/projects/{project}', [ProjectController::class, 'update'])->name('admin.projects.update');
     Route::delete('/admin/projects/{project}', [ProjectController::class, 'destroy'])->name('admin.projects.destroy');
     Route::post('/admin/projects/{project}/duplicate', [ProjectController::class, 'duplicate'])->name('admin.projects.duplicate');
+    Route::get('/admin/projects/{project}/interactive-map', [InteractiveMapController::class, 'editProject'])->name('admin.projects.interactive-map');
+
+    Route::prefix('admin/interactive-map/{ownerType}/{ownerId}')
+        ->where(['ownerType' => 'projects|dha-phases', 'ownerId' => '[0-9]+'])
+        ->group(function () {
+            Route::get('/', [InteractiveMapController::class, 'show'])->name('admin.interactive-map.show');
+            Route::put('/', [InteractiveMapController::class, 'update'])->name('admin.interactive-map.update');
+            Route::post('/overlay', [InteractiveMapController::class, 'uploadOverlay'])->name('admin.interactive-map.overlay.upload');
+            Route::delete('/overlay', [InteractiveMapController::class, 'deleteOverlay'])->name('admin.interactive-map.overlay.delete');
+            Route::post('/places/autocomplete', [InteractiveMapController::class, 'placesAutocomplete'])->name('admin.interactive-map.places.autocomplete');
+            Route::get('/places/{placeId}', [InteractiveMapController::class, 'placesDetails'])->where('placeId', '.+')->name('admin.interactive-map.places.details');
+        });
 
     Route::get('/admin/dealers', [DealerController::class, 'index'])->name('admin.dealers.index');
     Route::get('/admin/dealers/create', [DealerController::class, 'create'])->name('admin.dealers.create');

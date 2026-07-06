@@ -38,6 +38,45 @@
 .etihad-cta-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
 .etihad-cta-row .commentssubmit { margin: 0; }
 .etihad-cta-dark { background: #1e1e1e !important; }
+
+/* Breadcrumbs: visually hidden site-wide; HTML remains for crawlers */
+.breadcrumbs-list,
+.breadcrumbs-list_dec,
+.project-new-breadcrumb,
+.dha-lux-hero__crumb,
+nav[aria-label="Breadcrumb"] {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* CMS pages without hero banner */
+.cms-page-head {
+    padding: 28px 0 10px;
+}
+.cms-page-head h1 {
+    margin: 0;
+    font-size: clamp(1.75rem, 2.4vw, 2.25rem);
+    line-height: 1.15;
+    color: #0f172a;
+}
+.cms-page-head__lead {
+    margin: 10px 0 0;
+    max-width: 760px;
+    color: #64748b;
+    font-size: 16px;
+    line-height: 1.55;
+}
+.cms-page-head--compact {
+    padding-top: 22px;
+}
 .etihad-inline-flex-gap { display: inline-flex; gap: 8px; }
 
 /* --- Decorative SVG corners (replace inline style on hero/footer) --- */

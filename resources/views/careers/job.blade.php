@@ -60,22 +60,13 @@
     @include('partials.header')
     <div class="wrapper">
         <div class="content">
-            <div class="section hero-section hero-section_sin">
-                <div class="hero-section-wrap">
-                    <div class="hero-section-wrap-item">
-                        <div class="container">
-                            <div class="hero-section-container">
-                                <div class="hero-section-title">
-                                    <h1>{{ $career->title }}</h1>
-                                    @if($subheading)<h5>{{ $subheading }}</h5>@endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-wrap bg-hero bg-parallax-wrap-gradien fs-wrapper"><div class="bg" data-bg="{{ $bannerImage }}"></div></div>
-                    </div>
-                </div>
-            </div>
             <div class="container">
+                <div class="cms-page-head cms-page-head--compact">
+                    <h1>{{ $career->title }}</h1>
+                    @if($subheading)
+                    <p class="cms-page-head__lead">{{ $subheading }}</p>
+                    @endif
+                </div>
                 <div class="breadcrumbs-list bl_flat">
                     <a href="{{ url('/') }}">Home</a>
                     <a href="{{ url('/careers') }}">Careers</a>

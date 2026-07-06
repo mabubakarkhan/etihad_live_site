@@ -12,36 +12,16 @@
 
 <div class="wrapper {{ !empty($isPopup) ? 'contact-popup-mode' : '' }}">
     <div class="content">
-        @if(empty($isPopup))
-        <div class="section hero-section hero-section_sin">
-            <div class="hero-section-wrap">
-                <div class="hero-section-wrap-item">
-                    <div class="container">
-                        <div class="hero-section-container">
-                            <div class="hero-section-title">
-                                <h1>{{ $cmsPage->heading ?? 'Our Contacts' }}</h1>
-                                <h5>{{ !empty($cmsPage->content) ? \Illuminate\Support\Str::limit(strip_tags($cmsPage->content), 120) : 'Get in touch with our team for projects, listings, and support.' }}</h5>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="hs-scroll-down-wrap">
-                        <div class="scroll-down-item">
-                            <div class="mousey"><div class="scroller"></div></div>
-                            <span>Scroll Down To Discover</span>
-                        </div>
-                        <div class="svg-corner svg-corner_white contact-hero-corner-right"></div>
-                        <div class="svg-corner svg-corner_white contact-hero-corner-left"></div>
-                    </div>
-                    <div class="bg-wrap bg-hero bg-parallax-wrap-gradien fs-wrapper" data-scrollax-parent="true">
-                        <div class="bg" data-bg="{{ asset('theme/images/bg/14.jpg') }}" data-scrollax="properties: { translateY: '30%' }"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
-
         <div class="container">
             @if(empty($isPopup))
+            <div class="cms-page-head">
+                <h1>{{ $cmsPage->heading ?? 'Our Contacts' }}</h1>
+                @if(!empty($cmsPage->content))
+                <p class="cms-page-head__lead">{{ \Illuminate\Support\Str::limit(strip_tags($cmsPage->content), 160) }}</p>
+                @else
+                <p class="cms-page-head__lead">Get in touch with our team for projects, listings, and support.</p>
+                @endif
+            </div>
             <div class="breadcrumbs-list bl_flat">
                 <a href="{{ url('/') }}">Home</a><a href="#">Pages</a><span>Contact Us</span>
                 <div class="breadcrumbs-list_dec"><i class="fa-solid fa-angle-right"></i></div>

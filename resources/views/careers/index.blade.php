@@ -25,22 +25,13 @@
     @include('partials.header')
     <div class="wrapper">
         <div class="content">
-            <div class="section hero-section hero-section_sin">
-                <div class="hero-section-wrap">
-                    <div class="hero-section-wrap-item">
-                        <div class="container">
-                            <div class="hero-section-container">
-                                <div class="hero-section-title">
-                                    <h1>{{ $pageHeading }}</h1>
-                                    <h5>{{ $pageSubheading }}</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-wrap bg-hero bg-parallax-wrap-gradien fs-wrapper"><div class="bg" data-bg="{{ $bannerImage }}"></div></div>
-                    </div>
-                </div>
-            </div>
             <div class="container">
+                <div class="cms-page-head">
+                    <h1>{{ $pageHeading }}</h1>
+                    @if($pageSubheading)
+                    <p class="cms-page-head__lead">{{ $pageSubheading }}</p>
+                    @endif
+                </div>
                 <div class="breadcrumbs-list bl_flat">
                     <a href="{{ url('/') }}">Home</a>
                     <span>Careers</span>

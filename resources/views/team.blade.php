@@ -28,35 +28,13 @@
 
     <div class="wrapper">
         <div class="content">
-            <div class="section hero-section hero-section_sin">
-                <div class="hero-section-wrap">
-                    <div class="hero-section-wrap-item">
-                        <div class="container">
-                            <div class="hero-section-container">
-                                <div class="hero-section-title">
-                                    <h1>{{ $pageHeading }}</h1>
-                                    <h5>{{ $pageSubheading }}</h5>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="hs-scroll-down-wrap">
-                            <div class="scroll-down-item">
-                                <div class="mousey">
-                                    <div class="scroller"></div>
-                                </div>
-                                <span>Scroll Down To Discover</span>
-                            </div>
-                            <div class="svg-corner svg-corner_white hero-corner-br"></div>
-                            <div class="svg-corner svg-corner_white hero-corner-bl"></div>
-                        </div>
-                        <div class="bg-wrap bg-hero bg-parallax-wrap-gradien fs-wrapper" data-scrollax-parent="true">
-                            <div class="bg" data-bg="{{ $bannerImage }}" data-scrollax="properties: { translateY: '30%' }"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="container">
+                <div class="cms-page-head">
+                    <h1>{{ $pageHeading }}</h1>
+                    @if($pageSubheading)
+                    <p class="cms-page-head__lead">{{ $pageSubheading }}</p>
+                    @endif
+                </div>
                 <div class="breadcrumbs-list bl_flat">
                     <a href="{{ url('/') }}">Home</a>
                     <a href="{{ url('/our-team') }}">Our Team</a>

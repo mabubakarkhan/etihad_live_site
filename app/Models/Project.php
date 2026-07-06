@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Project extends Model
@@ -108,6 +109,11 @@ class Project extends Model
         return $this->belongsToMany(ProjectType::class, 'project_project_type')->withTimestamps();
     }
 
+    public function interactiveMap(): HasOne
+    {
+        return $this->hasOne(InteractiveMap::class);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('status', self::STATUS_ACTIVE);
@@ -146,16 +152,11 @@ class Project extends Model
 
     public function hasMapSection(): bool
     {
-        return $this->mapSectionImageUrl() !== null && $this->mapSectionUrl() !== null;
-    }
+        $map = $this->relationLoaded('interactiveMap')
+            ? $this->interactiveMap
+            : $this->interactiveMap()->first();
 
-    public function mapSectionViewerUrl(): ?string
-    {
-        if (! $this->hasMapSection()) {
-            return null;
-        }
-
-        return route('project.interactive-map', ['project' => $this]);
+        return $map !== null && $map->isReadyForFront();
     }
 
     public function vrTourImageUrl(): ?string

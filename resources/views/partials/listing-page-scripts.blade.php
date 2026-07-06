@@ -10,6 +10,7 @@
     $listingWaNumber = $listingWaRaw !== '' ? preg_replace('/\D/', '', $listingWaRaw) : '';
 @endphp
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<script src="{{ asset('theme/js/etihad-places-autocomplete.js') }}?v=1"></script>
 @if($googleMapsKey)
 <script>
 function initMap() {
@@ -147,36 +148,18 @@ window.initMap = initMap;
 
     function initListingLandmarkAutocomplete() {
         if (listingLandmarkAutocompleteInited) return;
+        if (typeof window.EtihadPlacesAutocomplete === 'undefined') return;
         if (typeof google === 'undefined' || !google.maps || !google.maps.places || !google.maps.places.Autocomplete) return;
         listingLandmarkAutocompleteInited = true;
-        var lahoreCenter = new google.maps.LatLng(31.5204, 74.3587);
-        var lahoreBounds = new google.maps.LatLngBounds(
-            new google.maps.LatLng(31.32, 74.14),
-            new google.maps.LatLng(31.72, 74.56)
-        );
         [['a', 'listing-location-a'], ['b', 'listing-location-b']].forEach(function (def) {
             var id = def[1];
             var input = document.getElementById(id);
             var latEl = document.getElementById(id + '-lat');
             var lngEl = document.getElementById(id + '-lng');
             if (!input || !latEl || !lngEl) return;
-            var ac = new google.maps.places.Autocomplete(input, {
-                fields: ['formatted_address', 'geometry', 'name'],
-                componentRestrictions: { country: 'pk' },
-                bounds: lahoreBounds,
-                strictBounds: false
-            });
-            // Keep inputs empty; only bias autocomplete to Lahore/Pakistan.
-            ac.addListener('place_changed', function () {
-                var place = ac.getPlace();
-                if (!place || !place.geometry || !place.geometry.location) return;
-                latEl.value = String(place.geometry.location.lat());
-                lngEl.value = String(place.geometry.location.lng());
-                if (place.formatted_address) input.value = place.formatted_address;
-                else if (place.name) input.value = place.name;
-            });
-            input.addEventListener('input', function () {
-                if (!input.value.trim()) { latEl.value = ''; lngEl.value = ''; }
+            window.EtihadPlacesAutocomplete.bindLandmarkAutocomplete(input, {
+                latEl: latEl,
+                lngEl: lngEl
             });
         });
     }
