@@ -19,7 +19,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('theme/css/pages/listing.css') }}">
-<link rel="stylesheet" href="{{ asset('theme/css/pages/listing-projects-cta.css') }}">
+<link rel="stylesheet" href="{{ asset('theme/css/pages/listing-projects-cta.css') }}?v=2">
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 <style>
 .to_top-btn-wrap {

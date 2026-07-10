@@ -16,7 +16,7 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('theme/css/pages/projects.css') }}">
 <link rel="stylesheet" href="{{ asset('theme/css/pages/portal.css') }}">
-<link rel="stylesheet" href="{{ asset('theme/css/pages/listing-projects-cta.css') }}">
+<link rel="stylesheet" href="{{ asset('theme/css/pages/listing-projects-cta.css') }}?v=2">
 @endpush
 
 @section('content')
