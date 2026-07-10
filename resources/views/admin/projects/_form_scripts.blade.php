@@ -137,6 +137,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.classList.contains('remove-feature')) e.target.closest('.feature-row')?.remove();
     });
 
+    document.getElementById('add-location-highlight')?.addEventListener('click', function() {
+        var c = document.getElementById('location-highlights-container');
+        if (!c) return;
+        var div = document.createElement('div');
+        div.className = 'location-highlight-row flex gap-2 items-center';
+        div.innerHTML = '<input type="text" name="location_highlight_points[]" placeholder="e.g. 5 mins to Lahore" class="flex-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" /><button type="button" class="remove-location-highlight text-rose-600 dark:text-rose-400 hover:text-rose-300 text-xs">Remove</button>';
+        c.appendChild(div);
+    });
+    document.getElementById('location-highlights-container')?.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-location-highlight')) e.target.closest('.location-highlight-row')?.remove();
+    });
+
     document.getElementById('add-price-plan')?.addEventListener('click', function() {
         var c = document.getElementById('price-plan-container');
         var i = document.createElement('input');

@@ -95,6 +95,7 @@ class ProjectController extends Controller
 
     public function editSection(Project $project, string $section)
     {
+        $section = ProjectEditSections::resolveSlug($section);
         if (!ProjectEditSections::exists($section)) {
             abort(404);
         }
@@ -106,6 +107,7 @@ class ProjectController extends Controller
 
     public function loadSection(Request $request, Project $project, string $section): JsonResponse
     {
+        $section = ProjectEditSections::resolveSlug($section);
         if (!ProjectEditSections::exists($section)) {
             abort(404);
         }
@@ -128,6 +130,7 @@ class ProjectController extends Controller
 
     public function updateSection(Request $request, Project $project, string $section): JsonResponse
     {
+        $section = ProjectEditSections::resolveSlug($section);
         if (!ProjectEditSections::exists($section)) {
             abort(404);
         }

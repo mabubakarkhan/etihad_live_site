@@ -55,6 +55,11 @@ class Project extends Model
         'extra_section_title',
         'extra_section_content',
         'unique_features',
+        'amenities_section_heading',
+        'location_section_heading',
+        'location_section_description',
+        'location_highlights',
+        'key_features_section_heading',
         'price_plan_section_title',
         'price_plan_items',
         'faqs',
@@ -87,6 +92,7 @@ class Project extends Model
     {
         return [
             'unique_features' => 'array',
+            'location_highlights' => 'array',
             'price_plan_items' => 'array',
             'faqs' => 'array',
             'plans' => 'array',

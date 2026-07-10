@@ -254,33 +254,53 @@
         foreach ($project->unique_features as $uf) {
             if (is_array($uf)) {
                 $title = trim((string) ($uf['title'] ?? ''));
+                $icon = trim((string) ($uf['icon'] ?? ''));
             } else {
                 $title = trim((string) $uf);
+                $icon = '';
             }
             if ($title !== '') {
-                $uniqueFeatureItems[] = $title;
+                $uniqueFeatureItems[] = ['title' => $title, 'icon' => $icon];
             }
         }
     }
-    $amenityItems = array_slice($uniqueFeatureItems, 0, 8);
+    $amenityItems = $uniqueFeatureItems;
     if (empty($amenityItems)) {
-        $amenityItems = ['Swimming Pool', 'Rooftop Lounge', 'Gym & Fitness', 'CCTV Surveillance', "Children's Play Area", 'Ample Parking', 'IoT Security', 'Power Backup'];
+        $amenityItems = array_map(fn (string $title) => ['title' => $title, 'icon' => ''], [
+            'Swimming Pool', 'Rooftop Lounge', 'Gym & Fitness', 'CCTV Surveillance', "Children's Play Area", 'Ample Parking', 'IoT Security', 'Power Backup',
+        ]);
     }
-    $keyFeatureItems = array_slice($uniqueFeatureItems, 0, 5);
+    $keyFeatureItems = $uniqueFeatureItems;
     if (empty($keyFeatureItems)) {
-        $keyFeatureItems = ['Premium Residential Units', 'Modern architecture & finishes', 'Green & sustainable design', 'Secure gated community', 'High rental yield potential'];
+        $keyFeatureItems = array_map(fn (string $title) => ['title' => $title, 'icon' => ''], [
+            'Premium Residential Units', 'Modern architecture & finishes', 'Green & sustainable design', 'Secure gated community', 'High rental yield potential',
+        ]);
     }
-    $locationPoints = [
-        '5 mins to ' . ($project->city ?: 'City Centre'),
-        '10 mins to Main Boulevard',
-        'Close to top schools',
-        'Near hospitals & malls',
-    ];
-    $locationDesc = trim((string) ($project->short_address ?? ''));
+    $amenitiesHeading = trim((string) ($project->amenities_section_heading ?? '')) ?: 'World-Class Amenities';
+    $locationHeading = trim((string) ($project->location_section_heading ?? '')) ?: 'Prime Location';
+    $keyFeaturesHeading = trim((string) ($project->key_features_section_heading ?? '')) ?: 'Key Features';
+    $locationPoints = is_array($project->location_highlights ?? null)
+        ? array_values(array_filter(array_map(fn ($v) => trim((string) $v), $project->location_highlights)))
+        : [];
+    if (empty($locationPoints)) {
+        $locationPoints = [
+            '5 mins to ' . ($project->city ?: 'City Centre'),
+            '10 mins to Main Boulevard',
+            'Close to top schools',
+            'Near hospitals & malls',
+        ];
+    }
+    $locationDesc = trim((string) ($project->location_section_description ?? ''));
+    if ($locationDesc === '') {
+        $locationDesc = trim((string) ($project->short_address ?? ''));
+    }
     if ($locationDesc === '') {
         $locationDesc = \Illuminate\Support\Str::limit(trim(strip_tags((string) ($project->description ?? ''))), 115, '...');
     }
-    $resolveAmenityIcon = function (string $label): string {
+    $resolveAmenityIcon = function (string $label, string $storedIcon = ''): string {
+        if ($storedIcon !== '') {
+            return $storedIcon;
+        }
         $l = strtolower($label);
         if (str_contains($l, 'swim') || str_contains($l, 'pool')) return 'fa-person-swimming';
         if (str_contains($l, 'gym') || str_contains($l, 'fitness')) return 'fa-dumbbell';
@@ -292,7 +312,10 @@
         if (str_contains($l, 'power') || str_contains($l, 'backup')) return 'fa-bolt';
         return 'fa-star';
     };
-    $resolveFeatureIcon = function (string $label): string {
+    $resolveFeatureIcon = function (string $label, string $storedIcon = ''): string {
+        if ($storedIcon !== '') {
+            return $storedIcon;
+        }
         $l = strtolower($label);
         if (str_contains($l, 'unit')) return 'fa-building';
         if (str_contains($l, 'architect') || str_contains($l, 'finish')) return 'fa-compass-drafting';
@@ -537,12 +560,12 @@
             <section class="project-new-kfl-section">
                 <div class="container">
                     <div class="project-new-kfl-amenities-bar">
-                        <h4>World-Class Amenities</h4>
+                        <h4>{{ $amenitiesHeading }}</h4>
                         <ul class="project-new-kfl-amenities-icons">
                             @foreach($amenityItems as $amenity)
                                 <li>
-                                    <span class="project-new-kfl-amenity-icon"><i class="fa-light {{ $resolveAmenityIcon($amenity) }}"></i></span>
-                                    <span class="project-new-kfl-amenity-label">{{ $amenity }}</span>
+                                    <span class="project-new-kfl-amenity-icon"><i class="fa-light {{ $resolveAmenityIcon($amenity['title'], $amenity['icon'] ?? '') }}"></i></span>
+                                    <span class="project-new-kfl-amenity-label">{{ $amenity['title'] }}</span>
                                 </li>
                             @endforeach
                         </ul>
@@ -559,7 +582,7 @@
                     </div>
                     <div class="project-new-kfl-location-content">
                         <div class="project-new-kfl-location-copy">
-                            <h4 class="project-new-kfl-location-title">Prime Location</h4>
+                            <h4 class="project-new-kfl-location-title">{{ $locationHeading }}</h4>
                             @if($locationDesc !== '')
                             <p class="project-new-kfl-location-desc">{{ $locationDesc }}</p>
                             @endif
@@ -579,10 +602,10 @@
                     <div class="project-new-kfl-features-card project-new-kfl-card project-new-kfl-features">
                         <div class="project-new-kfl-features-body" style="--project-new-kfl-features-bg: url('{{ $featuredUrl }}')">
                             <div class="project-new-kfl-features-copy">
-                                <h4>Key Features</h4>
+                                <h4>{{ $keyFeaturesHeading }}</h4>
                                 <ul>
                                     @foreach($keyFeatureItems as $feature)
-                                        <li><i class="fa-light {{ $resolveFeatureIcon($feature) }}"></i> {{ $feature }}</li>
+                                        <li><i class="fa-light {{ $resolveFeatureIcon($feature['title'], $feature['icon'] ?? '') }}"></i> {{ $feature['title'] }}</li>
                                     @endforeach
                                 </ul>
                             </div>

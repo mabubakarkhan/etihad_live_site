@@ -14,27 +14,36 @@ class ProjectEditSections
             'media' => ['label' => 'Hero section', 'tab' => 'tab-media'],
             'featured-video' => ['label' => 'Featured video', 'tab' => 'tab-featured-video'],
             'gallery' => ['label' => 'Gallery', 'tab' => 'tab-gallery'],
-            'features' => ['label' => 'Unique features', 'tab' => 'tab-features'],
             'pricing-place' => ['label' => 'Pricing place', 'tab' => 'tab-pricing-place'],
             'price-slider' => ['label' => 'Price Slider', 'tab' => 'tab-price-slider'],
             'map-section' => ['label' => 'Interactive map', 'tab' => 'tab-map-section'],
             'detail-tabs' => ['label' => 'Detail tabs', 'tab' => 'tab-detail-tabs'],
             'tabs-follow-content' => ['label' => 'After tabs content', 'tab' => 'tab-tabs-follow-content'],
-            'vr-tour' => ['label' => 'VR Tour', 'tab' => 'tab-vr-tour'],
+            'location-features' => ['label' => 'Amenities & location', 'tab' => 'tab-location-features'],
             'booking-procedure' => ['label' => 'Booking Procedure', 'tab' => 'tab-booking-procedure'],
+            'vr-tour' => ['label' => 'VR Tour', 'tab' => 'tab-vr-tour'],
             'social-proof' => ['label' => 'Testimonials + Invest', 'tab' => 'tab-social-proof'],
             'videos' => ['label' => 'Videos', 'tab' => 'tab-videos'],
             'seo' => ['label' => 'SEO', 'tab' => 'tab-seo'],
         ];
     }
 
+    public static function resolveSlug(string $slug): string
+    {
+        return $slug === 'features' ? 'location-features' : $slug;
+    }
+
     public static function exists(string $slug): bool
     {
+        $slug = self::resolveSlug($slug);
+
         return isset(self::all()[$slug]);
     }
 
     public static function tabFor(string $slug): ?string
     {
+        $slug = self::resolveSlug($slug);
+
         return self::all()[$slug]['tab'] ?? null;
     }
 
@@ -121,6 +130,16 @@ class ProjectEditSections
                 'booking_document_icons' => ['nullable', 'array'],
             ],
             'features' => [
+                'feature_titles' => ['nullable', 'array'],
+                'feature_icons' => ['nullable', 'array'],
+            ],
+            'location-features' => [
+                'amenities_section_heading' => ['nullable', 'string', 'max:255'],
+                'location_section_heading' => ['nullable', 'string', 'max:255'],
+                'location_section_description' => ['nullable', 'string'],
+                'location_highlight_points' => ['nullable', 'array'],
+                'location_highlight_points.*' => ['nullable', 'string', 'max:255'],
+                'key_features_section_heading' => ['nullable', 'string', 'max:255'],
                 'feature_titles' => ['nullable', 'array'],
                 'feature_icons' => ['nullable', 'array'],
             ],

@@ -13,7 +13,7 @@
     $tabIds = array_keys($projectTabs);
     $onlySection = $onlySection ?? null;
     $showSection = function (string $slug) use ($onlySection): bool {
-        if (in_array($slug, ['plans', 'pdf'], true)) {
+        if (in_array($slug, ['plans', 'pdf', 'features'], true)) {
             return false;
         }
         return $onlySection === null || $onlySection === $slug;
@@ -449,8 +449,8 @@
         </div>
     </div>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
-        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-tabs-follow-content">Back</button>
-        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-booking-procedure">Next</button>
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-booking-procedure">Back</button>
+        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-social-proof">Next</button>
     </div>
 </div>
 
@@ -528,8 +528,8 @@
         </div>
     </div>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
-        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-vr-tour">Back</button>
-        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-social-proof">Next</button>
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-location-features">Back</button>
+        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-vr-tour">Next</button>
     </div>
 </div>
 
@@ -643,7 +643,7 @@
     </div>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
         <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-future-note">Back</button>
-        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-features">Next</button>
+        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-pricing-place">Next</button>
     </div>
 </div>
 
@@ -703,7 +703,7 @@
         </div>
     </div>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
-        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-features">Back</button>
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-gallery">Back</button>
         <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-faqs">Next</button>
     </div>
 </div>
@@ -771,7 +771,7 @@
     </div>
     <button type="button" id="add-plan" class="mt-2 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">+ Add plan</button>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
-        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-features">Back</button>
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-gallery">Back</button>
         <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-pricing-place">Next</button>
     </div>
 </div>
@@ -869,7 +869,7 @@
     </div>
     <button type="button" id="add-pricing-place" class="mt-2 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">+ Add pricing card</button>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
-        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-features">Back</button>
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-gallery">Back</button>
         <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-price-slider">Next</button>
     </div>
 </div>
@@ -1108,7 +1108,90 @@
     </div>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
         <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-detail-tabs">Back</button>
-        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-vr-tour">Next</button>
+        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-location-features">Next</button>
+    </div>
+</div>
+
+@endif
+@if($showSection('location-features'))
+<div id="tab-location-features" class="tab-panel {{ $sectionPanelClass('location-features') }} rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-lg shadow-slate-200/80 dark:shadow-slate-950/50 transition-colors p-6 mb-6" role="tabpanel">
+    <h2 class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-2">Amenities &amp; location</h2>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">Controls the amenities bar, prime location block, and key features card on the project page. Map coordinates are set in the Address tab.</p>
+
+    <div class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Amenities bar heading</label>
+                <input type="text" name="amenities_section_heading" value="{{ old('amenities_section_heading', $project->amenities_section_heading ?? 'World-Class Amenities') }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Key features card heading</label>
+                <input type="text" name="key_features_section_heading" value="{{ old('key_features_section_heading', $project->key_features_section_heading ?? 'Key Features') }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-4">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Prime location</h3>
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Section heading</label>
+                <input type="text" name="location_section_heading" value="{{ old('location_section_heading', $project->location_section_heading ?? 'Prime Location') }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Location description</label>
+                <textarea name="location_section_description" rows="2" placeholder="Leave empty to use short address from Address tab" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100">{{ old('location_section_description', $project->location_section_description ?? '') }}</textarea>
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-2">Location highlights</label>
+                <div id="location-highlights-container" class="space-y-2">
+                    @php
+                        $locationHighlightPoints = old('location_highlight_points', $project->location_highlights ?? []);
+                        if (! is_array($locationHighlightPoints)) {
+                            $locationHighlightPoints = [];
+                        }
+                        $locationHighlightPoints = array_merge($locationHighlightPoints, ['']);
+                    @endphp
+                    @foreach($locationHighlightPoints as $hlIdx => $point)
+                        <div class="location-highlight-row flex gap-2 items-center">
+                            <input type="text" name="location_highlight_points[]" value="{{ $point }}" placeholder="e.g. 5 mins to Lahore" class="flex-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+                            <button type="button" class="remove-location-highlight text-rose-600 dark:text-rose-400 hover:text-rose-500 dark:hover:text-rose-300 text-xs">Remove</button>
+                        </div>
+                    @endforeach
+                </div>
+                <button type="button" id="add-location-highlight" class="mt-2 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">+ Add highlight</button>
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2">Unique features</h3>
+            <p class="text-xs text-slate-500 mb-3">Shown in the amenities bar and key features list. Add a title and icon for each.</p>
+            <div id="features-container" class="space-y-3">
+                @php
+                    $featureTitles = old('feature_titles', []);
+                    $featureIcons = old('feature_icons', []);
+                    $existingFeatures = $project->unique_features ?? [];
+                    if (empty($featureTitles) && !empty($existingFeatures)) {
+                        $featureTitles = array_column($existingFeatures, 'title');
+                        $featureIcons = array_column($existingFeatures, 'icon');
+                    }
+                    $featureTitles = array_merge($featureTitles ?: [], ['']);
+                    $featureIcons = array_merge($featureIcons ?: [], ['']);
+                @endphp
+                @foreach($featureTitles as $idx => $title)
+                    <div class="flex gap-2 items-center feature-row">
+                        <input type="text" name="feature_titles[]" value="{{ $title }}" placeholder="Title" class="flex-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+                        <input type="text" name="feature_icons[]" value="{{ $featureIcons[$idx] ?? '' }}" placeholder="Icon name" id="feature_icon_{{ $idx }}" class="w-32 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" />
+                        <button type="button" class="icon-picker-btn px-2 py-1 rounded border border-slate-400 text-slate-600 dark:text-slate-400 text-xs hover:bg-slate-200 dark:hover:bg-slate-700" data-target="feature_icon_{{ $idx }}">Pick</button>
+                        <button type="button" class="remove-feature text-rose-600 dark:text-rose-400 hover:text-rose-500 dark:hover:text-rose-300 text-xs">Remove</button>
+                    </div>
+                @endforeach
+            </div>
+            <button type="button" id="add-feature" class="mt-2 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300">+ Add feature</button>
+        </div>
+    </div>
+
+    <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
+        <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-tabs-follow-content">Back</button>
+        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-booking-procedure">Next</button>
     </div>
 </div>
 
@@ -1219,7 +1302,7 @@
     </div>
     <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
         <button type="button" class="project-tab-back inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" data-prev="tab-featured-video">Back</button>
-        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-features">Next</button>
+        <button type="button" class="project-tab-next inline-flex items-center justify-center rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow shadow-emerald-500/40 hover:bg-emerald-400 transition" data-next="tab-pricing-place">Next</button>
     </div>
 </div>
 

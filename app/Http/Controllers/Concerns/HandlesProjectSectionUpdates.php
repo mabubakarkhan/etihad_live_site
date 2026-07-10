@@ -121,6 +121,16 @@ trait HandlesProjectSectionUpdates
             case 'features':
                 $project->update(['unique_features' => $this->normalizeUniqueFeatures($request)]);
                 return;
+            case 'location-features':
+                $project->update([
+                    'amenities_section_heading' => $validated['amenities_section_heading'] ?? null,
+                    'location_section_heading' => $validated['location_section_heading'] ?? null,
+                    'location_section_description' => $validated['location_section_description'] ?? null,
+                    'location_highlights' => $this->normalizeLocationHighlights($request),
+                    'key_features_section_heading' => $validated['key_features_section_heading'] ?? null,
+                    'unique_features' => $this->normalizeUniqueFeatures($request),
+                ]);
+                return;
 
             case 'price-plan':
                 $project->update([
@@ -395,6 +405,20 @@ trait HandlesProjectSectionUpdates
         }
 
         return $cards;
+    }
+
+    /** @return list<string> */
+    protected function normalizeLocationHighlights(Request $request): array
+    {
+        $out = [];
+        foreach ((array) $request->input('location_highlight_points', []) as $point) {
+            $point = trim((string) $point);
+            if ($point !== '') {
+                $out[] = $point;
+            }
+        }
+
+        return $out;
     }
 
     protected function validateProjectSection(Request $request, Project $project, string $section): array
