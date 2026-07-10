@@ -16,6 +16,7 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('theme/css/pages/projects.css') }}">
 <link rel="stylesheet" href="{{ asset('theme/css/pages/portal.css') }}">
+<link rel="stylesheet" href="{{ asset('theme/css/pages/listing-projects-cta.css') }}">
 @endpush
 
 @section('content')
@@ -84,6 +85,15 @@
                         @endif
                     </div>
                 </div>
+
+                @include('partials.listing-projects-cta', [
+                    'ctaHeading' => 'Interested in one of our projects?',
+                    'ctaText' => 'Get detailed brochures, payment plans, and availability updates from our property consultants.',
+                    'primaryLabel' => 'Contact Us',
+                    'primaryUrl' => route('contact-us'),
+                    'secondaryLabel' => 'View Listings',
+                    'secondaryUrl' => route('listing'),
+                ])
 
                 <div class="to_top-btn-wrap">
                     <div class="to-top to-top_btn"><span>Back to top</span> <i class="fa-solid fa-arrow-up"></i></div>

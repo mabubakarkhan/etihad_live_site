@@ -19,6 +19,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('theme/css/pages/listing.css') }}">
+<link rel="stylesheet" href="{{ asset('theme/css/pages/listing-projects-cta.css') }}">
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
 <style>
 .to_top-btn-wrap {
@@ -77,6 +78,15 @@
                         @include('partials.listing-search-block', array_merge(compact('projectTypes', 'dhaPhases', 'lahoreCityId'), ['hideListingFilters' => true]))
                                     </div>
                 </div>
+
+                @include('partials.listing-projects-cta', [
+                    'ctaHeading' => 'Can\'t find the right property?',
+                    'ctaText' => 'Our team can help you shortlist verified listings, schedule visits, and answer questions about locations and pricing.',
+                    'primaryLabel' => 'Contact Us',
+                    'primaryUrl' => route('contact-us'),
+                    'secondaryLabel' => 'Browse Projects',
+                    'secondaryUrl' => route('projects'),
+                ])
 
                 <div class="to_top-btn-wrap">
                     <div class="to-top to-top_btn"><span>Back to top</span> <i class="fa-solid fa-arrow-up"></i></div>

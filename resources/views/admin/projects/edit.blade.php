@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
         <title>Edit Project | Etihad Admin</title>
         @include('admin.partials.theme-init')
         <script src="https://cdn.tailwindcss.com"></script>
@@ -27,6 +28,7 @@
                     <div class="flex items-center gap-2 flex-shrink-0">
                         @include('admin.partials.theme-toggle')
                         <a href="{{ route('admin.projects.index') }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition">Back to projects</a>
+                        @include('admin.projects._bulk_media_button', ['project' => $project, 'size' => 'md'])
                         <form method="POST" action="{{ route('admin.projects.duplicate', $project) }}" class="inline-flex">@csrf<button type="submit" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-400 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition">Duplicate</button></form>
                         <form method="POST" action="{{ route('admin.projects.destroy', $project) }}" class="inline-flex" onsubmit="return confirm('Delete this project?');">@csrf @method('DELETE')<button type="submit" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-rose-600/60 text-rose-600 dark:text-rose-300 hover:bg-rose-600/10 transition">Delete</button></form>
                     </div>
@@ -111,7 +113,9 @@
                 </section>
             </main>
         </div>
+        @include('admin.projects._bulk_media_modal')
         <script src="{{ asset('theme/js/admin-project-media.js') }}?v=5"></script>
+        <script src="{{ asset('theme/js/admin-project-bulk-media.js') }}?v=1"></script>
         @include('admin.projects._form_scripts')
     </body>
 </html>

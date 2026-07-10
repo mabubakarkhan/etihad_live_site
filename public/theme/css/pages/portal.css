@@ -144,6 +144,82 @@
 }
 .about-img-search { background: transparent; }
 .about-img-search .list-searh-input-wrap { margin-bottom: 0; }
+
+/* “Why Choose” row — contact block vertically centered */
+.portal-why-section-row {
+    align-items: center;
+}
+.portal-why-contact-col {
+    display: flex;
+    align-items: center;
+    min-height: 100%;
+}
+.portal-why-contact {
+    width: 100%;
+    padding: 28px 26px;
+    border: 1px solid #e8edf3;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.06);
+}
+.portal-why-contact__title {
+    margin: 0 0 18px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.portal-why-contact__list {
+    list-style: none;
+    margin: 0 0 22px;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+}
+.portal-why-contact__list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+.portal-why-contact__icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+    font-size: 16px;
+}
+.portal-why-contact__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.portal-why-contact__label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+}
+.portal-why-contact__body a,
+.portal-why-contact__text {
+    font-size: 14px;
+    line-height: 1.45;
+    color: #0f172a;
+    word-break: break-word;
+}
+.portal-why-contact__body a:hover {
+    color: #059669;
+}
+.portal-why-contact__btn {
+    margin-top: 4px;
+}
 .home-hero-section .col-lg-4 { position: relative; z-index: 25; overflow: visible; }
 
 /* Portal homepage hero: full screen height + wider centered form */

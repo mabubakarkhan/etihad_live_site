@@ -1,0 +1,121 @@
+PROJECT MEDIA ZIP — FOLDER STRUCTURE
+====================================
+Use stable folder names below (not admin tab display names).
+Tab labels in admin can change; these folder keys stay the same.
+
+project-name.zip
+├── featured/
+├── homepage/
+├── pdf/
+├── gallery/
+├── price-slider/
+├── pricing-place/
+├── detail-tabs/
+│   ├── tab-1/
+│   ├── tab-2/
+│   └── tab-3/
+├── vr-tour/
+└── invest/
+
+
+FOLDER HELP GUIDE
+=================
+
+featured/
+---------
+Admin tab: Hero section
+Front end: Main hero background, gallery fallback, key features card background
+Files: 1 image only (e.g. hero.jpg)
+Format: JPG, PNG, or WebP
+Tip: Wide image works best (~1920px wide). Keep under 5 MB if possible.
+
+homepage/
+---------
+Admin tab: Hero section
+Front end: Portal / homepage project listing cards
+Files: 1 image only (e.g. listing.jpg)
+Format: JPG, PNG, or WebP
+Tip: Card-style crop (~800–1200px wide). Used on listing pages, not the main hero.
+
+pdf/
+----
+Admin tab: Hero section
+Front end: "Download Brochure" button on project page
+Files: 1 PDF only (e.g. brochure.pdf)
+Format: PDF only
+Tip: Name does not matter; only one file allowed in this folder.
+
+gallery/
+--------
+Admin tab: Gallery
+Front end: Project gallery grid and lightbox
+Files: Many images
+Format: JPG, PNG, or WebP
+Naming: Use numeric prefix for order — 01.jpg, 02.jpg, 03.jpg
+Tip: ~1600px wide is enough. All images in this folder appear in the gallery.
+
+price-slider/
+-------------
+Admin tab: Price Slider
+Front end: Price slider image section on project page
+Files: Many images
+Format: JPG, PNG, or WebP
+Naming: 01.jpg, 02.jpg, 03.jpg (order by filename)
+Tip: One image per slide. Match the number of slides you want on the front end.
+
+pricing-place/
+--------------
+Admin tab: Pricing place
+Front end: Pricing / plan cards section
+Files: One image per card, matched by order
+Format: JPG, PNG, or WebP
+Naming: 01.jpg = 1st card, 02.jpg = 2nd card, 03.jpg = 3rd card
+Tip: Create pricing cards in admin first, then upload one image per card in order.
+
+detail-tabs/
+------------
+Admin tab: Detail tabs
+Front end: Images inside each detail tab panel
+Structure:
+  detail-tabs/tab-1/  → 1st detail tab in admin (top row)
+  detail-tabs/tab-2/  → 2nd detail tab
+  detail-tabs/tab-3/  → 3rd detail tab
+Files: Many images per tab folder
+Naming inside each tab: 01.jpg, 02.jpg, 03.jpg
+Important:
+  - Do NOT name folders after tab titles (e.g. "Payment Plan") — tab names can change.
+  - Use tab-1, tab-2, tab-3 by position only.
+  - Create tab labels and content in admin first; ZIP only adds images to existing tabs.
+  - If tab-2 folder exists but admin has only 1 tab, import should skip or warn.
+
+vr-tour/
+--------
+Admin tab: VR Tour
+Front end: Virtual tour promo block on project page
+Files: 1 image only (e.g. promo.jpg)
+Format: JPG, PNG, or WebP
+Tip: VR URL is set separately in admin; this folder is only the promo thumbnail image.
+
+invest/
+-------
+Admin tab: Testimonials + Invest
+Front end: "Why invest" section image
+Files: 1 image only (e.g. invest.jpg)
+Format: JPG, PNG, or WebP
+Tip: Testimonial quotes are text in admin; only the invest block uses this image.
+
+
+NOT INCLUDED IN ZIP (handle separately)
+=====================================
+- Interactive map overlay → Interactive map tab (PNG/SVG + map position)
+- Featured video / Videos → YouTube URLs in admin, not image files
+- Amenities & location, Booking, SEO, Address → text/content only
+
+
+GENERAL RULES
+=============
+- Single-file folders: featured, homepage, vr-tour, invest, pdf → only 1 file allowed
+- Multi-file folders: use 01-, 02-, 03- prefixes for display order
+- Allowed images: JPG, PNG, WebP
+- Avoid spaces in filenames; use hyphens (e.g. 01-exterior-view.jpg)
+- Unknown folders in ZIP should be rejected (do not guess)

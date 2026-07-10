@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
         <title>Projects | Etihad Admin</title>
         @include('admin.partials.theme-init')
         <script src="https://cdn.tailwindcss.com"></script>
@@ -133,5 +134,7 @@
         </div>
 
         @include('admin.partials.datatables')
+        @include('admin.projects._bulk_media_modal')
+        <script src="{{ asset('theme/js/admin-project-bulk-media.js') }}?v=1"></script>
     </body>
 </html>

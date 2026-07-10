@@ -36,6 +36,7 @@ use App\Http\Controllers\PortalHeroSlideController;
 use App\Http\Controllers\PortalAdController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectBulkMediaController;
 use App\Http\Controllers\DealerController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\ListingSortController;
@@ -1611,6 +1612,8 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/projects/create', [ProjectController::class, 'create'])->name('admin.projects.create');
     Route::post('/admin/projects', [ProjectController::class, 'store'])->name('admin.projects.store');
     Route::post('/admin/projects/upload-media', [ProjectController::class, 'uploadMedia'])->name('admin.projects.upload-media');
+    Route::post('/admin/projects/{project}/bulk-media/preview', [ProjectBulkMediaController::class, 'preview'])->name('admin.projects.bulk-media.preview');
+    Route::post('/admin/projects/{project}/bulk-media/import', [ProjectBulkMediaController::class, 'import'])->name('admin.projects.bulk-media.import');
     Route::get('/admin/projects/{project}/preview', [ProjectController::class, 'preview'])->name('admin.projects.preview');
     Route::get('/admin/projects/{project}/edit-section/{section}', [ProjectController::class, 'editSection'])->name('admin.projects.edit-section');
     Route::get('/admin/projects/{project}/edit-section/{section}/load', [ProjectController::class, 'loadSection'])->name('admin.projects.edit-section.load');

@@ -285,7 +285,7 @@
                             <div class="boxed-container">
                                 <div class="boxed-content "  >
                                     <div class="about-wrap boxed-content-item">
-                                        <div class="row">
+                                        <div class="row portal-why-section-row">
                                             <div class="col-lg-7">
                                                 <div class="about-title ab-hero">
                                                     <h2>Why Choose Our Properties </h2>
@@ -311,94 +311,15 @@
                                                     </ul>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-5">
+                                            <div class="col-lg-5 portal-why-contact-col">
                                                 <div class="about-img about-img-search">
-                                                    <div class="list-searh-input-wrap box_list-searh-input-wrap lws_column lsiw_dec" id="why-portal-quick-search-wrap" data-listing-url="{{ route('listing') }}">
-                                                        <div class="list-searh-input-wrap-title_wrap">
-                                                            <div class="list-searh-input-wrap-title"><i class="far fa-sliders-h"></i><span>Use Quick Search</span></div>
-                                                            <div class="list-searh-input-radio_wrap">
-                                                                <div class="header-search-radio">
-                                                                    <input class="hidden radio-label" type="radio" name="whyPortalPurpose" id="why-portal-purpose-sale" value="sale" checked="checked">
-                                                                    <label class="button-label" for="why-portal-purpose-sale">Sale</label>
-                                                                    <input class="hidden radio-label" type="radio" name="whyPortalPurpose" id="why-portal-purpose-rent" value="rent">
-                                                                    <label class="button-label" for="why-portal-purpose-rent">Rent</label>
-                                                                </div>
-                                                                <button type="button" class="reset-form reset-btn tolt" id="why-portal-quick-search-reset" data-microtip-position="bottom" data-tooltip="Reset Filters" aria-label="Reset filters"><i class="fa-solid fa-arrows-rotate"></i></button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="custom-form">
-                                                            <input type="hidden" id="why-portal-default-city-id" value="{{ $lahoreCityId ?? '' }}" data-default="{{ $lahoreCityId ?? '' }}" data-city-name="Lahore" autocomplete="off">
-                                                            <div class="row g-2">
-                                                                <div class="col-12">
-                                                                    <div class="cs-intputwrap listing-address-wrap">
-                                                                        <i class="fa-light fa-location-dot"></i>
-                                                                        <input type="text" id="why-portal-quick-address" placeholder="Address, street, area…" value="" autocomplete="off">
-                                                                        <input type="hidden" id="why-portal-quick-address-value" value="">
-                                                                        <div id="why-portal-address-suggestions" class="listing-address-suggestions" role="listbox" aria-hidden="true"></div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-12">
-                                                                    <div class="cs-intputwrap">
-                                                                        <i class="fa-light fa-layer-group"></i>
-                                                                        <select id="why-portal-project-type" data-placeholder="All Categories" class="chosen-select on-radius no-search-select">
-                                                                            <option value="">All Categories</option>
-                                                                            @foreach(($projectTypes ?? []) as $pt)
-                                                                                <option value="{{ $pt->id }}">{{ $pt->name }}</option>
-                                                                            @endforeach
-                                                                        </select>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-12">
-                                                                    <div class="cs-intputwrap listing-range-dropdown-cswrap">
-                                                                        <i class="fa-light fa-ruler-combined" aria-hidden="true"></i>
-                                                                        <div class="listing-range-dropdown">
-                                                                            <button type="button" class="listing-range-dropdown-btn" id="why-portal-area-range-toggle" aria-expanded="false" aria-controls="why-portal-area-range-panel">
-                                                                                <span class="listing-range-dropdown-title">Area</span>
-                                                                                <span class="listing-range-dropdown-summary" id="why-portal-area-range-summary"></span>
-                                                                                <i class="fa-solid fa-chevron-down listing-range-dropdown-caret" aria-hidden="true"></i>
-                                                                            </button>
-                                                                            <div class="listing-range-dropdown-panel" id="why-portal-area-range-panel" role="region" aria-label="Area range">
-                                                                                <div class="listing-range-dropdown-panel-inner">
-                                                                                    <div class="price-range-wrap fl-wrap listing-range-wrap">
-                                                                                        <label>Area/Marla</label>
-                                                                                        <div class="price-rage-item pr-nopad fl-wrap">
-                                                                                            <input type="text" id="why-portal-area-range" class="price-range-double listing-deferred-range" data-min="1" data-max="400" data-from="1" data-to="20" name="why_portal_area_range" data-step="1" data-prefix="" autocomplete="off">
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <button type="button" id="why-portal-quick-search-btn" class="commentssubmit commentssubmit_fw">Search</button>
-                                                        </div>
-                                                    </div>
+                                                    @include('partials.portal-why-contact')
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- clients-carousel-wrap-->
-                                @if(isset($portalPartners) && $portalPartners->isNotEmpty())
-                                <div class="clients-carousel-wrap">
-                                    <div class="clients-carousel-title">Our Trusted Partners  </div>
-                                    <div class="clients-carousel">
-                                        <div class="swiper-container">
-                                            <div class="swiper-wrapper">
-                                                @foreach($portalPartners as $partner)
-                                                <div class="swiper-slide">
-                                                    <div class="client-item"><img src="{{ url('storage/' . ltrim($partner->image, '/')) }}" alt="{{ $partner->title }}"></div>
-                                                </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                        <div class="cc-button cc-button-next"><i class="fal fa-angle-right"></i></div>
-                                        <div class="cc-button cc-button-prev"><i class="fal fa-angle-left"></i></div>
-                                    </div>
-                                </div>
-                                @endif
-                                <!-- clients-carousel-wrap end-->									
+                                {{-- Trusted Partners carousel hidden per portal homepage update --}}									
                             </div>
                         </div>
 
