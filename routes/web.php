@@ -42,6 +42,7 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\ListingSortController;
 use App\Http\Controllers\DhaSettingController;
 use App\Http\Controllers\DhaPhaseController;
+use App\Http\Controllers\DhaPhaseBulkMediaController;
 use App\Http\Controllers\InteractiveMapController;
 use App\Models\DhaSetting;
 use App\Models\DhaPhase;
@@ -1603,6 +1604,8 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/dha-phases/create', [DhaPhaseController::class, 'create'])->name('admin.dha-phases.create');
     Route::post('/admin/dha-phases', [DhaPhaseController::class, 'store'])->name('admin.dha-phases.store');
     Route::post('/admin/dha-phases/upload-media', [DhaPhaseController::class, 'uploadMedia'])->name('admin.dha-phases.upload-media');
+    Route::post('/admin/dha-phases/{dhaPhase}/bulk-media/preview', [DhaPhaseBulkMediaController::class, 'preview'])->name('admin.dha-phases.bulk-media.preview');
+    Route::post('/admin/dha-phases/{dhaPhase}/bulk-media/import', [DhaPhaseBulkMediaController::class, 'import'])->name('admin.dha-phases.bulk-media.import');
     Route::get('/admin/dha-phases/{dhaPhase}/edit', [DhaPhaseController::class, 'edit'])->name('admin.dha-phases.edit');
     Route::put('/admin/dha-phases/{dhaPhase}', [DhaPhaseController::class, 'update'])->name('admin.dha-phases.update');
     Route::delete('/admin/dha-phases/{dhaPhase}', [DhaPhaseController::class, 'destroy'])->name('admin.dha-phases.destroy');

@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>DHA Phases | Etihad Admin</title>
     @include('admin.partials.theme-init')
     <script src="https://cdn.tailwindcss.com"></script>
@@ -50,6 +51,7 @@
                             </td>
                             <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded {{ $phase->status === 'active' ? 'bg-emerald-500/20 text-emerald-700' : 'bg-slate-500/20' }}">{{ $phase->status }}</span></td>
                             <td class="px-4 py-3 text-right space-x-2">
+                                @include('admin.dha_phases._bulk_media_button', ['phase' => $phase])
                                 <a href="{{ route('dha.phase.show', $phase->slug) }}" target="_blank" class="text-emerald-600 hover:underline text-xs">View</a>
                                 <a href="{{ route('admin.dha-phases.edit', $phase) }}" class="text-sky-600 hover:underline text-xs">Edit</a>
                             </td>
@@ -61,5 +63,7 @@
         </section>
     </main>
 </div>
+@include('admin.dha_phases._bulk_media_modal')
+<script src="{{ asset('theme/js/admin-dha-phase-bulk-media.js') }}?v=1"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>Edit {{ $phase->title }} | DHA | Etihad Admin</title>
     @include('admin.partials.theme-init')
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,6 +22,9 @@
                     · <a href="{{ route('dha.phase.show', $phase->slug) }}" target="_blank" class="text-emerald-600 hover:underline">View on site</a>
                     · <a href="{{ route('admin.dealer-listings.index', ['dha_phase' => $phase->id]) }}" class="text-violet-600 hover:underline">Listings in this phase</a>
                 </p>
+            </div>
+            <div class="flex items-center gap-2">
+                @include('admin.dha_phases._bulk_media_button', ['phase' => $phase, 'size' => 'md'])
             </div>
         </header>
         <section class="p-8">
@@ -43,6 +47,8 @@
         </section>
     </main>
 </div>
+@include('admin.dha_phases._bulk_media_modal')
+<script src="{{ asset('theme/js/admin-dha-phase-bulk-media.js') }}?v=1"></script>
 @stack('scripts')
 </body>
 </html>

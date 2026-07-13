@@ -1,7 +1,14 @@
-PROJECT MEDIA ZIP — FOLDER STRUCTURE
-====================================
-Use stable folder names below (not admin tab display names).
-Tab labels in admin can change; these folder keys stay the same.
+================================================================================
+MEDIA BULK UPLOAD — ROADMAP & FOLDER STRUCTURE
+================================================================================
+Stable folder names only (not admin tab display labels).
+Tab/section labels in admin can change; these folder keys stay fixed.
+
+
+--------------------------------------------------------------------------------
+1) PROJECTS  (Admin → Projects → Bulk Media)
+--------------------------------------------------------------------------------
+Status: LIVE
 
 project-name.zip
 ├── featured/
@@ -18,104 +25,179 @@ project-name.zip
 └── invest/
 
 
-FOLDER HELP GUIDE
-=================
+PROJECT FOLDER HELP
+===================
 
 featured/
 ---------
-Admin tab: Hero section
+Admin: Hero section
 Front end: Main hero background, gallery fallback, key features card background
 Files: 1 image only (e.g. hero.jpg)
 Format: JPG, PNG, or WebP
-Tip: Wide image works best (~1920px wide). Keep under 5 MB if possible.
+Tip: Wide image (~1920px). Keep under 5 MB if possible.
 
 homepage/
 ---------
-Admin tab: Hero section
+Admin: Hero section
 Front end: Portal / homepage project listing cards
 Files: 1 image only (e.g. listing.jpg)
 Format: JPG, PNG, or WebP
-Tip: Card-style crop (~800–1200px wide). Used on listing pages, not the main hero.
+Tip: Card crop (~800–1200px). Not the main hero.
 
 pdf/
 ----
-Admin tab: Hero section
-Front end: "Download Brochure" button on project page
+Admin: Hero section
+Front end: "Download Brochure" button
 Files: 1 PDF only (e.g. brochure.pdf)
 Format: PDF only
-Tip: Name does not matter; only one file allowed in this folder.
 
 gallery/
 --------
-Admin tab: Gallery
+Admin: Gallery
 Front end: Project gallery grid and lightbox
 Files: Many images
-Format: JPG, PNG, or WebP
-Naming: Use numeric prefix for order — 01.jpg, 02.jpg, 03.jpg
-Tip: ~1600px wide is enough. All images in this folder appear in the gallery.
+Naming: 01.jpg, 02.jpg, 03.jpg (order by filename)
+Tip: ~1600px wide is enough.
 
 price-slider/
 -------------
-Admin tab: Price Slider
-Front end: Price slider image section on project page
+Admin: Price Slider
+Front end: Price slider section
 Files: Many images
-Format: JPG, PNG, or WebP
-Naming: 01.jpg, 02.jpg, 03.jpg (order by filename)
-Tip: One image per slide. Match the number of slides you want on the front end.
+Naming: 01.jpg, 02.jpg, 03.jpg
 
 pricing-place/
 --------------
-Admin tab: Pricing place
-Front end: Pricing / plan cards section
-Files: One image per card, matched by order
-Format: JPG, PNG, or WebP
-Naming: 01.jpg = 1st card, 02.jpg = 2nd card, 03.jpg = 3rd card
-Tip: Create pricing cards in admin first, then upload one image per card in order.
+Admin: Pricing place
+Front end: Pricing / plan cards
+Files: One image per card by order
+Naming: 01.jpg = 1st card, 02.jpg = 2nd card, …
+Tip: Create pricing cards in admin first; ZIP only fills images by position.
 
 detail-tabs/
 ------------
-Admin tab: Detail tabs
+Admin: Detail tabs
 Front end: Images inside each detail tab panel
 Structure:
-  detail-tabs/tab-1/  → 1st detail tab in admin (top row)
+  detail-tabs/tab-1/  → 1st detail tab in admin
   detail-tabs/tab-2/  → 2nd detail tab
   detail-tabs/tab-3/  → 3rd detail tab
-Files: Many images per tab folder
 Naming inside each tab: 01.jpg, 02.jpg, 03.jpg
 Important:
-  - Do NOT name folders after tab titles (e.g. "Payment Plan") — tab names can change.
-  - Use tab-1, tab-2, tab-3 by position only.
-  - Create tab labels and content in admin first; ZIP only adds images to existing tabs.
-  - If tab-2 folder exists but admin has only 1 tab, import should skip or warn.
+  - Do NOT name folders after tab titles — use tab-1, tab-2, tab-3 only.
+  - Create tab content in admin first; ZIP only adds images.
+  - Extra tab folders with no matching admin tab are skipped (warning).
 
 vr-tour/
 --------
-Admin tab: VR Tour
-Front end: Virtual tour promo block on project page
-Files: 1 image only (e.g. promo.jpg)
-Format: JPG, PNG, or WebP
-Tip: VR URL is set separately in admin; this folder is only the promo thumbnail image.
+Admin: VR Tour
+Front end: Virtual tour promo block
+Files: 1 image only
+Tip: VR URL is set separately in admin.
 
 invest/
 -------
-Admin tab: Testimonials + Invest
+Admin: Testimonials + Invest
 Front end: "Why invest" section image
-Files: 1 image only (e.g. invest.jpg)
-Format: JPG, PNG, or WebP
-Tip: Testimonial quotes are text in admin; only the invest block uses this image.
+Files: 1 image only
 
-
-NOT INCLUDED IN ZIP (handle separately)
-=====================================
-- Interactive map overlay → Interactive map tab (PNG/SVG + map position)
-- Featured video / Videos → YouTube URLs in admin, not image files
+PROJECT — NOT IN ZIP
+--------------------
+- Interactive map overlay → Interactive map tab (PNG/SVG + position)
+- Featured video / Videos → YouTube URLs in admin
 - Amenities & location, Booking, SEO, Address → text/content only
 
 
-GENERAL RULES
-=============
-- Single-file folders: featured, homepage, vr-tour, invest, pdf → only 1 file allowed
-- Multi-file folders: use 01-, 02-, 03- prefixes for display order
-- Allowed images: JPG, PNG, WebP
-- Avoid spaces in filenames; use hyphens (e.g. 01-exterior-view.jpg)
-- Unknown folders in ZIP should be rejected (do not guess)
+--------------------------------------------------------------------------------
+2) DHA PHASES  (Admin → DHA Phases → Bulk Media)
+--------------------------------------------------------------------------------
+Status: LIVE
+
+phase-name.zip
+├── featured/
+├── card/
+├── pdf/
+├── gallery/
+└── plot-maps/
+
+
+DHA PHASE FOLDER HELP
+=====================
+
+featured/
+---------
+Admin: Featured / banner image
+Front end: Phase hero / banner (also gallery fallback)
+Files: 1 image only (e.g. banner.jpg)
+Format: JPG, PNG, or WebP
+Tip: Wide hero image (~1920px).
+
+card/
+-----
+Admin: Card image
+Front end: DHA listing cards / phase tiles (square preferred)
+Files: 1 image only (e.g. card.jpg)
+Format: JPG, PNG, or WebP
+Tip: ~800×800px recommended.
+
+pdf/
+----
+Admin: Phase brochure (PDF)
+Front end: Brochure download on phase page
+Files: 1 PDF only (e.g. brochure.pdf)
+Format: PDF only
+
+gallery/
+--------
+Admin: Image gallery
+Front end: Phase image gallery grid
+Files: Many images
+Naming: 01.jpg, 02.jpg, 03.jpg (order by filename)
+Tip: ~1200×800px (3:2) recommended.
+
+plot-maps/
+----------
+Admin: Plot maps
+Front end: Plot / layout map images on phase page
+Files: Many images
+Naming: 01-masterplan.jpg, 02-sector-a.jpg (order by filename)
+Tip: Filename (without extension) is used as the map title in admin.
+     You can edit titles later in the DHA phase edit form.
+
+
+DHA PHASE — NOT IN ZIP
+----------------------
+- Interactive map overlay → Interactive map section on phase edit (PNG/SVG)
+- Video gallery → YouTube embed codes in admin (not image files)
+- Attractions images → text/content fields in admin (optional future)
+- Map coordinates / Google embed → Map section text fields
+
+
+--------------------------------------------------------------------------------
+3) ROADMAP (future)
+--------------------------------------------------------------------------------
+Done:
+  [x] Projects bulk ZIP upload (preview + AJAX confirm)
+  [x] DHA Phases bulk ZIP upload (preview + AJAX confirm)
+  [x] Solid green "Bulk Media" button on listing + edit pages
+  [x] Stable folder keys (not admin tab labels)
+
+Possible later:
+  [ ] Attractions images for DHA via attractions/01.jpg … (by slot order)
+  [ ] Background queue for very large ZIPs on live (200MB+)
+  [ ] Optional manifest.json inside ZIP for stricter mapping
+  [ ] Dry-run “fill empty only” vs “replace all” mode toggle
+
+
+--------------------------------------------------------------------------------
+GENERAL RULES (both Projects & DHA Phases)
+--------------------------------------------------------------------------------
+- Single-file folders → only 1 file allowed (extra files: first used + warning)
+- Multi-file folders → use 01-, 02-, 03- prefixes for display order
+- Allowed images: JPG, PNG, WebP (GIF accepted)
+- Avoid spaces in filenames; use hyphens
+- Unknown folders are ignored (warning) — never guessed
+- Always preview before Confirm import
+- Max ZIP size default: 200 MB (env: PROJECT_BULK_MEDIA_MAX_ZIP_KB /
+  DHA_PHASE_BULK_MEDIA_MAX_ZIP_KB). Raise PHP upload_max_filesize /
+  post_max_size on the live server to match.
