@@ -18,7 +18,6 @@
                         <code class="text-emerald-600 dark:text-emerald-400">pdf</code>,
                         <code class="text-emerald-600 dark:text-emerald-400">gallery</code>,
                         <code class="text-emerald-600 dark:text-emerald-400">plot-maps</code>.
-                        See <code>live.txt</code> for the full guide.
                     </p>
                     <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">ZIP file</label>
                     <input type="file" id="dha-phase-bulk-media-zip" accept=".zip,application/zip" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-500 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-950 hover:file:bg-emerald-400" />

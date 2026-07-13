@@ -19,7 +19,6 @@
                         <code class="text-emerald-600 dark:text-emerald-400">price-slider</code>,
                         <code class="text-emerald-600 dark:text-emerald-400">pricing-place</code>,
                         <code class="text-emerald-600 dark:text-emerald-400">detail-tabs/tab-1</code>, etc.
-                        See <code>live.txt</code> for the full guide.
                     </p>
                     <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">ZIP file</label>
                     <input type="file" id="project-bulk-media-zip" accept=".zip,application/zip" class="block w-full text-sm text-slate-600 dark:text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-500 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-950 hover:file:bg-emerald-400" />
