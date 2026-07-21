@@ -264,3 +264,53 @@
 .choice .choice-swiper-slide__number {
   display: none !important;
 }
+
+/* Contemporary — center front image must fully cover center-back (same box + fill) */
+.contemporary .contemporary__image-center,
+.contemporary .contemporary__image-center-back {
+  overflow: hidden;
+}
+
+.contemporary .contemporary__image-center img,
+.contemporary .contemporary__image-center-back img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.contemporary .contemporary__image-center {
+  z-index: -1;
+}
+
+.contemporary .contemporary__image-center-back {
+  z-index: -2;
+}
+
+/* Scroll handoff targets — keep center + center-back identical so Flip does not expose the back layer */
+@media (min-width: 992px) {
+  .why .why__floating-center,
+  .why .why__floating-center-back {
+    width: min(35rem, 35vh) !important;
+    height: min(42rem, 42vh) !important;
+  }
+}
+
+@media screen and (orientation: portrait) and (max-width: 991px) {
+  .why .why__floating-center,
+  .why .why__floating-center-back {
+    width: 9.6rem !important;
+    height: 12.3rem !important;
+  }
+}
+
+@media screen and (min-width: 482px) and (max-width: 991px) and (orientation: portrait) {
+  .why .why__floating-center,
+  .why .why__floating-center-back {
+    width: 16.6rem !important;
+    height: 19.3rem !important;
+  }
+}
