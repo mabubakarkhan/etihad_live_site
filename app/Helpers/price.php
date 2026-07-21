@@ -8,7 +8,10 @@ if (! function_exists('clean_price_string')) {
             return '';
         }
 
-        return trim(preg_replace('/\s*rupees\s*/i', ' ', $priceString));
+        $cleaned = trim(preg_replace('/\s*rupees\s*/i', ' ', $priceString));
+
+        // Drop trailing decimal zeros (e.g. 23,000,000.00 → 23,000,000).
+        return trim(preg_replace('/\.0+$/', '', $cleaned));
     }
 }
 
@@ -22,7 +25,7 @@ if (! function_exists('format_price')) {
         $currency = config('app.currency', 'PKR');
 
         if ($priceDigits !== null && $priceDigits !== '') {
-            return $currency . ' ' . number_format((float) $priceDigits, 2);
+            return $currency . ' ' . number_format((float) $priceDigits, 0);
         }
 
         $priceString = clean_price_string($priceString);
