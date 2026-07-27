@@ -3,6 +3,7 @@
 
     var STORAGE_VISITOR = 'etihad_visitor_id';
     var STORAGE_POPUP = 'etihad_fvp_seen';
+    var STORAGE_SUBMITTED = 'etihad_fvp_submitted';
     var COOKIE_DAYS = 365;
 
     function uuid() {
@@ -40,6 +41,18 @@
         }).catch(function () { return null; });
     }
 
+    function hasFlag(key) {
+        try {
+            if (localStorage.getItem(key) === '1') return true;
+        } catch (e) {}
+        return getCookie(key) === '1';
+    }
+
+    function setFlag(key) {
+        try { localStorage.setItem(key, '1'); } catch (e) {}
+        setCookie(key, '1', COOKIE_DAYS);
+    }
+
     function resolveCfg() {
         if (window.__ETIHAD_FVP__ && typeof window.__ETIHAD_FVP__ === 'object') {
             return window.__ETIHAD_FVP__;
@@ -58,7 +71,9 @@
         var root = document.getElementById('etihad-fvp');
 
         var isFirstVisit = false;
-        var visitorId = localStorage.getItem(STORAGE_VISITOR) || getCookie(STORAGE_VISITOR);
+        var visitorId = null;
+        try { visitorId = localStorage.getItem(STORAGE_VISITOR); } catch (e) {}
+        visitorId = visitorId || getCookie(STORAGE_VISITOR);
         if (!visitorId) {
             isFirstVisit = true;
             visitorId = uuid();
@@ -75,8 +90,11 @@
 
         if (!root || !cfg.enabled) return;
 
+        // After a successful form submit, never show again (even in testing mode)
+        if (hasFlag(STORAGE_SUBMITTED)) return;
+
         var forceShow = !!cfg.forceShow;
-        var popupSeen = localStorage.getItem(STORAGE_POPUP) === '1' || getCookie(STORAGE_POPUP) === '1';
+        var popupSeen = hasFlag(STORAGE_POPUP);
         if (!forceShow && (popupSeen || !isFirstVisit)) return;
 
         var cta = document.getElementById('etihad-fvp-cta');
@@ -88,8 +106,12 @@
 
         function markSeen() {
             if (forceShow) return;
-            try { localStorage.setItem(STORAGE_POPUP, '1'); } catch (e) {}
-            setCookie(STORAGE_POPUP, '1', COOKIE_DAYS);
+            setFlag(STORAGE_POPUP);
+        }
+
+        function markSubmitted() {
+            setFlag(STORAGE_SUBMITTED);
+            setFlag(STORAGE_POPUP);
         }
 
         function openPopup() {
@@ -99,12 +121,16 @@
             document.documentElement.classList.add('etihad-fvp-open');
         }
 
-        function closePopup() {
+        function closePopup(fromSubmit) {
             root.classList.remove('is-open', 'is-flipped');
             root.hidden = true;
             root.setAttribute('aria-hidden', 'true');
             document.documentElement.classList.remove('etihad-fvp-open');
-            markSeen();
+            if (fromSubmit) {
+                markSubmitted();
+            } else {
+                markSeen();
+            }
         }
 
         function flip(on) {
@@ -112,11 +138,11 @@
         }
 
         Array.prototype.forEach.call(closeEls, function (el) {
-            el.addEventListener('click', closePopup);
+            el.addEventListener('click', function () { closePopup(false); });
         });
 
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && root.classList.contains('is-open')) closePopup();
+            if (e.key === 'Escape' && root.classList.contains('is-open')) closePopup(false);
         });
 
         if (cta) cta.addEventListener('click', function () { flip(true); });
@@ -153,8 +179,9 @@
                             msg.textContent = json.message || 'Thanks! We will contact you soon.';
                         }
                         form.reset();
-                        markSeen();
-                        setTimeout(closePopup, 1200);
+                        // Permanently dismiss right away on successful submit
+                        markSubmitted();
+                        setTimeout(function () { closePopup(true); }, 1200);
                     } else if (msg) {
                         msg.className = 'etihad-fvp__msg is-error';
                         msg.textContent = (json && json.message) || 'Something went wrong. Please try again.';
