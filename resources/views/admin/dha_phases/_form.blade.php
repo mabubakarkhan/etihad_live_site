@@ -117,10 +117,11 @@
 
     <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg space-y-4">
         <h2 class="text-sm font-semibold text-emerald-600 uppercase tracking-wider">Sections below hero</h2>
-        <p class="text-xs text-slate-500 dark:text-slate-400">Value bar, attractions grid, investment block, and help bar. Leave blank to use defaults for this phase.</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400">Ordered to match the front phase page. Leave blank to use defaults where applicable.</p>
 
+        {{-- Front order: 1. Value proposition bar --}}
         <div class="space-y-3">
-            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Value proposition bar (4 items)</h3>
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">1. Value proposition bar (4 items)</h3>
             @foreach(range(0, 3) as $i)
                 @php $vp = $valueProps[$i] ?? ['title' => '', 'text' => '', 'icon' => '']; @endphp
                 <div class="grid md:grid-cols-3 gap-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800">
@@ -131,58 +132,40 @@
             @endforeach
         </div>
 
-        <div class="space-y-3">
-            <div><label class="block text-sm mb-1">Attractions heading</label>
-                <input name="attractions_heading" type="text" value="{{ old('attractions_heading', $phase->attractions_heading) }}" placeholder="ATTRACTIONS NEAR DHA PHASE 1" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
-            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Attractions grid (6 items)</h3>
-            @foreach(range(0, 5) as $i)
-                @php $at = $attractionItems[$i] ?? ['title' => '', 'text' => '', 'icon' => '', 'image' => '']; @endphp
-                <div class="grid md:grid-cols-4 gap-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800">
-                    <input name="attractions[{{ $i }}][title]" type="text" value="{{ $at['title'] ?? '' }}" placeholder="Title" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
-                    <input name="attractions[{{ $i }}][text]" type="text" value="{{ $at['text'] ?? '' }}" placeholder="Description" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
-                    <input name="attractions[{{ $i }}][icon]" type="text" value="{{ $at['icon'] ?? '' }}" placeholder="Lucide icon" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
-                    <input name="attractions[{{ $i }}][image]" type="text" value="{{ $at['image'] ?? '' }}" placeholder="Image path (optional)" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
+        {{-- Front order: Meet The Agents (after map hub / listings) --}}
+        <div class="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">2. Meet The Agents</h3>
+            <p class="text-xs text-slate-500">Select dealers to feature on this phase page. Leave empty to hide the section. Front page shows 2 random selected agents.</p>
+            @php
+                $dealersList = $dealers ?? collect();
+                $selectedAgents = old('featured_agent_ids', $selectedAgentIds ?? $phase->featuredAgentIds());
+                $selectedAgents = array_map('intval', (array) $selectedAgents);
+            @endphp
+            @if($dealersList->isEmpty())
+                <p class="text-xs text-amber-600 dark:text-amber-400">No active dealers found. Add dealers first.</p>
+            @else
+                <div class="max-h-56 overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-700 p-3 grid sm:grid-cols-2 md:grid-cols-3 gap-2">
+                    @foreach($dealersList as $dealer)
+                        <label class="flex items-center gap-2 text-sm cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="featured_agent_ids[]"
+                                value="{{ $dealer->id }}"
+                                @checked(in_array((int) $dealer->id, $selectedAgents, true))
+                                class="rounded border-slate-400"
+                            />
+                            <span>{{ $dealer->name }}</span>
+                        </label>
+                    @endforeach
                 </div>
-            @endforeach
+            @endif
         </div>
 
-        <div class="space-y-3">
-            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Why invest (6 items)</h3>
-            @foreach(range(0, 5) as $i)
-                @php $ir = $investItems[$i] ?? ['title' => '', 'text' => '', 'icon' => '']; @endphp
-                <div class="grid md:grid-cols-3 gap-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800">
-                    <input name="invest_reasons[{{ $i }}][title]" type="text" value="{{ $ir['title'] ?? '' }}" placeholder="Title" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
-                    <input name="invest_reasons[{{ $i }}][text]" type="text" value="{{ $ir['text'] ?? '' }}" placeholder="Description" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
-                    <input name="invest_reasons[{{ $i }}][icon]" type="text" value="{{ $ir['icon'] ?? '' }}" placeholder="Lucide icon" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
-                </div>
-            @endforeach
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-4">
-            <h3 class="md:col-span-2 text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Project highlights card</h3>
-            <div><label class="block text-xs mb-1">Tag 1</label><input name="highlight_tag_primary" type="text" value="{{ $highlights['tag_primary'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
-            <div><label class="block text-xs mb-1">Tag 2</label><input name="highlight_tag_secondary" type="text" value="{{ $highlights['tag_secondary'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
-            <div class="md:col-span-2"><label class="block text-xs mb-1">Location line</label><input name="highlight_location" type="text" value="{{ $highlights['location'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
-            <div><label class="block text-xs mb-1">Total views value</label><input name="highlight_total_views" type="text" value="{{ $highlights['total_views'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
-            <div><label class="block text-xs mb-1">Developed year</label><input name="highlight_developed_year" type="text" value="{{ $highlights['developed_year'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
-            <div><label class="block text-xs mb-1">Register title</label><input name="highlight_register_title" type="text" value="{{ $highlights['register_title'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
-            <div><label class="block text-xs mb-1">Register URL</label><input name="highlight_register_url" type="text" value="{{ $highlights['register_url'] ?? '#dha-contact' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
-            <div class="md:col-span-2"><label class="block text-xs mb-1">Register description</label><textarea name="highlight_register_text" rows="2" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm">{{ $highlights['register_text'] ?? '' }}</textarea></div>
-        </div>
-
-        <div class="grid md:grid-cols-1 gap-4">
-            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Help bar (marble)</h3>
-            <div><label class="block text-xs mb-1">Eyebrow</label><input name="help_bar_eyebrow" type="text" value="{{ old('help_bar_eyebrow', $phase->help_bar_eyebrow) }}" placeholder="HAVE QUESTIONS?" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
-            <div><label class="block text-xs mb-1">Title</label><input name="help_bar_title" type="text" value="{{ old('help_bar_title', $phase->help_bar_title) }}" placeholder="We're Here to Help!" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
-            <div><label class="block text-xs mb-1">Description</label><textarea name="help_bar_text" rows="2" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" placeholder="Connect with our property experts…">{{ old('help_bar_text', $phase->help_bar_text) }}</textarea></div>
-            <p class="text-xs text-slate-500">Phone &amp; WhatsApp buttons use site Contact Settings.</p>
-        </div>
-
+        {{-- Front order: Investment Scorecard --}}
         @php
             $scorecardRows = old('scorecard', $phase->investment_scorecard ?: []);
             if (! is_array($scorecardRows) || $scorecardRows === []) {
                 $scorecardRows = \App\Models\DhaPhase::defaultInvestmentScorecard();
-                // Empty saved scorecard stays empty on front; admin form shows editable blanks from defaults for convenience only when never saved.
                 if (is_array($phase->investment_scorecard) && $phase->investment_scorecard === []) {
                     $scorecardRows = array_map(fn ($row) => ['label' => $row['label'], 'score' => '', 'icon' => $row['icon']], $scorecardRows);
                 }
@@ -192,8 +175,8 @@
             }
             $scorecardRows = array_slice(array_values($scorecardRows), 0, 5);
         @endphp
-        <div class="grid md:grid-cols-1 gap-4">
-            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Investment Scorecard</h3>
+        <div class="grid md:grid-cols-1 gap-4 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">3. Investment Scorecard</h3>
             <p class="text-xs text-slate-500">Scores are out of 10. Overall investment score is calculated automatically as the average. Leave all blank to hide the section.</p>
             <div class="space-y-2">
                 @foreach($scorecardRows as $i => $row)
@@ -233,6 +216,7 @@
             </div>
         </div>
 
+        {{-- Front order: Nearby Landmarks --}}
         @php
             $landmarkRows = old('landmarks', $phase->nearby_landmarks ?: []);
             if (! is_array($landmarkRows) || $landmarkRows === []) {
@@ -243,8 +227,8 @@
             }
             $landmarkRows = array_slice(array_values($landmarkRows), 0, 5);
         @endphp
-        <div class="grid md:grid-cols-1 gap-4">
-            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Nearby Attractions &amp; Landmarks</h3>
+        <div class="grid md:grid-cols-1 gap-4 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">4. Nearby Attractions &amp; Landmarks</h3>
             <p class="text-xs text-slate-500">Interactive accessibility cards shown with the phase map. Leave all blank to hide the section.</p>
             <div class="space-y-2">
                 @foreach($landmarkRows as $i => $row)
@@ -281,6 +265,7 @@
             </div>
         </div>
 
+        {{-- Front order: Final CTA --}}
         @php
             $ctaDefaults = \App\Models\DhaPhase::defaultFinalCta($phase);
             $ctaStored = old('final_cta_heading') !== null
@@ -301,9 +286,9 @@
             }
             $ctaBenefits = array_slice(array_values($ctaBenefits), 0, 4);
         @endphp
-        <div class="grid md:grid-cols-1 gap-4">
-            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Final CTA (consultation form)</h3>
-            <p class="text-xs text-slate-500">Attractive end-of-page inquiry block. Clear all fields and save to hide the section.</p>
+        <div class="grid md:grid-cols-1 gap-4 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">5. Final CTA (consultation form)</h3>
+            <p class="text-xs text-slate-500">Attractive inquiry block. Clear all fields and save to hide the section.</p>
             <div class="grid sm:grid-cols-2 gap-3">
                 <div class="sm:col-span-2">
                     <label class="block text-xs text-slate-500 mb-1">Heading</label>
@@ -338,6 +323,57 @@
                     />
                 @endforeach
             </div>
+        </div>
+
+        {{-- Front order: Attractions grid --}}
+        <div class="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <div><label class="block text-sm mb-1">6. Attractions heading</label>
+                <input name="attractions_heading" type="text" value="{{ old('attractions_heading', $phase->attractions_heading) }}" placeholder="ATTRACTIONS NEAR DHA PHASE 1" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Attractions grid (6 items)</h3>
+            @foreach(range(0, 5) as $i)
+                @php $at = $attractionItems[$i] ?? ['title' => '', 'text' => '', 'icon' => '', 'image' => '']; @endphp
+                <div class="grid md:grid-cols-4 gap-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800">
+                    <input name="attractions[{{ $i }}][title]" type="text" value="{{ $at['title'] ?? '' }}" placeholder="Title" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
+                    <input name="attractions[{{ $i }}][text]" type="text" value="{{ $at['text'] ?? '' }}" placeholder="Description" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
+                    <input name="attractions[{{ $i }}][icon]" type="text" value="{{ $at['icon'] ?? '' }}" placeholder="Lucide icon" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
+                    <input name="attractions[{{ $i }}][image]" type="text" value="{{ $at['image'] ?? '' }}" placeholder="Image path (optional)" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
+                </div>
+            @endforeach
+        </div>
+
+        {{-- Front order: Why invest --}}
+        <div class="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">7. Why invest (6 items)</h3>
+            @foreach(range(0, 5) as $i)
+                @php $ir = $investItems[$i] ?? ['title' => '', 'text' => '', 'icon' => '']; @endphp
+                <div class="grid md:grid-cols-3 gap-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800">
+                    <input name="invest_reasons[{{ $i }}][title]" type="text" value="{{ $ir['title'] ?? '' }}" placeholder="Title" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
+                    <input name="invest_reasons[{{ $i }}][text]" type="text" value="{{ $ir['text'] ?? '' }}" placeholder="Description" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
+                    <input name="invest_reasons[{{ $i }}][icon]" type="text" value="{{ $ir['icon'] ?? '' }}" placeholder="Lucide icon" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950/60 px-3 py-2 text-sm" />
+                </div>
+            @endforeach
+        </div>
+
+        {{-- Front order: Project highlights --}}
+        <div class="grid md:grid-cols-2 gap-4 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="md:col-span-2 text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">8. Project highlights card</h3>
+            <div><label class="block text-xs mb-1">Tag 1</label><input name="highlight_tag_primary" type="text" value="{{ $highlights['tag_primary'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
+            <div><label class="block text-xs mb-1">Tag 2</label><input name="highlight_tag_secondary" type="text" value="{{ $highlights['tag_secondary'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
+            <div class="md:col-span-2"><label class="block text-xs mb-1">Location line</label><input name="highlight_location" type="text" value="{{ $highlights['location'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
+            <div><label class="block text-xs mb-1">Total views value</label><input name="highlight_total_views" type="text" value="{{ $highlights['total_views'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
+            <div><label class="block text-xs mb-1">Developed year</label><input name="highlight_developed_year" type="text" value="{{ $highlights['developed_year'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
+            <div><label class="block text-xs mb-1">Register title</label><input name="highlight_register_title" type="text" value="{{ $highlights['register_title'] ?? '' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
+            <div><label class="block text-xs mb-1">Register URL</label><input name="highlight_register_url" type="text" value="{{ $highlights['register_url'] ?? '#dha-contact' }}" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
+            <div class="md:col-span-2"><label class="block text-xs mb-1">Register description</label><textarea name="highlight_register_text" rows="2" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm">{{ $highlights['register_text'] ?? '' }}</textarea></div>
+        </div>
+
+        {{-- Front order: Help bar --}}
+        <div class="grid md:grid-cols-1 gap-4 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">9. Help bar (marble)</h3>
+            <div><label class="block text-xs mb-1">Eyebrow</label><input name="help_bar_eyebrow" type="text" value="{{ old('help_bar_eyebrow', $phase->help_bar_eyebrow) }}" placeholder="HAVE QUESTIONS?" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
+            <div><label class="block text-xs mb-1">Title</label><input name="help_bar_title" type="text" value="{{ old('help_bar_title', $phase->help_bar_title) }}" placeholder="We're Here to Help!" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" /></div>
+            <div><label class="block text-xs mb-1">Description</label><textarea name="help_bar_text" rows="2" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" placeholder="Connect with our property experts…">{{ old('help_bar_text', $phase->help_bar_text) }}</textarea></div>
+            <p class="text-xs text-slate-500">Phone &amp; WhatsApp buttons use site Contact Settings.</p>
         </div>
     </div>
 
@@ -469,34 +505,6 @@
                 </label>
             @endforeach
         </div>
-    </div>
-
-    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg space-y-4">
-        <h2 class="text-sm font-semibold text-emerald-600 uppercase tracking-wider">Meet The Agents</h2>
-        <p class="text-xs text-slate-500">Select dealers to feature on this phase page. Leave empty to hide the section. Front page shows 2 random selected agents.</p>
-        @php
-            $dealersList = $dealers ?? collect();
-            $selectedAgents = old('featured_agent_ids', $selectedAgentIds ?? $phase->featuredAgentIds());
-            $selectedAgents = array_map('intval', (array) $selectedAgents);
-        @endphp
-        @if($dealersList->isEmpty())
-            <p class="text-xs text-amber-600 dark:text-amber-400">No active dealers found. Add dealers first.</p>
-        @else
-            <div class="max-h-56 overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-700 p-3 grid sm:grid-cols-2 md:grid-cols-3 gap-2">
-                @foreach($dealersList as $dealer)
-                    <label class="flex items-center gap-2 text-sm cursor-pointer">
-                        <input
-                            type="checkbox"
-                            name="featured_agent_ids[]"
-                            value="{{ $dealer->id }}"
-                            @checked(in_array((int) $dealer->id, $selectedAgents, true))
-                            class="rounded border-slate-400"
-                        />
-                        <span>{{ $dealer->name }}</span>
-                    </label>
-                @endforeach
-            </div>
-        @endif
     </div>
 
     <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg space-y-4">
