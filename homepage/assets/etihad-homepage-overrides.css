@@ -141,10 +141,17 @@
   z-index: 2;
 }
 
-/* Dealers listing — square agent photos + theme accents */
+/* Dealers listing — 2:2 square agent photos + theme accents */
 .popular-listings--dealers .popular-listings__media {
   height: auto;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 2 / 2;
+}
+
+.popular-listings--dealers .popular-listings__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
 }
 
 .popular-listings--dealers .popular-listings__eyebrow,

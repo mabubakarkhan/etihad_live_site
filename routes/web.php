@@ -754,7 +754,53 @@ Route::get('/dha/{phase:slug}/vr-tour', function (DhaPhase $phase) {
     return view('dha-phase-vr-tour', compact('phase', 'vrTourUrl', 'overlayPhone'));
 })->name('dha.phase.vr-tour');
 
-Route::get('/dha/{phase:slug}/vr-tour', function (DhaPhase $phase) {
+Route::post('/dha/{phase:slug}/request-info', function (Request $request, DhaPhase $phase) {
+    if ($phase->status !== DhaPhase::STATUS_ACTIVE) {
+        abort(404);
+    }
+
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'phone' => 'required|string|max:50',
+        'property_type' => 'nullable|string|max:120',
+        'budget' => 'nullable|string|max:120',
+    ]);
+
+    $messageParts = ['DHA phase consultation: ' . $phase->title];
+    if (! empty($validated['property_type'])) {
+        $messageParts[] = 'Property type: ' . $validated['property_type'];
+    }
+    if (! empty($validated['budget'])) {
+        $messageParts[] = 'Budget: ' . $validated['budget'];
+    }
+
+    $req = PropertyRequest::create([
+        'property_id' => 0,
+        'project_id' => 0,
+        'type' => 'dha_phase',
+        'dealer_id' => 0,
+        'name' => $validated['name'],
+        'phone' => $validated['phone'],
+        'email' => null,
+        'property_type' => $validated['property_type'] ?? null,
+        'budget' => $validated['budget'] ?? null,
+        'message' => implode(' | ', $messageParts),
+    ]);
+
+    \App\Models\AdminNotification::notify(
+        \App\Models\AdminNotification::TYPE_PROPERTY_REQUEST,
+        'New DHA phase enquiry',
+        $validated['name'] . ' requested consultation for ' . $phase->title . '.',
+        route('admin.requests.show', $req)
+    );
+
+    return response()->json([
+        'success' => (bool) $req,
+        'message' => 'Your request has been sent successfully. We will get back to you soon.',
+    ]);
+})->name('dha.phase.request-info');
+
+Route::get('/listing/dealers', function () {
     $q = request()->getQueryString();
     $url = route('listing') . ($q !== null && $q !== '' ? '?' . $q : '');
 
@@ -801,6 +847,8 @@ Route::get('/contact-us', function () {
     return view('contact', compact('cmsPage', 'cs'));
 })->name('contact-us');
 Route::post('/contact-us/submit', [ContactMessageController::class, 'store'])->name('contact-us.submit');
+Route::post('/first-visit-popup/submit', [\App\Http\Controllers\FirstVisitPopupController::class, 'submit'])->name('first-visit-popup.submit');
+Route::post('/site-analytics/track', [\App\Http\Controllers\FirstVisitPopupController::class, 'track'])->name('site-analytics.track');
 
 Route::get('/sell-or-rent-property', function () {
     $cmsPage = db_safe('sell.cms_page', fn () => CmsPage::findBySlug('sell-or-rent-property'));
@@ -1675,6 +1723,9 @@ Route::middleware('admin')->group(function () {
 
     Route::get('/admin/contact-settings', [ContactSettingsController::class, 'edit'])->name('admin.contact-settings.edit');
     Route::put('/admin/contact-settings', [ContactSettingsController::class, 'update'])->name('admin.contact-settings.update');
+    Route::get('/admin/first-visit-popup', [\App\Http\Controllers\FirstVisitPopupSettingsController::class, 'edit'])->name('admin.first-visit-popup.edit');
+    Route::put('/admin/first-visit-popup', [\App\Http\Controllers\FirstVisitPopupSettingsController::class, 'update'])->name('admin.first-visit-popup.update');
+    Route::get('/admin/site-analytics', [\App\Http\Controllers\FirstVisitPopupController::class, 'analytics'])->name('admin.site-analytics.index');
     Route::get('/admin/site-seo-settings', [SiteSeoSettingsController::class, 'edit'])->name('admin.site-seo-settings.edit');
     Route::put('/admin/site-seo-settings', [SiteSeoSettingsController::class, 'update'])->name('admin.site-seo-settings.update');
     Route::get('/admin/contact-messages', [ContactMessageController::class, 'index'])->name('admin.contact-messages.index');

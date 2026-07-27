@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\Dealer;
 use App\Models\DhaPhase;
 use App\Models\ProjectType;
 use Illuminate\Http\JsonResponse;
@@ -28,10 +29,12 @@ class DhaPhaseController extends Controller
     {
         $phase = new DhaPhase(['status' => DhaPhase::STATUS_ACTIVE, 'map_zoom' => 14]);
         $projectTypes = ProjectType::orderBy('name')->get(['id', 'name']);
+        $dealers = Dealer::query()->active()->orderBy('name')->get(['id', 'name']);
+        $selectedAgentIds = [];
         $uploadToken = Str::uuid()->toString();
         session(['dha_phase_upload_token' => $uploadToken]);
 
-        return view('admin.dha_phases.create', compact('phase', 'projectTypes', 'uploadToken'));
+        return view('admin.dha_phases.create', compact('phase', 'projectTypes', 'dealers', 'selectedAgentIds', 'uploadToken'));
     }
 
     public function store(Request $request)
@@ -55,9 +58,11 @@ class DhaPhaseController extends Controller
     {
         $phase = $dhaPhase;
         $projectTypes = ProjectType::orderBy('name')->get(['id', 'name']);
+        $dealers = Dealer::query()->active()->orderBy('name')->get(['id', 'name']);
         $selectedTypeIds = $phase->projectTypes()->pluck('project_types.id')->all();
+        $selectedAgentIds = $phase->featuredAgentIds();
 
-        return view('admin.dha_phases.edit', compact('phase', 'projectTypes', 'selectedTypeIds'));
+        return view('admin.dha_phases.edit', compact('phase', 'projectTypes', 'dealers', 'selectedTypeIds', 'selectedAgentIds'));
     }
 
     public function update(Request $request, DhaPhase $dhaPhase)
@@ -186,6 +191,20 @@ class DhaPhaseController extends Controller
             'status' => ['nullable', 'string', 'in:active,inactive'],
             'project_type_ids' => ['nullable', 'array'],
             'project_type_ids.*' => ['exists:project_types,id'],
+            'featured_agent_ids' => ['nullable', 'array'],
+            'featured_agent_ids.*' => ['integer', 'exists:dealers,id'],
+            'scorecard' => ['nullable', 'array'],
+            'scorecard.*.label' => ['nullable', 'string', 'max:120'],
+            'scorecard.*.score' => ['nullable', 'numeric', 'min:0', 'max:10'],
+            'scorecard.*.icon' => ['nullable', 'string', 'max:64'],
+            'landmarks' => ['nullable', 'array'],
+            'landmarks.*.title' => ['nullable', 'string', 'max:120'],
+            'landmarks.*.text' => ['nullable', 'string', 'max:255'],
+            'landmarks.*.icon' => ['nullable', 'string', 'max:64'],
+            'final_cta_heading' => ['nullable', 'string', 'max:255'],
+            'final_cta_label' => ['nullable', 'string', 'max:120'],
+            'final_cta_benefits' => ['nullable', 'array'],
+            'final_cta_benefits.*' => ['nullable', 'string', 'max:120'],
             'video_gallery' => ['nullable', 'array'],
             'video_gallery.*' => ['nullable', 'string'],
             'image_gallery_paths' => ['nullable', 'array'],
@@ -217,6 +236,10 @@ class DhaPhaseController extends Controller
         $validated['map_zoom'] = $validated['map_zoom'] ?? 14;
         $validated['sort_order'] = $validated['sort_order'] ?? ($phase?->sort_order ?? ((int) DhaPhase::max('sort_order') + 1));
         $validated['show_map_button'] = $request->boolean('show_map_button');
+        $validated['featured_agent_ids'] = array_values(array_unique(array_map(
+            'intval',
+            (array) $request->input('featured_agent_ids', [])
+        )));
 
         return $validated;
     }
@@ -322,7 +345,86 @@ class DhaPhaseController extends Controller
             'help_bar_eyebrow' => $request->input('help_bar_eyebrow'),
             'help_bar_title' => $request->input('help_bar_title'),
             'help_bar_text' => $request->input('help_bar_text'),
+            'investment_scorecard' => $this->buildInvestmentScorecard($request->input('scorecard', [])),
+            'nearby_landmarks' => $this->buildNearbyLandmarks($request->input('landmarks', [])),
+            'final_cta' => $this->buildFinalCta($request),
         ];
+    }
+
+    /** @return array{heading: string, benefits: list<string>, cta_label: string}|null */
+    private function buildFinalCta(Request $request): ?array
+    {
+        $heading = trim((string) $request->input('final_cta_heading', ''));
+        $ctaLabel = trim((string) $request->input('final_cta_label', ''));
+        $benefits = [];
+        foreach ((array) $request->input('final_cta_benefits', []) as $item) {
+            $text = trim((string) $item);
+            if ($text !== '') {
+                $benefits[] = $text;
+            }
+        }
+        $benefits = array_values(array_slice($benefits, 0, 6));
+
+        if ($heading === '' && $ctaLabel === '' && $benefits === []) {
+            return null;
+        }
+
+        return [
+            'heading' => $heading,
+            'benefits' => $benefits,
+            'cta_label' => $ctaLabel,
+        ];
+    }
+
+    /** @param array<int, array<string, mixed>> $rows */
+    private function buildNearbyLandmarks(array $rows): ?array
+    {
+        $items = [];
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $title = trim((string) ($row['title'] ?? ''));
+            $text = trim((string) ($row['text'] ?? ''));
+            $icon = trim((string) ($row['icon'] ?? ''));
+            if ($title === '' && $text === '') {
+                continue;
+            }
+            $items[] = [
+                'title' => $title !== '' ? $title : 'Landmark',
+                'text' => $text,
+                'icon' => $icon !== '' ? $icon : 'map-pin',
+            ];
+        }
+
+        return $items !== [] ? $items : null;
+    }
+
+    /** @param array<int, array<string, mixed>> $rows */
+    private function buildInvestmentScorecard(array $rows): ?array
+    {
+        $items = [];
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $label = trim((string) ($row['label'] ?? ''));
+            $scoreRaw = $row['score'] ?? null;
+            if ($label === '' && ($scoreRaw === null || $scoreRaw === '')) {
+                continue;
+            }
+            if ($label === '') {
+                continue;
+            }
+            $score = is_numeric($scoreRaw) ? (float) $scoreRaw : 0.0;
+            $items[] = [
+                'label' => $label,
+                'score' => max(0, min(10, $score)),
+                'icon' => trim((string) ($row['icon'] ?? 'star')) ?: 'star',
+            ];
+        }
+
+        return $items !== [] ? $items : null;
     }
 
     /** @param array<int, array<string, mixed>> $rows */

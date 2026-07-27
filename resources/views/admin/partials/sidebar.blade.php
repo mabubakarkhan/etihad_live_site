@@ -284,6 +284,26 @@
                     <span class="text-[11px] text-emerald-600 dark:text-emerald-400">active</span>
                 @endif
             </a>
+            <a href="{{ route('admin.first-visit-popup.edit') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.first-visit-popup.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-xs {{ request()->routeIs('admin.first-visit-popup.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">P</span>
+                    <span class="text-sm">First visit popup</span>
+                </span>
+                @if(request()->routeIs('admin.first-visit-popup.*'))
+                    <span class="text-[11px] text-emerald-600 dark:text-emerald-400">active</span>
+                @endif
+            </a>
+            <a href="{{ route('admin.site-analytics.index') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.site-analytics.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-xs {{ request()->routeIs('admin.site-analytics.*') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400' }}">A</span>
+                    <span class="text-sm">Site analytics</span>
+                </span>
+                @if(request()->routeIs('admin.site-analytics.*'))
+                    <span class="text-[11px] text-emerald-600 dark:text-emerald-400">active</span>
+                @endif
+            </a>
             <a href="{{ route('admin.site-seo-settings.edit') }}"
                class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.site-seo-settings.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
                 <span class="flex items-center gap-3">
@@ -318,6 +338,26 @@
                     <span class="text-[11px] text-emerald-600 dark:text-emerald-400">logs</span>
                 @else
                     <span class="text-[11px] text-slate-500">logs</span>
+                @endif
+            </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase px-2 mb-2">
+                    Development
+                </div>
+                <div class="space-y-1 mb-5">
+            <a href="{{ route('admin.prototype.interactive-map.index') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.prototype.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-amber-500/40 shadow-sm shadow-amber-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-xs {{ request()->routeIs('admin.prototype.*') ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400' }}">M</span>
+                    <span class="text-sm">Interactive Map Prototype</span>
+                </span>
+                @if(request()->routeIs('admin.prototype.*'))
+                    <span class="text-[11px] text-amber-600 dark:text-amber-400">POC</span>
+                @else
+                    <span class="text-[11px] text-slate-500">POC</span>
                 @endif
             </a>
                 </div>

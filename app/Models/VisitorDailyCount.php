@@ -12,6 +12,8 @@ class VisitorDailyCount extends Model
         'count_own_listing',
         'count_dealer_listing',
         'count_projects',
+        'page_views',
+        'first_visitors',
     ];
 
     protected function casts(): array
@@ -22,6 +24,8 @@ class VisitorDailyCount extends Model
             'count_own_listing' => 'integer',
             'count_dealer_listing' => 'integer',
             'count_projects' => 'integer',
+            'page_views' => 'integer',
+            'first_visitors' => 'integer',
         ];
     }
 }

@@ -29,12 +29,20 @@
                         <option value="seen" {{ $status === 'seen' ? 'selected' : '' }}>Seen</option>
                     </select>
                 </div>
+                <div class="space-y-1 sm:col-span-2 lg:col-span-1">
+                    <label for="source" class="block text-xs font-medium text-slate-500 dark:text-slate-400">Source</label>
+                    <select id="source" name="source" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition">
+                        <option value="">All</option>
+                        <option value="contact_form" {{ ($source ?? '') === 'contact_form' ? 'selected' : '' }}>Contact form</option>
+                        <option value="popup_first_visitor" {{ ($source ?? '') === 'popup_first_visitor' ? 'selected' : '' }}>Popup first-time visitor</option>
+                    </select>
+                </div>
             </div>
             <div class="flex flex-wrap items-center gap-2">
                 <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-orange-500 to-amber-400 px-4 py-2 text-sm font-medium text-slate-950 shadow shadow-orange-500/40 hover:from-orange-400 hover:to-amber-300 transition">
                     Apply filters
                 </button>
-                @if(!empty($search) || !empty($status))
+                @if(!empty($search) || !empty($status) || !empty($source))
                     <a href="{{ route('admin.contact-messages.index') }}" class="inline-flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                         Clear
                     </a>
@@ -48,6 +56,7 @@
             <thead class="bg-slate-100 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 text-xs uppercase text-slate-500 dark:text-slate-400">
                 <tr>
                     <th class="px-4 py-2 text-left">Status</th>
+                    <th class="px-4 py-2 text-left">Source</th>
                     <th class="px-4 py-2 text-left">Name</th>
                     <th class="px-4 py-2 text-left">Contact</th>
                     <th class="px-4 py-2 text-left">Message</th>
@@ -62,6 +71,12 @@
                             {{ strtoupper($m->status) }}
                         </span>
                     </td>
+                    <td class="px-4 py-2 text-slate-600 dark:text-slate-400 text-xs">
+                        {{ $m->sourceLabel() }}
+                        @if($m->city)
+                            <div class="text-[11px] text-slate-500">{{ $m->city }}</div>
+                        @endif
+                    </td>
                     <td class="px-4 py-2 text-slate-800 dark:text-slate-200 font-medium">
                         <a class="text-sky-600 dark:text-sky-400 hover:underline" href="{{ route('admin.contact-messages.show', $m) }}">{{ $m->name }}</a>
                     </td>
@@ -70,7 +85,7 @@
                     <td class="px-4 py-2 text-slate-700 dark:text-slate-300 whitespace-nowrap">{{ optional($m->created_at)->format('Y-m-d H:i') }}</td>
                 </tr>
                 @empty
-                <tr data-empty><td colspan="5" class="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-500">No messages found.</td></tr>
+                <tr data-empty><td colspan="6" class="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-500">No messages found.</td></tr>
                 @endforelse
             </tbody>
         </table>

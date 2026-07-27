@@ -9,9 +9,24 @@
     $statYear = $phase->stat_year_developed ?: '2002';
     $heroImage = $phase->heroVisualUrl();
     $hasPhasePdf = $phase->hasPhasePdf();
-    $hasVrTour = $phase->hasVrTour();
-    $hasMapButton = $phase->showMapButton();
-    $hasHeroActions = $hasPhasePdf || $hasVrTour || $hasMapButton || !empty($hasGallery);
+
+    $hasLiveMap = $phase->hasMapSection();
+    $hasMapPage = $phase->showMapButton();
+    $mapHref = $hasLiveMap
+        ? '#dha-phase-live-map'
+        : ($hasMapPage ? $phase->mapPageUrl() : null);
+
+    $hasListingsOnPage = !empty($hasPhaseListings);
+    $listingsHref = $hasListingsOnPage
+        ? '#dha-phase-listings'
+        : (route('listing') . '?dha_phase=' . urlencode((string) $phase->id));
+
+    // Same contact number as listing detail pages + Contact settings.
+    $cs = $cs ?? \App\Models\ContactSetting::instance();
+    $agentPhone = trim((string) ($cs->phone ?: ''));
+    $agentPhoneClean = $agentPhone !== '' ? preg_replace('/\s+/', '', $agentPhone) : '';
+    $agentTelHref = $agentPhoneClean !== '' ? 'tel:' . $agentPhoneClean : '';
+    $hasAgentPhone = $agentTelHref !== '';
 @endphp
 <div class="dha-lux-hero-wrap" id="dha-phase-hero">
     <section class="dha-lux-hero">
@@ -70,7 +85,6 @@
                     </article>
                 </div>
 
-                @if($hasHeroActions)
                 <div class="dha-lux-hero__actions" aria-label="Phase actions">
                     @if($hasPhasePdf)
                     <a href="{{ $phase->phasePdfUrl() }}" class="dha-lux-hero__btn dha-lux-hero__btn--primary" target="_blank" rel="noopener noreferrer">
@@ -78,27 +92,62 @@
                         View PDF
                     </a>
                     @endif
-                    @if($hasVrTour)
-                    <a href="{{ $phase->vrTourPageUrl() }}" class="dha-lux-hero__btn dha-lux-hero__btn--ghost" target="_blank" rel="noopener noreferrer">
-                        <i class="fa-solid fa-vr-cardboard" aria-hidden="true"></i>
-                        VR Tour
-                    </a>
-                    @endif
-                    @if($hasMapButton)
-                    <a href="{{ $phase->mapPageUrl() }}" class="dha-lux-hero__btn dha-lux-hero__btn--ghost">
+
+                    @if($mapHref)
+                    <a href="{{ $mapHref }}" class="dha-lux-hero__btn dha-lux-hero__btn--ghost">
                         <i data-lucide="map" aria-hidden="true"></i>
                         View Map
                     </a>
                     @endif
-                    @if(!empty($hasGallery))
-                    <a href="#dha-gallery" class="dha-lux-hero__btn {{ $hasPhasePdf ? 'dha-lux-hero__btn--ghost' : 'dha-lux-hero__btn--primary' }}">
-                        <i data-lucide="image" aria-hidden="true"></i>
-                        View Gallery
+
+                    <a href="{{ $listingsHref }}" class="dha-lux-hero__btn dha-lux-hero__btn--ghost">
+                        <i data-lucide="search" aria-hidden="true"></i>
+                        Explore Listings
                     </a>
+
+                    @if($hasAgentPhone)
+                    <button
+                        type="button"
+                        class="dha-lux-hero__btn dha-lux-hero__btn--ghost"
+                        data-dha-agent-trigger
+                        data-tel="{{ $agentTelHref }}"
+                        aria-haspopup="dialog"
+                    >
+                        <i data-lucide="phone" aria-hidden="true"></i>
+                        Talk to an Agent
+                    </button>
                     @endif
                 </div>
-                @endif
             </div>
         </div>
     </section>
+
+    @if($hasAgentPhone)
+    <div
+        class="dha-agent-modal"
+        id="dha-agent-modal"
+        hidden
+        aria-hidden="true"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dha-agent-modal-title"
+    >
+        <div class="dha-agent-modal__backdrop" data-dha-agent-close tabindex="-1"></div>
+        <div class="dha-agent-modal__panel">
+            <button type="button" class="dha-agent-modal__close" data-dha-agent-close aria-label="Close">
+                <i class="fa-regular fa-xmark" aria-hidden="true"></i>
+            </button>
+            <div class="dha-agent-modal__icon" aria-hidden="true">
+                <i data-lucide="phone-call"></i>
+            </div>
+            <h2 class="dha-agent-modal__title" id="dha-agent-modal-title">Talk to an Agent</h2>
+            <p class="dha-agent-modal__lead">Speak with our team about {{ $phase->title }}.</p>
+            <a href="{{ $agentTelHref }}" class="dha-agent-modal__number">{{ $agentPhone }}</a>
+            <a href="{{ $agentTelHref }}" class="dha-agent-modal__call-btn">
+                <i class="fa-solid fa-phone" aria-hidden="true"></i>
+                Call Now
+            </a>
+        </div>
+    </div>
+    @endif
 </div>

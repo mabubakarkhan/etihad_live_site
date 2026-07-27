@@ -1,0 +1,347 @@
+/* Prototype Map Overlay — isolated POC styles */
+
+.prototype-shell {
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+.prototype-shell--viewer {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    height: 100vh;
+}
+
+.prototype-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.prototype-header--compact {
+    padding: 1rem 1.25rem;
+    margin-bottom: 0;
+    border-bottom: 1px solid rgb(51 65 85);
+    background: rgb(15 23 42 / 0.95);
+}
+
+.prototype-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: 0.35rem;
+}
+
+.prototype-main {
+    max-width: 1200px;
+}
+
+.prototype-card {
+    background: rgb(30 41 59);
+    border: 1px solid rgb(51 65 85);
+    border-radius: 0.875rem;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.2);
+}
+
+.prototype-list-card {
+    background: rgb(15 23 42);
+    border: 1px solid rgb(51 65 85);
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.prototype-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 0.6rem;
+    border: 1px solid rgb(71 85 105);
+    background: rgb(30 41 59);
+    color: rgb(226 232 240);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition: background 0.15s, border-color 0.15s;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.prototype-btn:hover {
+    background: rgb(51 65 85);
+}
+
+.prototype-btn--primary {
+    background: rgb(16 185 129);
+    border-color: rgb(5 150 105);
+    color: #fff;
+}
+
+.prototype-btn--primary:hover {
+    background: rgb(5 150 105);
+}
+
+.prototype-btn--danger {
+    background: rgb(190 18 60 / 0.15);
+    border-color: rgb(244 63 94 / 0.5);
+    color: rgb(251 113 133);
+}
+
+.prototype-btn--sm {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.75rem;
+}
+
+.prototype-status {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.45rem;
+    border-radius: 999px;
+    border: 1px solid rgb(71 85 105);
+}
+
+.prototype-status--active {
+    color: rgb(52 211 153);
+    border-color: rgb(16 185 129 / 0.5);
+}
+
+.prototype-status--draft {
+    color: rgb(251 191 36);
+    border-color: rgb(245 158 11 / 0.5);
+}
+
+.prototype-status--inactive {
+    color: rgb(148 163 184);
+}
+
+.prototype-select {
+    background: rgb(30 41 59);
+    border: 1px solid rgb(71 85 105);
+    color: rgb(226 232 240);
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8125rem;
+}
+
+.prototype-draw-hint {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    color: rgb(52 211 153);
+    background: rgb(16 185 129 / 0.1);
+    border-bottom: 1px solid rgb(16 185 129 / 0.25);
+}
+
+.prototype-map-viewer,
+.prototype-map-canvas {
+    width: 100%;
+    min-height: 520px;
+    height: 520px;
+    background: rgb(15 23 42);
+}
+
+.prototype-card .prototype-map-canvas {
+    display: block;
+}
+
+.prototype-shell--viewer .prototype-map-viewer {
+    flex: 1;
+    min-height: 0;
+}
+
+.prototype-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0.65rem;
+    border-bottom: 1px solid rgb(51 65 85);
+    background: rgb(15 23 42 / 0.6);
+}
+
+.prototype-tool-btn {
+    padding: 0.35rem 0.65rem;
+    border-radius: 0.45rem;
+    border: 1px solid rgb(71 85 105);
+    background: rgb(30 41 59);
+    color: rgb(203 213 225);
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.prototype-tool-btn.is-active,
+.prototype-tool-btn:hover {
+    border-color: rgb(16 185 129 / 0.6);
+    color: rgb(52 211 153);
+}
+
+.prototype-overlay-item {
+    width: 100%;
+    text-align: left;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.6rem;
+    border: 1px solid transparent;
+    background: rgb(15 23 42 / 0.5);
+    color: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.prototype-overlay-item:hover,
+.prototype-overlay-item.is-active {
+    border-color: rgb(16 185 129 / 0.5);
+    background: rgb(16 185 129 / 0.08);
+}
+
+.prototype-upload-zone {
+    border: 2px dashed rgb(71 85 105);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.prototype-upload-zone.is-dragover {
+    border-color: rgb(16 185 129);
+    background: rgb(16 185 129 / 0.06);
+}
+
+.prototype-overlay-preview {
+    max-width: 100%;
+    max-height: 180px;
+    margin: 0 auto;
+    object-fit: contain;
+    border-radius: 0.5rem;
+}
+
+.prototype-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+}
+
+.prototype-field span {
+    color: rgb(148 163 184);
+}
+
+.prototype-field input,
+.prototype-field select {
+    width: 100%;
+    padding: 0.5rem 0.65rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(71 85 105);
+    background: rgb(15 23 42);
+    color: rgb(226 232 240);
+    font-size: 0.8125rem;
+}
+
+.prototype-field input[type="range"] {
+    padding: 0;
+}
+
+.prototype-alert {
+    padding: 0.75rem 1rem;
+    border-radius: 0.6rem;
+    font-size: 0.875rem;
+    border: 1px solid rgb(71 85 105);
+    background: rgb(30 41 59);
+}
+
+.prototype-alert--success {
+    border-color: rgb(16 185 129 / 0.5);
+    color: rgb(52 211 153);
+}
+
+.prototype-alert--error {
+    border-color: rgb(244 63 94 / 0.5);
+    color: rgb(251 113 133);
+}
+
+.prototype-viewer-status {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    background: rgb(15 23 42 / 0.95);
+    border: 1px solid rgb(71 85 105);
+    font-size: 0.8125rem;
+    color: rgb(203 213 225);
+    z-index: 20;
+}
+
+/* Light mode admin adjustments */
+html:not(.dark) .prototype-card {
+    background: #fff;
+    border-color: rgb(226 232 240);
+}
+
+html:not(.dark) .prototype-overlay-item {
+    background: rgb(248 250 252);
+}
+
+html:not(.dark) .prototype-field input,
+html:not(.dark) .prototype-field select {
+    background: #fff;
+    color: rgb(15 23 42);
+    border-color: rgb(203 213 213);
+}
+
+html:not(.dark) .prototype-btn {
+    background: #fff;
+    color: rgb(30 41 59);
+    border-color: rgb(203 213 213);
+}
+
+html:not(.dark) .prototype-tool-btn {
+    background: #fff;
+    color: rgb(51 65 85);
+}
+
+html:not(.dark) .prototype-upload-zone {
+    border-color: rgb(203 213 213);
+}
+
+html:not(.dark) .prototype-toolbar {
+    background: rgb(248 250 252);
+    border-color: rgb(226 232 240);
+}
+
+.prototype-section-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: 0.55rem;
+    border: 1px solid transparent;
+    background: rgb(15 23 42 / 0.45);
+    color: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.prototype-section-item:hover,
+.prototype-section-item.is-active {
+    border-color: rgb(34 211 238 / 0.5);
+    background: rgb(34 211 238 / 0.08);
+}
+
+.prototype-section-swatch {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid rgb(255 255 255 / 0.2);
+    flex-shrink: 0;
+}
+
+html:not(.dark) .prototype-section-item {
+    background: rgb(248 250 252);
+}

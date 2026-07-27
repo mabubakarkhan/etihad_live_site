@@ -10,7 +10,7 @@
         $googleMapsKey = config('app.google_maps_api_key', '');
         $googleMapsMapId = config('app.google_maps_map_id', 'DEMO_MAP_ID');
     @endphp
-    <section class="portal-map-section" aria-labelledby="portal-map-section-title">
+    <section class="portal-map-section" @if(!empty($mapSectionId)) id="{{ $mapSectionId }}" @endif aria-labelledby="portal-map-section-title">
         <div class="portal-map-section__inner">
             <div class="container">
                 <div class="row justify-content-center">

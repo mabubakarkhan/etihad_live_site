@@ -46,24 +46,16 @@
     <div class="wrapper">
         <div class="content">
             <div class="dha-phase-page">
-            @include('partials.dha-phase-hero', compact('phase', 'hasGallery', 'hasPhaseListings'))
-            @include('partials.dha-phase-sections', compact('phase', 'cs', 'waUrl', 'hasGallery'))
+            @include('partials.dha-phase-hero', compact('phase', 'hasGallery', 'hasPhaseListings', 'cs'))
+            @include('partials.dha-phase-quick-stats', compact('phase'))
+            @include('partials.dha-phase-sections', compact('phase', 'cs', 'waUrl', 'hasGallery', 'hasPhaseListings', 'projectTypes', 'dhaPhases', 'lahoreCityId'))
             @include('partials.portal-map-section', [
                 'heading' => $phase->map_section_heading,
                 'tagline' => $phase->map_section_tagline,
                 'interactiveMap' => $phase->interactiveMap,
+                'mapSectionId' => 'dha-phase-live-map',
             ])
             @include('partials.dha-phase-gallery', compact('phase', 'galleryImages'))
-
-            @if(!empty($hasPhaseListings))
-            <div class="dha-phase-properties-head">
-                <div class="container">
-                    <h2 class="dha-phase-properties-title">Properties in {{ $phase->title }}</h2>
-                </div>
-            </div>
-
-            @include('partials.dha-phase-listings', compact('phase', 'projectTypes', 'dhaPhases', 'lahoreCityId'))
-            @endif
             </div>
 
             <div class="container">
@@ -105,6 +97,7 @@
 @endif
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="{{ asset('theme/js/dha-phase-hero.js') }}"></script>
+<script src="{{ asset('theme/js/dha-phase-map-hub.js') }}"></script>
 @if($hasGallery)
 <script src="{{ asset('theme/js/dha-phase-gallery.js') }}"></script>
 @endif

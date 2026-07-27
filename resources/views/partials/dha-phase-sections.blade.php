@@ -36,6 +36,23 @@
         </div>
     </section>
 
+    @include('partials.dha-phase-map-hub', compact('phase'))
+    @include('partials.dha-phase-recall', compact('phase'))
+
+    @if(!empty($hasPhaseListings))
+    <div class="dha-phase-properties-head dha-phase-properties-head--sale" id="dha-current-houses">
+        <div class="container">
+            <h2 class="dha-phase-properties-title">Current Houses for Sale</h2>
+        </div>
+    </div>
+    @include('partials.dha-phase-listings', compact('phase', 'projectTypes', 'dhaPhases', 'lahoreCityId'))
+    @endif
+
+    @include('partials.dha-phase-agents', compact('phase'))
+    @include('partials.dha-phase-scorecard', compact('phase'))
+    @include('partials.dha-phase-landmarks', compact('phase'))
+    @include('partials.dha-phase-final-cta', compact('phase'))
+
     {{-- 2. Attractions grid --}}
     <section class="dha-attractions" id="dha-attractions" aria-labelledby="dha-attractions-title">
         <div class="dha-attractions__head">

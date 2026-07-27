@@ -12,6 +12,8 @@
             <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">{{ $contactMessage->name }}</h3>
             <p class="text-slate-600 dark:text-slate-300"><strong>Email:</strong> {{ $contactMessage->email ?: '-' }}</p>
             <p class="text-slate-600 dark:text-slate-300"><strong>Phone:</strong> {{ $contactMessage->phone ?: '-' }}</p>
+            <p class="text-slate-600 dark:text-slate-300"><strong>City:</strong> {{ $contactMessage->city ?: '-' }}</p>
+            <p class="text-slate-600 dark:text-slate-300"><strong>Source:</strong> {{ $contactMessage->sourceLabel() }}</p>
             <p class="text-slate-600 dark:text-slate-300"><strong>Date:</strong> {{ optional($contactMessage->created_at)->format('Y-m-d H:i') }}</p>
             <div class="pt-2">
                 <p class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Message</p>

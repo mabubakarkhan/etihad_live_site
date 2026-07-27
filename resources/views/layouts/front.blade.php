@@ -27,6 +27,7 @@
     data-wishlist-panel-url="{{ url('/wishlist/panel') }}"
     data-contact-popup-url="{{ route('contact-us', ['popup' => 1]) }}"
 >
+    @include('partials.first-visit-popup')
     <div class="loader-wrap">
         <div class="loader-inner">
             <svg>

@@ -41,15 +41,23 @@ class ContactMessageController extends Controller
         if (in_array($status, [ContactMessage::STATUS_NEW, ContactMessage::STATUS_SEEN], true)) {
             $q->where('status', $status);
         }
+        $source = (string) $request->input('source', '');
+        if (in_array($source, [ContactMessage::SOURCE_CONTACT_FORM, ContactMessage::SOURCE_POPUP_FIRST_VISITOR], true)) {
+            $q->where('source', $source);
+        }
         $search = trim((string) $request->input('search', ''));
         if ($search !== '') {
             $term = '%' . $search . '%';
             $q->where(function ($x) use ($term) {
-                $x->where('name', 'like', $term)->orWhere('email', 'like', $term)->orWhere('phone', 'like', $term)->orWhere('message', 'like', $term);
+                $x->where('name', 'like', $term)
+                    ->orWhere('email', 'like', $term)
+                    ->orWhere('phone', 'like', $term)
+                    ->orWhere('city', 'like', $term)
+                    ->orWhere('message', 'like', $term);
             });
         }
         $messages = $q->orderByRaw("CASE WHEN status='new' THEN 0 ELSE 1 END ASC")->orderByDesc('created_at')->limit(2000)->get();
-        return view('admin.contact_messages.index', compact('messages', 'status', 'search'));
+        return view('admin.contact_messages.index', compact('messages', 'status', 'search', 'source'));
     }
 
     public function show(ContactMessage $contactMessage): View

@@ -177,6 +177,168 @@
             <div><label class="block text-xs mb-1">Description</label><textarea name="help_bar_text" rows="2" class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm" placeholder="Connect with our property experts…">{{ old('help_bar_text', $phase->help_bar_text) }}</textarea></div>
             <p class="text-xs text-slate-500">Phone &amp; WhatsApp buttons use site Contact Settings.</p>
         </div>
+
+        @php
+            $scorecardRows = old('scorecard', $phase->investment_scorecard ?: []);
+            if (! is_array($scorecardRows) || $scorecardRows === []) {
+                $scorecardRows = \App\Models\DhaPhase::defaultInvestmentScorecard();
+                // Empty saved scorecard stays empty on front; admin form shows editable blanks from defaults for convenience only when never saved.
+                if (is_array($phase->investment_scorecard) && $phase->investment_scorecard === []) {
+                    $scorecardRows = array_map(fn ($row) => ['label' => $row['label'], 'score' => '', 'icon' => $row['icon']], $scorecardRows);
+                }
+            }
+            while (count($scorecardRows) < 5) {
+                $scorecardRows[] = ['label' => '', 'score' => '', 'icon' => 'star'];
+            }
+            $scorecardRows = array_slice(array_values($scorecardRows), 0, 5);
+        @endphp
+        <div class="grid md:grid-cols-1 gap-4">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Investment Scorecard</h3>
+            <p class="text-xs text-slate-500">Scores are out of 10. Overall investment score is calculated automatically as the average. Leave all blank to hide the section.</p>
+            <div class="space-y-2">
+                @foreach($scorecardRows as $i => $row)
+                    <div class="grid sm:grid-cols-12 gap-2 items-center">
+                        <div class="sm:col-span-6">
+                            <input
+                                name="scorecard[{{ $i }}][label]"
+                                type="text"
+                                value="{{ $row['label'] ?? '' }}"
+                                placeholder="Factor (e.g. Rental Yield)"
+                                class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm"
+                            />
+                        </div>
+                        <div class="sm:col-span-3">
+                            <input
+                                name="scorecard[{{ $i }}][score]"
+                                type="number"
+                                min="0"
+                                max="10"
+                                step="0.1"
+                                value="{{ $row['score'] ?? '' }}"
+                                placeholder="Score /10"
+                                class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm"
+                            />
+                        </div>
+                        <div class="sm:col-span-3">
+                            <input
+                                name="scorecard[{{ $i }}][icon]"
+                                type="text"
+                                value="{{ $row['icon'] ?? '' }}"
+                                placeholder="Lucide icon"
+                                class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm"
+                            />
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        @php
+            $landmarkRows = old('landmarks', $phase->nearby_landmarks ?: []);
+            if (! is_array($landmarkRows) || $landmarkRows === []) {
+                $landmarkRows = \App\Models\DhaPhase::defaultNearbyLandmarks();
+            }
+            while (count($landmarkRows) < 5) {
+                $landmarkRows[] = ['title' => '', 'text' => '', 'icon' => 'map-pin'];
+            }
+            $landmarkRows = array_slice(array_values($landmarkRows), 0, 5);
+        @endphp
+        <div class="grid md:grid-cols-1 gap-4">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Nearby Attractions &amp; Landmarks</h3>
+            <p class="text-xs text-slate-500">Interactive accessibility cards shown with the phase map. Leave all blank to hide the section.</p>
+            <div class="space-y-2">
+                @foreach($landmarkRows as $i => $row)
+                    <div class="grid sm:grid-cols-12 gap-2 items-center">
+                        <div class="sm:col-span-4">
+                            <input
+                                name="landmarks[{{ $i }}][title]"
+                                type="text"
+                                value="{{ $row['title'] ?? '' }}"
+                                placeholder="Title (e.g. Airport Distance)"
+                                class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm"
+                            />
+                        </div>
+                        <div class="sm:col-span-5">
+                            <input
+                                name="landmarks[{{ $i }}][text]"
+                                type="text"
+                                value="{{ $row['text'] ?? '' }}"
+                                placeholder="Detail (e.g. 25 min to airport)"
+                                class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm"
+                            />
+                        </div>
+                        <div class="sm:col-span-3">
+                            <input
+                                name="landmarks[{{ $i }}][icon]"
+                                type="text"
+                                value="{{ $row['icon'] ?? '' }}"
+                                placeholder="Lucide icon"
+                                class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm"
+                            />
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        @php
+            $ctaDefaults = \App\Models\DhaPhase::defaultFinalCta($phase);
+            $ctaStored = old('final_cta_heading') !== null
+                ? [
+                    'heading' => old('final_cta_heading', ''),
+                    'cta_label' => old('final_cta_label', ''),
+                    'benefits' => old('final_cta_benefits', ['', '', '', '']),
+                ]
+                : (is_array($phase->final_cta) && $phase->final_cta !== []
+                    ? $phase->final_cta
+                    : $ctaDefaults);
+            $ctaBenefits = $ctaStored['benefits'] ?? $ctaDefaults['benefits'];
+            if (! is_array($ctaBenefits)) {
+                $ctaBenefits = $ctaDefaults['benefits'];
+            }
+            while (count($ctaBenefits) < 4) {
+                $ctaBenefits[] = '';
+            }
+            $ctaBenefits = array_slice(array_values($ctaBenefits), 0, 4);
+        @endphp
+        <div class="grid md:grid-cols-1 gap-4">
+            <h3 class="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase">Final CTA (consultation form)</h3>
+            <p class="text-xs text-slate-500">Attractive end-of-page inquiry block. Clear all fields and save to hide the section.</p>
+            <div class="grid sm:grid-cols-2 gap-3">
+                <div class="sm:col-span-2">
+                    <label class="block text-xs text-slate-500 mb-1">Heading</label>
+                    <input
+                        name="final_cta_heading"
+                        type="text"
+                        value="{{ $ctaStored['heading'] ?? '' }}"
+                        placeholder="Need Expert Advice About DHA Phase 1?"
+                        class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm"
+                    />
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-xs text-slate-500 mb-1">Button label</label>
+                    <input
+                        name="final_cta_label"
+                        type="text"
+                        value="{{ $ctaStored['cta_label'] ?? '' }}"
+                        placeholder="Get Property Consultation"
+                        class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm"
+                    />
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="block text-xs text-slate-500">Benefit checklist (up to 4)</label>
+                @foreach($ctaBenefits as $i => $benefit)
+                    <input
+                        name="final_cta_benefits[{{ $i }}]"
+                        type="text"
+                        value="{{ is_string($benefit) ? $benefit : '' }}"
+                        placeholder="Benefit {{ $i + 1 }}"
+                        class="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950/60 px-3 py-2 text-sm"
+                    />
+                @endforeach
+            </div>
+        </div>
     </div>
 
     <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg space-y-4" data-media-wrap>
@@ -307,6 +469,34 @@
                 </label>
             @endforeach
         </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg space-y-4">
+        <h2 class="text-sm font-semibold text-emerald-600 uppercase tracking-wider">Meet The Agents</h2>
+        <p class="text-xs text-slate-500">Select dealers to feature on this phase page. Leave empty to hide the section. Front page shows 2 random selected agents.</p>
+        @php
+            $dealersList = $dealers ?? collect();
+            $selectedAgents = old('featured_agent_ids', $selectedAgentIds ?? $phase->featuredAgentIds());
+            $selectedAgents = array_map('intval', (array) $selectedAgents);
+        @endphp
+        @if($dealersList->isEmpty())
+            <p class="text-xs text-amber-600 dark:text-amber-400">No active dealers found. Add dealers first.</p>
+        @else
+            <div class="max-h-56 overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-700 p-3 grid sm:grid-cols-2 md:grid-cols-3 gap-2">
+                @foreach($dealersList as $dealer)
+                    <label class="flex items-center gap-2 text-sm cursor-pointer">
+                        <input
+                            type="checkbox"
+                            name="featured_agent_ids[]"
+                            value="{{ $dealer->id }}"
+                            @checked(in_array((int) $dealer->id, $selectedAgents, true))
+                            class="rounded border-slate-400"
+                        />
+                        <span>{{ $dealer->name }}</span>
+                    </label>
+                @endforeach
+            </div>
+        @endif
     </div>
 
     <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg space-y-4">

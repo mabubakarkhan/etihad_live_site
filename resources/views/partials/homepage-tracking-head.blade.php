@@ -1,6 +1,7 @@
 @php
     $siteSeo = $siteSeo ?? null;
 @endphp
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @if($siteSeo && !empty($siteSeo->google_site_verification))
     <meta name="google-site-verification" content="{{ e($siteSeo->google_site_verification) }}" />
 @endif

@@ -1534,12 +1534,12 @@
     }
 }
 
-/* Dealer portrait images — team grid, portal agents, listing avatars */
+/* Dealer portrait images — team grid, portal agents, listing avatars (2:2 / square) */
 .team-page .agent-card-item_media-wrap,
 .portal-home-agents-grid .agent-card-item_media-wrap {
     width: 100%;
-    aspect-ratio: 3 / 4;
-    max-height: 300px;
+    aspect-ratio: 2 / 2;
+    max-height: none;
     height: auto !important;
     flex-shrink: 0;
     background: #e2e8f0;
@@ -1551,7 +1551,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 22%;
+    object-position: center center;
     display: block;
 }
 

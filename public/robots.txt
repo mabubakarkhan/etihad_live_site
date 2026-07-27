@@ -1,5 +1,7 @@
 User-agent: *
 Disallow: /admin/
 Disallow: /admin
+Disallow: /prototype/
+Disallow: /prototype
 Disallow: /project/interactive-map/
 Disallow: /*/interactive-map

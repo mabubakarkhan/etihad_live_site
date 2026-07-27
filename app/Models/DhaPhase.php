@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 class DhaPhase extends Model
@@ -31,6 +32,12 @@ class DhaPhase extends Model
         'attractions',
         'investment_reasons',
         'project_highlights',
+        'quick_stats',
+        'nearby_facilities',
+        'featured_agent_ids',
+        'investment_scorecard',
+        'nearby_landmarks',
+        'final_cta',
         'help_bar_eyebrow',
         'help_bar_title',
         'help_bar_text',
@@ -75,6 +82,12 @@ class DhaPhase extends Model
             'attractions' => 'array',
             'investment_reasons' => 'array',
             'project_highlights' => 'array',
+            'quick_stats' => 'array',
+            'nearby_facilities' => 'array',
+            'featured_agent_ids' => 'array',
+            'investment_scorecard' => 'array',
+            'nearby_landmarks' => 'array',
+            'final_cta' => 'array',
         ];
     }
 
@@ -84,6 +97,262 @@ class DhaPhase extends Model
         $items = $this->normalizeContentItems($this->value_propositions, self::defaultValuePropositions());
 
         return array_slice($items, 0, 4);
+    }
+
+    /** @return list<array{icon: string, title: string, text: string}> */
+    public function quickStats(): array
+    {
+        $items = $this->normalizeContentItems($this->quick_stats, self::defaultQuickStats($this));
+
+        return array_slice($items, 0, 6);
+    }
+
+    /** @return list<array{category: string, name: string, lat: float, lng: float}> */
+    public function nearbyFacilities(): array
+    {
+        $stored = is_array($this->nearby_facilities) ? $this->nearby_facilities : [];
+        if ($stored === []) {
+            return self::defaultNearbyFacilities($this);
+        }
+
+        $out = [];
+        foreach ($stored as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $category = trim((string) ($row['category'] ?? ''));
+            $name = trim((string) ($row['name'] ?? ''));
+            $lat = isset($row['lat']) ? (float) $row['lat'] : null;
+            $lng = isset($row['lng']) ? (float) $row['lng'] : null;
+            if ($category === '' || $name === '' || $lat === null || $lng === null) {
+                continue;
+            }
+            $out[] = [
+                'category' => $category,
+                'name' => $name,
+                'lat' => $lat,
+                'lng' => $lng,
+            ];
+        }
+
+        return $out !== [] ? $out : self::defaultNearbyFacilities($this);
+    }
+
+    /** @return list<string> */
+    public function nearbyFacilityCategories(): array
+    {
+        $categories = [];
+        foreach ($this->nearbyFacilities() as $facility) {
+            $categories[$facility['category']] = true;
+        }
+
+        $preferred = ['Schools', 'Mosques', 'Markets', 'Hospitals', 'Parks'];
+        $ordered = [];
+        foreach ($preferred as $category) {
+            if (isset($categories[$category])) {
+                $ordered[] = $category;
+                unset($categories[$category]);
+            }
+        }
+
+        return array_values(array_merge($ordered, array_keys($categories)));
+    }
+
+    /** @return list<int> */
+    public function featuredAgentIds(): array
+    {
+        $ids = is_array($this->featured_agent_ids) ? $this->featured_agent_ids : [];
+
+        return array_values(array_unique(array_filter(array_map('intval', $ids), fn (int $id) => $id > 0)));
+    }
+
+    /**
+     * Random active agents chosen from admin-selected dealers (max 2).
+     *
+     * @return \Illuminate\Support\Collection<int, Dealer>
+     */
+    public function featuredAgentsForDisplay(int $limit = 2)
+    {
+        $ids = $this->featuredAgentIds();
+        if ($ids === []) {
+            return collect();
+        }
+
+        return Dealer::query()
+            ->active()
+            ->whereIn('id', $ids)
+            ->withCount([
+                'properties as phase_properties_count' => function ($query) {
+                    $query->where('dha_phase_id', $this->id);
+                },
+            ])
+            ->inRandomOrder()
+            ->limit(max(1, $limit))
+            ->get();
+    }
+
+    /** @return list<array{label: string, score: float, icon: string}> */
+    public function investmentScorecardFactors(): array
+    {
+        $defaults = self::defaultInvestmentScorecard();
+        $stored = is_array($this->investment_scorecard) ? $this->investment_scorecard : [];
+        if ($stored === []) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($stored as $i => $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $label = trim((string) ($row['label'] ?? ''));
+            if ($label === '') {
+                continue;
+            }
+            $score = isset($row['score']) ? (float) $row['score'] : 0.0;
+            $score = max(0, min(10, $score));
+            $defaultIcon = $defaults[$i]['icon'] ?? 'star';
+            $icon = trim((string) ($row['icon'] ?? $defaultIcon)) ?: $defaultIcon;
+            $out[] = [
+                'label' => $label,
+                'score' => $score,
+                'icon' => $icon,
+            ];
+        }
+
+        return $out;
+    }
+
+    public function investmentScoreOverall(): float
+    {
+        $factors = $this->investmentScorecardFactors();
+        if ($factors === []) {
+            return 0.0;
+        }
+
+        $sum = 0.0;
+        foreach ($factors as $factor) {
+            $sum += (float) $factor['score'];
+        }
+
+        return round($sum / count($factors), 1);
+    }
+
+    /** @return list<array{label: string, score: float, icon: string}> */
+    public static function defaultInvestmentScorecard(): array
+    {
+        return [
+            ['label' => 'Rental Yield', 'score' => 8, 'icon' => 'trending-up'],
+            ['label' => 'Development', 'score' => 10, 'icon' => 'building-2'],
+            ['label' => 'Commercial Activity', 'score' => 9, 'icon' => 'store'],
+            ['label' => 'Appreciation Potential', 'score' => 8, 'icon' => 'line-chart'],
+            ['label' => 'Family Living', 'score' => 9, 'icon' => 'home'],
+        ];
+    }
+
+    /** @return list<array{icon: string, title: string, text: string}> */
+    public function nearbyLandmarks(): array
+    {
+        $stored = is_array($this->nearby_landmarks) ? $this->nearby_landmarks : [];
+        if ($stored === []) {
+            return [];
+        }
+
+        $defaults = self::defaultNearbyLandmarks();
+        $out = [];
+        foreach ($stored as $i => $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $title = trim((string) ($row['title'] ?? ''));
+            $text = trim((string) ($row['text'] ?? ''));
+            if ($title === '' && $text === '') {
+                continue;
+            }
+            $defaultIcon = $defaults[$i]['icon'] ?? 'map-pin';
+            $out[] = [
+                'icon' => trim((string) ($row['icon'] ?? $defaultIcon)) ?: $defaultIcon,
+                'title' => $title !== '' ? $title : ($defaults[$i]['title'] ?? 'Landmark'),
+                'text' => $text,
+            ];
+        }
+
+        return $out;
+    }
+
+    /** @return list<array{icon: string, title: string, text: string}> */
+    public static function defaultNearbyLandmarks(): array
+    {
+        return [
+            ['icon' => 'plane', 'title' => 'Airport Distance', 'text' => '25 min to Allama Iqbal International Airport'],
+            ['icon' => 'route', 'title' => 'Ring Road Access', 'text' => 'Direct connectivity via Lahore Ring Road'],
+            ['icon' => 'shopping-bag', 'title' => 'Packages Mall', 'text' => '12 min drive to Packages Mall'],
+            ['icon' => 'building-2', 'title' => 'Raya', 'text' => '10 min to Raya commercial corridor'],
+            ['icon' => 'landmark', 'title' => 'Main Boulevard', 'text' => 'Easy access to Main Boulevard DHA'],
+        ];
+    }
+
+    /**
+     * @return array{heading: string, benefits: list<string>, cta_label: string}|null
+     */
+    public function finalCta(): ?array
+    {
+        $stored = is_array($this->final_cta) ? $this->final_cta : [];
+        if ($stored === []) {
+            return null;
+        }
+
+        $defaults = self::defaultFinalCta($this);
+        $heading = trim((string) ($stored['heading'] ?? ''));
+        if ($heading === '') {
+            $heading = $defaults['heading'];
+        }
+
+        $benefits = [];
+        $rawBenefits = $stored['benefits'] ?? [];
+        if (is_array($rawBenefits)) {
+            foreach ($rawBenefits as $item) {
+                $text = is_string($item)
+                    ? trim($item)
+                    : trim((string) (is_array($item) ? ($item['text'] ?? '') : ''));
+                if ($text !== '') {
+                    $benefits[] = $text;
+                }
+            }
+        }
+        if ($benefits === []) {
+            $benefits = $defaults['benefits'];
+        }
+
+        $ctaLabel = trim((string) ($stored['cta_label'] ?? ''));
+        if ($ctaLabel === '') {
+            $ctaLabel = $defaults['cta_label'];
+        }
+
+        return [
+            'heading' => $heading,
+            'benefits' => array_values(array_slice($benefits, 0, 6)),
+            'cta_label' => $ctaLabel,
+        ];
+    }
+
+    /**
+     * @return array{heading: string, benefits: list<string>, cta_label: string}
+     */
+    public static function defaultFinalCta(?self $phase = null): array
+    {
+        $title = trim((string) ($phase?->title ?? '')) ?: 'DHA Phase 1';
+
+        return [
+            'heading' => 'Need Expert Advice About ' . $title . '?',
+            'benefits' => [
+                'Latest Prices',
+                'Updated Inventory',
+                'Investment Consultation',
+                'Verified Property Options',
+            ],
+            'cta_label' => 'Get Property Consultation',
+        ];
     }
 
     public function attractionsHeading(): string
@@ -190,7 +459,7 @@ class DhaPhase extends Model
 
     public function vrTourPageUrl(): ?string
     {
-        if (! $this->hasVrTour()) {
+        if (! $this->hasVrTour() || ! Route::has('dha.phase.vr-tour')) {
             return null;
         }
 
@@ -332,6 +601,41 @@ class DhaPhase extends Model
             ['icon' => 'shield-check', 'title' => 'Secure Investment', 'text' => 'Stable growth and high ROI'],
             ['icon' => 'gem', 'title' => 'Premium Lifestyle', 'text' => 'World class amenities and living'],
             ['icon' => 'navigation', 'title' => 'Excellent Connectivity', 'text' => 'Easy access to all major areas of Lahore'],
+        ];
+    }
+
+    /** @return list<array{icon: string, title: string, text: string}> */
+    public static function defaultQuickStats(?self $phase = null): array
+    {
+        $location = trim((string) ($phase?->stat_location ?? '')) ?: 'Lahore, Pakistan';
+
+        return [
+            ['icon' => 'map-pin', 'title' => 'Location', 'text' => $location],
+            ['icon' => 'building-2', 'title' => 'Total Blocks', 'text' => '12 Blocks'],
+            ['icon' => 'trending-up', 'title' => 'Current Market Trend', 'text' => 'Rising Demand'],
+            ['icon' => 'banknote', 'title' => 'Starting Plot Price', 'text' => 'From PKR 2.5 Cr'],
+            ['icon' => 'home', 'title' => 'Available Houses', 'text' => '120+'],
+            ['icon' => 'user-round', 'title' => 'Active Agents', 'text' => '45+'],
+        ];
+    }
+
+    /** @return list<array{category: string, name: string, lat: float, lng: float}> */
+    public static function defaultNearbyFacilities(?self $phase = null): array
+    {
+        $lat = $phase?->latitude !== null ? (float) $phase->latitude : 31.476723;
+        $lng = $phase?->longitude !== null ? (float) $phase->longitude : 74.384087;
+
+        return [
+            ['category' => 'Schools', 'name' => 'DHA Junior School', 'lat' => $lat + 0.0042, 'lng' => $lng + 0.0031],
+            ['category' => 'Schools', 'name' => 'Beaconhouse DHA Campus', 'lat' => $lat - 0.0038, 'lng' => $lng + 0.0055],
+            ['category' => 'Mosques', 'name' => 'Central Mosque DHA', 'lat' => $lat + 0.0018, 'lng' => $lng - 0.0024],
+            ['category' => 'Mosques', 'name' => 'Masjid-e-Noor', 'lat' => $lat - 0.0026, 'lng' => $lng - 0.0041],
+            ['category' => 'Markets', 'name' => 'Y Block Market', 'lat' => $lat + 0.0051, 'lng' => $lng - 0.0012],
+            ['category' => 'Markets', 'name' => 'MM Alam Commercial Hub', 'lat' => $lat - 0.0015, 'lng' => $lng + 0.0062],
+            ['category' => 'Hospitals', 'name' => 'DHA Medical Centre', 'lat' => $lat + 0.0029, 'lng' => $lng + 0.0048],
+            ['category' => 'Hospitals', 'name' => 'National Hospital DHA', 'lat' => $lat - 0.0047, 'lng' => $lng + 0.0019],
+            ['category' => 'Parks', 'name' => 'DHA Central Park', 'lat' => $lat + 0.0009, 'lng' => $lng + 0.0022],
+            ['category' => 'Parks', 'name' => 'Canal View Garden', 'lat' => $lat - 0.0031, 'lng' => $lng - 0.0036],
         ];
     }
 
