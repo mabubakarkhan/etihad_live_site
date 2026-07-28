@@ -2,8 +2,8 @@
     'use strict';
 
     var STORAGE_VISITOR = 'etihad_visitor_id';
-    var STORAGE_POPUP = 'etihad_fvp_seen';
     var STORAGE_SUBMITTED = 'etihad_fvp_submitted';
+    var SESSION_DISMISS_PREFIX = 'etihad_fvp_closed:';
     var COOKIE_DAYS = 365;
 
     function uuid() {
@@ -53,6 +53,24 @@
         setCookie(key, '1', COOKIE_DAYS);
     }
 
+    function currentPath() {
+        return window.location.pathname || '/';
+    }
+
+    function sessionDismissedForPath() {
+        try {
+            return sessionStorage.getItem(SESSION_DISMISS_PREFIX + currentPath()) === '1';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function markPathDismissed() {
+        try {
+            sessionStorage.setItem(SESSION_DISMISS_PREFIX + currentPath(), '1');
+        } catch (e) {}
+    }
+
     function resolveCfg() {
         if (window.__ETIHAD_FVP__ && typeof window.__ETIHAD_FVP__ === 'object') {
             return window.__ETIHAD_FVP__;
@@ -90,12 +108,13 @@
 
         if (!root || !cfg.enabled) return;
 
-        // After a successful form submit, never show again (even in testing mode)
-        if (hasFlag(STORAGE_SUBMITTED)) return;
-
         var forceShow = !!cfg.forceShow;
-        var popupSeen = hasFlag(STORAGE_POPUP);
-        if (!forceShow && (popupSeen || !isFirstVisit)) return;
+
+        // After submit, never show again — unless testing force-show is on
+        if (!forceShow && hasFlag(STORAGE_SUBMITTED)) return;
+
+        // Close without submit: hidden for this page only; other pages can still show it
+        if (!forceShow && sessionDismissedForPath()) return;
 
         var cta = document.getElementById('etihad-fvp-cta');
         var backBtn = document.getElementById('etihad-fvp-back');
@@ -104,14 +123,8 @@
         var msg = document.getElementById('etihad-fvp-msg');
         var closeEls = root.querySelectorAll('[data-fvp-close]');
 
-        function markSeen() {
-            if (forceShow) return;
-            setFlag(STORAGE_POPUP);
-        }
-
         function markSubmitted() {
             setFlag(STORAGE_SUBMITTED);
-            setFlag(STORAGE_POPUP);
         }
 
         function openPopup() {
@@ -119,6 +132,15 @@
             root.setAttribute('aria-hidden', 'false');
             root.classList.add('is-open');
             document.documentElement.classList.add('etihad-fvp-open');
+            document.body.classList.add('etihad-fvp-open');
+            try {
+                root._scrollY = window.scrollY || window.pageYOffset || 0;
+                document.body.style.top = '-' + root._scrollY + 'px';
+                document.body.style.position = 'fixed';
+                document.body.style.left = '0';
+                document.body.style.right = '0';
+                document.body.style.width = '100%';
+            } catch (e) {}
         }
 
         function closePopup(fromSubmit) {
@@ -126,10 +148,20 @@
             root.hidden = true;
             root.setAttribute('aria-hidden', 'true');
             document.documentElement.classList.remove('etihad-fvp-open');
+            document.body.classList.remove('etihad-fvp-open');
+            try {
+                var y = root._scrollY || 0;
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.left = '';
+                document.body.style.right = '';
+                document.body.style.width = '';
+                window.scrollTo(0, y);
+            } catch (e) {}
             if (fromSubmit) {
                 markSubmitted();
-            } else {
-                markSeen();
+            } else if (!forceShow) {
+                markPathDismissed();
             }
         }
 

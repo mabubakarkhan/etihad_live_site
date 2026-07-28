@@ -27,7 +27,9 @@
     data-wishlist-panel-url="{{ url('/wishlist/panel') }}"
     data-contact-popup-url="{{ route('contact-us', ['popup' => 1]) }}"
 >
-    @include('partials.first-visit-popup')
+    @include('partials.first-visit-popup', [
+        'fvpSurface' => $fvpSurface ?? (request()->routeIs('portal') || request()->is('portal') ? 'portal' : 'site'),
+    ])
     <div class="loader-wrap">
         <div class="loader-inner">
             <svg>

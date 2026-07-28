@@ -8,17 +8,31 @@ use App\Models\VisitorDailyCount;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class FirstVisitPopupController extends Controller
 {
     public function submit(Request $request): JsonResponse
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:60'],
             'city' => ['required', 'string', 'max:120'],
+        ], [
+            'name.required' => 'Please enter your name.',
+            'phone.required' => 'Please enter your phone number.',
+            'city.required' => 'Please enter your city.',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => implode(' ', $validator->errors()->all()),
+            ], 422);
+        }
+
+        $validated = $validator->validated();
 
         $message = ContactMessage::create([
             'name' => $validated['name'],

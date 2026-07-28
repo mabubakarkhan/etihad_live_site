@@ -1,19 +1,15 @@
-/* First-visit popup — light mode, soft backdrop, flip card */
+﻿/* First-visit popup — compact, fixed type, transparent backdrop */
 .etihad-fvp {
     --fvp-gold: #c89b3c;
-    --fvp-gold-dark: #a67c2a;
-    --fvp-ink: #1a2332;
-    --fvp-muted: #5c6b7a;
-    --fvp-surface: #ffffff;
-    --fvp-surface-soft: #f7f5f1;
+    --fvp-gold-bright: #d4a84b;
     position: fixed;
     inset: 0;
     z-index: 10060;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    font-family: 'Poppins', system-ui, sans-serif;
+    padding: 16px;
+    font-family: var(--main-font, 'Poppins', sans-serif);
 }
 
 .etihad-fvp[hidden] {
@@ -27,28 +23,30 @@
 .etihad-fvp__backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(15, 23, 42, 0.28);
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    width: 100%;
+    height: 100%;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
     animation: etihad-fvp-fade 0.28s ease;
 }
 
 .etihad-fvp__stage {
     position: relative;
     z-index: 1;
-    width: min(100%, 460px);
+    width: min(100%, 620px);
     perspective: 1400px;
     transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .etihad-fvp.is-flipped .etihad-fvp__stage {
-    width: min(100%, 540px);
+    width: min(100%, 480px);
 }
 
 .etihad-fvp__card {
     position: relative;
     width: 100%;
-    min-height: 460px;
+    height: auto;
     transform-style: preserve-3d;
     transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
     animation: etihad-fvp-in 0.4s cubic-bezier(0.22, 1, 0.36, 1);
@@ -56,33 +54,24 @@
 
 .etihad-fvp.is-flipped .etihad-fvp__card {
     transform: rotateY(180deg);
+    min-height: 460px;
 }
 
 .etihad-fvp__close {
     position: absolute;
-    top: 14px;
-    right: 14px;
+    top: 8px;
+    right: 8px;
     z-index: 5;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 999px;
-    border: 1px solid rgba(26, 35, 50, 0.12);
-    background: rgba(255, 255, 255, 0.92);
-    color: #334155;
-    font-size: 1.35rem;
+    font-size: 1.25rem;
     line-height: 1;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
     transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-
-.etihad-fvp__close:hover {
-    background: #fff;
-    border-color: rgba(200, 155, 60, 0.55);
-    color: var(--fvp-gold-dark);
 }
 
 .etihad-fvp.is-flipped .etihad-fvp__close {
@@ -90,83 +79,75 @@
 }
 
 .etihad-fvp__face {
-    position: absolute;
-    inset: 0;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    border-radius: 22px;
+    border-radius: 18px;
     overflow: hidden;
-    border: 1px solid rgba(200, 155, 60, 0.28);
-    box-shadow:
-        0 24px 60px rgba(15, 23, 42, 0.16),
-        0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+    backdrop-filter: blur(18px) saturate(1.15);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
 }
 
+/* Front defines natural height — no empty space */
 .etihad-fvp__face--front {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: var(--fvp-ink);
-    background:
-        radial-gradient(ellipse 90% 60% at 50% -10%, rgba(200, 155, 60, 0.16), transparent 55%),
-        linear-gradient(165deg, #ffffff 0%, #fbf8f3 48%, #f3eee6 100%);
+    position: relative;
 }
 
-.etihad-fvp__card.has-bg .etihad-fvp__face--front {
-    background-image:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(247, 245, 241, 0.92) 100%),
-        var(--fvp-bg);
-    background-size: cover;
-    background-position: center;
+.etihad-fvp__face--back {
+    position: absolute;
+    inset: 0;
+    transform: rotateY(180deg);
 }
 
 .etihad-fvp__front-inner {
     width: 100%;
-    padding: 42px 36px 36px;
+    margin: 0 auto;
+    padding: 28px 24px 26px;
+    text-align: center;
 }
 
 .etihad-fvp__logo {
     display: block;
-    margin: 0 auto 22px;
-    max-width: 148px;
+    margin: 0 auto 14px;
+    max-width: 130px;
     height: auto;
 }
 
 .etihad-fvp__logo--sm {
-    max-width: 112px;
-    margin-bottom: 16px;
+    max-width: 110px;
+    margin-bottom: 12px;
 }
 
 .etihad-fvp__eyebrow {
-    margin: 0 0 14px;
-    color: var(--fvp-gold-dark);
-    font-size: 0.72rem;
+    margin: 0 0 10px;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
+    text-align: center;
 }
 
 .etihad-fvp__sub {
-    margin: 0 0 14px;
-    color: var(--fvp-muted);
-    font-size: 0.9rem;
-    line-height: 1.55;
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-align: center;
 }
 
 .etihad-fvp__title {
-    margin: 0 0 14px;
-    color: var(--fvp-ink);
-    font-size: clamp(1.2rem, 3.4vw, 1.5rem);
+    margin: 0 0 10px;
+    font-size: 20px;
     font-weight: 700;
     line-height: 1.35;
+    text-align: center;
 }
 
 .etihad-fvp__body {
-    margin: 0 0 28px;
-    color: #64748b;
-    font-size: 0.9rem;
-    line-height: 1.6;
+    margin: 0 0 18px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.55;
+    text-align: center;
 }
 
 .etihad-fvp__cta,
@@ -174,23 +155,24 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 50px;
-    padding: 0 32px;
+    min-height: 42px;
+    padding: 0 28px;
     border: 0;
     border-radius: 999px;
-    background: linear-gradient(135deg, #d4a84b 0%, #c89b3c 50%, #a67c2a 100%);
-    color: #1a1508;
-    font-size: 0.94rem;
+    background: linear-gradient(135deg, #e0b85a 0%, #c89b3c 50%, #a67c2a 100%);
+    color: #111111;
+    font-size: 14px;
     font-weight: 700;
+    font-family: inherit;
     cursor: pointer;
-    box-shadow: 0 10px 24px rgba(200, 155, 60, 0.28);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 .etihad-fvp__cta:hover,
 .etihad-fvp__submit:hover {
     transform: translateY(-1px);
-    filter: brightness(1.04);
+    filter: brightness(1.05);
 }
 
 .etihad-fvp__cta:disabled,
@@ -200,106 +182,275 @@
     transform: none;
 }
 
-.etihad-fvp__face--back {
-    transform: rotateY(180deg);
-    color: var(--fvp-ink);
-    background:
-        radial-gradient(ellipse 80% 50% at 100% 0%, rgba(200, 155, 60, 0.12), transparent 50%),
-        linear-gradient(165deg, #ffffff 0%, #fbf8f3 55%, #f3eee6 100%);
-}
-
 .etihad-fvp__back-inner {
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 42px 36px 32px;
+    padding: 40px 36px 32px;
     text-align: center;
+    box-sizing: border-box;
+}
+
+.etihad-fvp__back-inner .etihad-fvp__logo {
+    margin-top: 6px;
+    margin-bottom: 14px;
+}
+
+.etihad-fvp__back-inner .etihad-fvp__back-btn {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 .etihad-fvp__form-title {
     margin: 0 0 8px;
-    font-size: 1.25rem;
+    font-size: 18px;
     font-weight: 700;
-    color: var(--fvp-ink);
+    text-align: center;
 }
 
 .etihad-fvp__form-lead {
-    margin: 0 0 20px;
-    color: var(--fvp-muted);
-    font-size: 0.88rem;
-    line-height: 1.5;
+    margin: 0 0 14px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+    text-align: center;
 }
 
 .etihad-fvp__form {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     text-align: left;
 }
 
 .etihad-fvp__form input {
     width: 100%;
-    min-height: 48px;
+    min-height: 44px;
     padding: 0 14px;
-    border-radius: 12px;
-    border: 1px solid rgba(26, 35, 50, 0.12);
-    background: #fff;
-    color: var(--fvp-ink);
-    font-size: 0.92rem;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.etihad-fvp__form input::placeholder {
-    color: #94a3b8;
-}
-
-.etihad-fvp__form input:focus {
-    border-color: rgba(200, 155, 60, 0.7);
-    box-shadow: 0 0 0 3px rgba(200, 155, 60, 0.16);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .etihad-fvp__msg {
-    min-height: 1.1em;
-    font-size: 0.82rem;
-    color: var(--fvp-muted);
+    min-height: 1.2em;
+    font-size: 13px;
+    font-weight: 500;
     text-align: center;
 }
 
-.etihad-fvp__msg.is-success {
-    color: #059669;
-}
-
-.etihad-fvp__msg.is-error {
-    color: #e11d48;
-}
+.etihad-fvp__msg.is-success { color: #059669; }
+.etihad-fvp__msg.is-error { color: #e11d48; }
 
 .etihad-fvp__submit {
     width: 100%;
-    border-radius: 12px;
-    margin-top: 4px;
+    border-radius: 10px;
+    margin-top: 2px;
 }
 
 .etihad-fvp__back-btn {
     background: transparent;
     border: 0;
-    color: #64748b;
-    font-size: 0.82rem;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
     cursor: pointer;
     padding: 8px;
     text-decoration: underline;
     text-underline-offset: 3px;
 }
 
-.etihad-fvp__back-btn:hover {
-    color: var(--fvp-gold-dark);
-}
-
 html.etihad-fvp-open,
 html.etihad-fvp-open body {
-    overflow: hidden;
+    overflow: hidden !important;
+    height: 100% !important;
+    overscroll-behavior: none;
 }
+
+html.etihad-fvp-open body {
+    touch-action: none;
+}
+
+/* ========== LIGHT (homepage / site) ========== */
+.etihad-fvp--light .etihad-fvp__backdrop {
+    background: rgba(15, 23, 42, 0.22);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.etihad-fvp--light .etihad-fvp__face {
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.14);
+}
+
+.etihad-fvp--light .etihad-fvp__face--front,
+.etihad-fvp--light .etihad-fvp__face--back {
+    background: rgba(255, 255, 255, 0.42);
+    color: #0f172a;
+}
+
+.etihad-fvp--light .etihad-fvp__card.has-bg .etihad-fvp__face--front {
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.55) 100%),
+        var(--fvp-bg);
+    background-size: cover;
+    background-position: center;
+}
+
+.etihad-fvp--light .etihad-fvp__close {
+    border: 1px solid rgba(15, 23, 42, 0.14);
+    background: rgba(255, 255, 255, 0.75);
+    color: #0f172a;
+}
+
+.etihad-fvp--light .etihad-fvp__eyebrow {
+    color: #0f172a;
+    font-size: 14px;
+}
+
+.etihad-fvp--light .etihad-fvp__sub,
+.etihad-fvp--light .etihad-fvp__body,
+.etihad-fvp--light .etihad-fvp__form-lead {
+    color: #1e293b;
+}
+
+.etihad-fvp--light .etihad-fvp__title,
+.etihad-fvp--light .etihad-fvp__form-title {
+    color: #0f172a;
+}
+
+.etihad-fvp--light .etihad-fvp__form input {
+    border: 1px solid rgba(15, 23, 42, 0.16);
+    background: rgba(248, 250, 252, 0.95);
+    color: #0f172a;
+}
+
+.etihad-fvp--light .etihad-fvp__form input::placeholder {
+    color: #64748b;
+}
+
+.etihad-fvp--light .etihad-fvp__form input:focus {
+    border-color: rgba(200, 155, 60, 0.75);
+    box-shadow: 0 0 0 3px rgba(200, 155, 60, 0.18);
+}
+
+.etihad-fvp--light .etihad-fvp__back-btn {
+    color: #475569;
+}
+
+.etihad-fvp--light .etihad-fvp__back-btn:hover {
+    color: #9a7428;
+}
+
+.etihad-fvp--light .etihad-fvp__msg {
+    color: #334155;
+}
+
+.etihad-fvp--light .etihad-fvp__msg.is-success { color: #047857; }
+.etihad-fvp--light .etihad-fvp__msg.is-error { color: #be123c; }
+
+/* ========== DARK (portal) — black transparent + blurred panel ========== */
+.etihad-fvp--dark .etihad-fvp__backdrop {
+    background: rgba(0, 0, 0, 0.28);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.etihad-fvp--dark .etihad-fvp__face {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 20px 56px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(20px) saturate(1.2);
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+}
+
+.etihad-fvp--dark .etihad-fvp__face--front {
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+}
+
+.etihad-fvp--dark .etihad-fvp__face--back {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+}
+
+.etihad-fvp--dark .etihad-fvp__card.has-bg .etihad-fvp__face--front {
+    background-image:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.48) 0%, rgba(0, 0, 0, 0.58) 100%),
+        var(--fvp-bg);
+    background-size: cover;
+    background-position: center;
+}
+
+.etihad-fvp--dark .etihad-fvp__close {
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.etihad-fvp--dark .etihad-fvp__close:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.etihad-fvp--dark .etihad-fvp__logo {
+    filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.45));
+    max-width: 150px;
+}
+
+.etihad-fvp--dark .etihad-fvp__eyebrow {
+    color: var(--fvp-gold-bright);
+}
+
+.etihad-fvp--dark .etihad-fvp__sub,
+.etihad-fvp--dark .etihad-fvp__body,
+.etihad-fvp--dark .etihad-fvp__form-lead {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.etihad-fvp--dark .etihad-fvp__title {
+    color: var(--fvp-gold-bright);
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.35);
+}
+
+.etihad-fvp--dark .etihad-fvp__form-title {
+    color: #fff;
+}
+
+.etihad-fvp--dark .etihad-fvp__form input {
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.etihad-fvp--dark .etihad-fvp__form input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.etihad-fvp--dark .etihad-fvp__form input:focus {
+    border-color: rgba(212, 168, 75, 0.85);
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.2);
+}
+
+.etihad-fvp--dark .etihad-fvp__back-btn {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.etihad-fvp--dark .etihad-fvp__back-btn:hover {
+    color: var(--fvp-gold-bright);
+}
+
+.etihad-fvp--dark .etihad-fvp__msg {
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.etihad-fvp--dark .etihad-fvp__msg.is-success { color: #6ee7b7; }
+.etihad-fvp--dark .etihad-fvp__msg.is-error { color: #fda4af; }
 
 @keyframes etihad-fvp-fade {
     from { opacity: 0; }
@@ -309,7 +460,7 @@ html.etihad-fvp-open body {
 @keyframes etihad-fvp-in {
     from {
         opacity: 0;
-        transform: translateY(16px) scale(0.97);
+        transform: translateY(12px) scale(0.98);
     }
     to {
         opacity: 1;
@@ -319,8 +470,7 @@ html.etihad-fvp-open body {
 
 @media (max-width: 560px) {
     .etihad-fvp {
-        padding: 14px;
-        align-items: center;
+        padding: 12px;
     }
 
     .etihad-fvp__stage,
@@ -328,21 +478,21 @@ html.etihad-fvp-open body {
         width: 100%;
     }
 
-    .etihad-fvp__card {
-        min-height: 420px;
+    .etihad-fvp__front-inner {
+        padding: 24px 18px 22px;
     }
 
-    .etihad-fvp__front-inner,
     .etihad-fvp__back-inner {
-        padding: 36px 22px 28px;
+        padding: 36px 28px 28px;
     }
 
     .etihad-fvp__title {
-        font-size: 1.15rem;
+        font-size: 18px;
     }
 
-    .etihad-fvp__body {
-        margin-bottom: 22px;
+    .etihad-fvp__body,
+    .etihad-fvp__sub {
+        font-size: 13px;
     }
 }
 

@@ -1,6 +1,7 @@
 @extends('layouts.front')
 
 @php
+    $fvpSurface = 'portal';
     $cmsPage = $cmsPage ?? null;
     $portalTitle = ($cmsPage && $cmsPage->meta_title) ? $cmsPage->meta_title : ('Portal – ' . config('app.name'));
 @endphp

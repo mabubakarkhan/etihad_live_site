@@ -1,0 +1,299 @@
+Date: 27 July 2026
+Project: Etihad Marketing
+Document: Daily work report (client share)
+
+================================================================================
+FULL DAILY REPORT – WHAT WAS COMPLETED TODAY
+================================================================================
+
+This report covers all website work completed today for Etihad Marketing,
+focused mainly on the DHA Phase detail pages, site-wide visitor popup,
+and visit analytics. Written for client review (non-technical).
+
+
+--------------------------------------------------------------------------------
+A. DHA PHASE PAGE – OVERVIEW
+--------------------------------------------------------------------------------
+
+The DHA Phase detail page (example: DHA Phase 1) was expanded into a complete,
+premium property experience. New blocks follow the site’s navy & gold design.
+Sample / dummy content was prepared for DHA Phase 1 so the page can be reviewed
+immediately. Almost every new block is editable from Admin → DHA Phases.
+
+
+--------------------------------------------------------------------------------
+B. PAGE SECTIONS BUILT / UPDATED TODAY (FRONT ORDER)
+--------------------------------------------------------------------------------
+
+Below is the full section flow of the DHA Phase page after today’s work.
+
+
+1) HERO SECTION (TOP OF PAGE)
+   What visitors see:
+   - Large phase banner with title and short tagline
+   - Key stats in the hero area
+   - Action buttons redesigned for clarity
+
+   Button behaviour delivered:
+   - Download PDF / Brochure – kept (when a PDF is uploaded for the phase)
+   - View Map – scrolls/jumps to the live map section on the same page
+   - Explore Listings – takes visitors to houses listed for that phase
+   - Talk to an Agent
+       • On mobile: starts a phone call using the site contact number
+       • On desktop: opens an attractive popup with blurred background and
+         shows the phone number with a Call Now action
+
+   Also fixed:
+   - VR Tour button no longer causes a broken page error
+   - VR button only shows when a VR link is actually available
+
+
+2) QUICK STATS STRIP
+   - Six quick-stat cards directly under the hero
+   - Shows useful phase highlights at a glance
+   - Editable from admin for each phase
+   - Styled in the dark DHA theme
+
+
+3) VALUE PROPOSITION BAR
+   - Short benefit strip under the stats
+   - Highlights key selling points of the phase
+   - Editable from admin
+
+
+4) INTERACTIVE MAP HUB
+   A combined map experience with:
+   - Phase PDF / map document viewer (when uploaded)
+   - Google map view of the phase location
+   - Nearby Facilities pins / list (editable from admin)
+   Helps buyers understand location and surroundings quickly.
+
+
+5) RECALL / DOWNLOAD MAP STRIP
+   - Call-to-action strip encouraging visitors to download the phase map/PDF
+   - Heading style tailored for the phase (e.g. houses for rent / phase name)
+   - Supports lead recall and map download behaviour
+
+
+6) CURRENT HOUSES FOR SALE
+   - Existing listings block repositioned in the page flow
+   - Retitled clearly as “Current Houses for Sale”
+   - Shows live inventory linked to that DHA phase
+
+
+7) MEET THE AGENTS
+   - New dedicated agents section on the phase page
+   - Admin can select which agents/dealers to feature for each phase
+   - If none selected, section stays hidden
+   - On the website, two agents are shown at random from the selected list
+   - Agent cards use consistent square photo framing site-wide for a cleaner look
+   - Cards are centered and match the DHA theme
+
+
+8) INVESTMENT SCORECARD
+   - New “Unique Feature” style scorecard for each phase
+   - Shows an overall Investment Score (out of 10)
+   - Breaks down factors such as:
+       • Rental Yield
+       • Development
+       • Commercial Activity
+       • Appreciation Potential
+       • Family Living
+   - Each factor has its own score and visual progress bar
+   - Overall score is calculated automatically from the factor scores
+   - Fully editable from admin (labels, scores, icons)
+   - DHA Phase 1 dummy data prepared (overall score around 8.8/10)
+   - Layout refined so:
+       • Left side = overall score circle (smaller width)
+       • Right side = factor bars (wider width)
+   - Headings left-aligned; responsive on mobile
+
+
+9) NEARBY ATTRACTIONS & LANDMARKS
+   - New accessibility / landmarks section
+   - Cards for nearby destinations (airport, ring road, malls, commercial areas, etc.)
+   - Shown with the phase location map
+   - Editable from admin
+   - DHA Phase 1 dummy landmarks prepared (Airport, Ring Road, Packages Mall,
+     Raya, Main Boulevard)
+
+
+10) FINAL CONSULTATION / CTA SECTION
+    - Attractive end-of-page consultation block
+    - Heading example: “Need Expert Advice About DHA Phase 1?”
+    - Checklist benefits:
+        • Latest Prices
+        • Updated Inventory
+        • Investment Consultation
+        • Verified Property Options
+    - Short form fields: Name, Phone, Property Type, Budget
+    - Button: “Get Property Consultation”
+    - Inspired by the project-page enquiry style, adapted to DHA theme
+    - Fully editable from admin (heading, benefits, button text)
+    - Dummy content loaded for DHA Phase 1
+    - Headings left-aligned
+    - Mobile responsive
+    - Submissions go into the admin contact / enquiry inbox with phase context
+
+
+11) EXISTING CONTENT BLOCKS (KEPT IN FLOW)
+    Still present after the new blocks:
+    - Attractions grid
+    - Why Invest / investment reasons
+    - Project highlights card
+    - Help / contact bar
+    - Interactive master-plan map section
+    - Image gallery
+
+    These were not removed; new work was fitted around them carefully.
+
+
+--------------------------------------------------------------------------------
+C. SITE-WIDE FIRST-TIME VISITOR POPUP
+--------------------------------------------------------------------------------
+
+A new first-time visitor popup was added across the website (homepage and
+inner pages).
+
+What the visitor sees:
+- Light, attractive branded popup (cream/white with gold accents)
+- Etihad logo
+- Promotional message (Phase-X / Future of Lahore dummy content included)
+- Optional custom background image (upload from admin)
+- If no background image is uploaded, a clean branded panel is used instead
+- Soft background blur (page still visible behind the popup – not too heavy)
+- Comfortable spacing and padding
+
+How it works:
+1. Front side shows the promotional message and a “Contact Us” button
+2. Clicking Contact Us flips the card smoothly to a short form
+3. Form fields: Name, Phone, City
+4. After successful submit, the popup does not show again for that visitor
+5. Closing without submit also respects first-visit rules (shown once per visitor)
+
+Admin control:
+- New menu: Admin → First visit popup
+- Enable / disable popup
+- Edit eyebrow, heading, subheading, body text
+- Edit button labels
+- Show / hide logo
+- Upload or remove background image
+- Optional delay before showing
+- Temporary “show every time” testing option (can be turned off for live use)
+
+Leads from popup:
+- Saved into Contact Messages
+- Clearly labelled as “Popup first-time visitor”
+- City is captured and visible in the message detail
+- Admin can filter contact messages by source
+
+
+--------------------------------------------------------------------------------
+D. WEBSITE VISIT ANALYTICS
+--------------------------------------------------------------------------------
+
+New analytics for the whole website:
+
+Tracked:
+- Total page visits (site-wide)
+- First-time visitors
+
+Admin view:
+- New menu: Admin → Site analytics
+- Today’s page views
+- Today’s first-time visitors
+- Last 14 days chart (page views + first visitors)
+- Popup lead totals (new / all)
+
+Purpose:
+- Give management a simple view of traffic and first-time interest
+- Connect visitor activity with popup lead performance
+
+
+--------------------------------------------------------------------------------
+E. ADMIN PANEL UPDATES (DHA PHASES)
+--------------------------------------------------------------------------------
+
+Admin → DHA Phases edit form was updated so content blocks follow the same
+order as the live page. This makes editing easier for the content team.
+
+Admin section order now follows the front page:
+
+1. Value proposition bar
+2. Meet The Agents
+3. Investment Scorecard
+4. Nearby Attractions & Landmarks
+5. Final CTA (consultation form)
+6. Attractions grid
+7. Why invest
+8. Project highlights
+9. Help bar
+
+Also available in admin for each phase (from today’s broader work):
+- Hero tagline and hero stats
+- Brochure PDF upload
+- VR tour link
+- Banner / card images
+- Map coordinates and Google map
+- Interactive map section text & SEO
+- Featured agents selection
+- Scorecard factors and scores
+- Landmark cards
+- Final consultation content
+- Gallery / videos / plot maps / SEO fields
+
+
+--------------------------------------------------------------------------------
+F. DESIGN & QUALITY NOTES
+--------------------------------------------------------------------------------
+
+- Kept the established DHA navy / gold visual language
+- Agent photos standardized to a consistent square look
+- Final CTA and scorecard refined for desktop and mobile
+- Popup redesigned into an attractive light theme (not dark)
+- Popup blur reduced so the page behind remains readable
+- Care taken not to break unrelated website sections
+- Sample content for DHA Phase 1 prepared for demo / client review
+
+
+--------------------------------------------------------------------------------
+G. WHAT THE CLIENT CAN REVIEW NOW
+--------------------------------------------------------------------------------
+
+Recommended review checklist:
+
+1. Open DHA Phase 1 page and scroll top to bottom through all new sections
+2. Test hero buttons: PDF, View Map, Explore Listings, Talk to an Agent
+   (mobile call vs desktop number popup)
+3. Review Quick Stats, Map Hub, Agents, Scorecard, Landmarks, Final CTA
+4. Submit a test consultation from the Final CTA form
+5. Open the site in a private/incognito window to see the first-time popup
+6. Submit the popup form and confirm it does not appear again
+7. Check Admin → Contact Messages for popup and consultation leads
+8. Check Admin → Site analytics for visit numbers
+9. Check Admin → First visit popup to edit promotional text/image
+10. Check Admin → DHA Phases edit form order matches the live page
+
+
+--------------------------------------------------------------------------------
+H. SUMMARY FOR CLIENT
+--------------------------------------------------------------------------------
+
+Today’s delivery is a major upgrade of the DHA Phase experience plus a
+site-wide first-time visitor engagement system:
+
+• Richer DHA Phase page with new marketing and conversion sections
+• Stronger hero actions and agent calling experience
+• Investment Scorecard and landmarks for buyer confidence
+• Final consultation form for qualified leads
+• First-time visitor popup with flip-to-form enquiry
+• Site visit + first-visitor analytics dashboard
+• Admin controls for content, leads, and popup messaging
+• Dummy content ready on DHA Phase 1 for immediate demonstration
+
+Everything above is ready for client review and content replacement with
+final approved copy and images.
+
+================================================================================
+End of report – 27 July 2026
+================================================================================

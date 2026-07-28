@@ -11,15 +11,35 @@
         'enabled' => false,
         'trackUrl' => route('site-analytics.track'),
         'delayMs' => 0,
+        'showLogo' => true,
     ];
+
+    // Homepage include can pass fvpSurface=home; portal view/route uses dark theme + homepage logo
+    $isPortal = ($fvpSurface ?? null) === 'portal'
+        || request()->routeIs('portal')
+        || request()->is('portal')
+        || request()->is('portal/*');
+    $isHome = ($fvpSurface ?? null) === 'home';
+    $themeClass = $isPortal ? 'etihad-fvp--dark' : 'etihad-fvp--light';
+
+    // Portal only: homepage/assets/logo.png | everywhere else: theme logo
+    if ($isPortal) {
+        $fvpPayload['logo'] = asset('homepage/assets/logo.png');
+        $fvpPayload['showLogo'] = true;
+    } else {
+        $fvpPayload['logo'] = asset('theme/images/logo.png');
+    }
+    $fvpPayload['theme'] = $isPortal ? 'dark' : 'light';
+    $fvpPayload['surface'] = $isPortal ? 'portal' : ($isHome ? 'home' : 'site');
+
     $fvpHasBg = ! empty($fvpPayload['bg']);
     $fvpShowUi = ! empty($fvpPayload['enabled']);
 @endphp
-<link rel="stylesheet" href="{{ asset('theme/css/first-visit-popup.css') }}">
+<link rel="stylesheet" href="{{ asset('theme/css/first-visit-popup.css') }}?v=20260728m">
 @if($fvpShowUi)
 <div
     id="etihad-fvp"
-    class="etihad-fvp"
+    class="etihad-fvp {{ $themeClass }}"
     hidden
     aria-hidden="true"
     role="dialog"
@@ -35,7 +55,7 @@
             <div class="etihad-fvp__face etihad-fvp__face--front" @if($fvpHasBg) style="--fvp-bg:url('{{ $fvpPayload['bg'] }}')" @endif>
                 <div class="etihad-fvp__front-inner">
                     @if(!empty($fvpPayload['showLogo']))
-                        <img class="etihad-fvp__logo" src="{{ $fvpPayload['logo'] }}" alt="Etihad" width="140" height="48" decoding="async">
+                        <img class="etihad-fvp__logo" src="{{ $fvpPayload['logo'] }}" alt="Etihad" width="180" height="60" decoding="async">
                     @endif
                     @if(($fvpPayload['eyebrow'] ?? '') !== '')
                         <p class="etihad-fvp__eyebrow">{{ $fvpPayload['eyebrow'] }}</p>
@@ -56,7 +76,7 @@
             <div class="etihad-fvp__face etihad-fvp__face--back">
                 <div class="etihad-fvp__back-inner">
                     @if(!empty($fvpPayload['showLogo']))
-                        <img class="etihad-fvp__logo etihad-fvp__logo--sm" src="{{ $fvpPayload['logo'] }}" alt="Etihad" width="110" height="38" decoding="async">
+                        <img class="etihad-fvp__logo etihad-fvp__logo--sm" src="{{ $fvpPayload['logo'] }}" alt="Etihad" width="140" height="48" decoding="async">
                     @endif
                     <h3 class="etihad-fvp__form-title">{{ $fvpPayload['formHeading'] ?? 'Get in touch' }}</h3>
                     <p class="etihad-fvp__form-lead">Share your details and our advisors will reach out.</p>
@@ -80,4 +100,4 @@
 <script>
 window.__ETIHAD_FVP__ = @json($fvpPayload);
 </script>
-<script src="{{ asset('theme/js/first-visit-popup.js') }}"></script>
+<script src="{{ asset('theme/js/first-visit-popup.js') }}?v=20260728n"></script>
