@@ -43,6 +43,7 @@ use App\Http\Controllers\ListingSortController;
 use App\Http\Controllers\DhaSettingController;
 use App\Http\Controllers\DhaPhaseController;
 use App\Http\Controllers\DhaPhaseBulkMediaController;
+use App\Http\Controllers\DhaFileRateController;
 use App\Http\Controllers\InteractiveMapController;
 use App\Models\DhaSetting;
 use App\Models\DhaPhase;
@@ -706,6 +707,8 @@ Route::get('/dha', function () {
 
     return view('dha', compact('dha', 'phases'));
 })->name('dha.index');
+
+Route::get('/dha-file-rates', [DhaFileRateController::class, 'show'])->name('dha-file-rates');
 
 Route::get('/dha/{phase:slug}', function (DhaPhase $phase) {
     if ($phase->status !== DhaPhase::STATUS_ACTIVE) {
@@ -1658,6 +1661,9 @@ Route::middleware('admin')->group(function () {
     Route::put('/admin/dha-phases/{dhaPhase}', [DhaPhaseController::class, 'update'])->name('admin.dha-phases.update');
     Route::delete('/admin/dha-phases/{dhaPhase}', [DhaPhaseController::class, 'destroy'])->name('admin.dha-phases.destroy');
     Route::get('/admin/dha-phases/{dhaPhase}/interactive-map', [InteractiveMapController::class, 'editDhaPhase'])->name('admin.dha-phases.interactive-map');
+
+    Route::get('/admin/dha-file-rates', [DhaFileRateController::class, 'edit'])->name('admin.dha-file-rates.edit');
+    Route::put('/admin/dha-file-rates', [DhaFileRateController::class, 'update'])->name('admin.dha-file-rates.update');
 
     Route::get('/admin/projects', [ProjectController::class, 'index'])->name('admin.projects.index');
     Route::get('/admin/projects/create', [ProjectController::class, 'create'])->name('admin.projects.create');

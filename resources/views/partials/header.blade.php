@@ -11,6 +11,7 @@
                         <li><a href="{{ route('portal') }}">Home</a></li>
                         <li><a href="{{ url('/listing') }}">Listing</a></li>
                         <li><a href="{{ route('dha.index') }}">DHA</a></li>
+                        <li><a href="{{ route('dha-file-rates') }}">DHA File Rates</a></li>
                         <li><a href="{{ url('/projects') }}">Projects</a></li>
                         <li><a href="{{ route('team') }}">Our Team</a></li>
                     </ul>
