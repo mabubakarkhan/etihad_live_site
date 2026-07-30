@@ -50,11 +50,14 @@
     margin-bottom: 8px;
 }
 .dha-file-rates-page .cms-page-head__lead {
+    display: block;
+    width: 100%;
     max-width: 36rem;
-    margin: 0 auto;
+    margin: 10px auto 0;
     color: #64748b;
     font-size: 1rem;
     line-height: 1.55;
+    text-align: center;
 }
 .dha-file-rates-page .breadcrumbs-list {
     justify-content: center;
@@ -283,11 +286,13 @@
     cursor: pointer;
 }
 @media (max-width: 991.98px) {
-    .dha-file-rates-page .cms-page-head,
-    .dha-file-rates-details { text-align: left; }
-    .dha-file-rates-page .cms-page-head__lead,
-    .dha-file-rates-details { margin-left: 0; margin-right: 0; max-width: none; }
+    .dha-file-rates-details { text-align: left; margin-left: 0; margin-right: 0; max-width: none; }
     .dha-file-rates-page .breadcrumbs-list { justify-content: flex-start; }
+    .dha-file-rates-page .cms-page-head__lead {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
 </style>
 @endpush
