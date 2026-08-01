@@ -44,6 +44,7 @@ use App\Http\Controllers\DhaSettingController;
 use App\Http\Controllers\DhaPhaseController;
 use App\Http\Controllers\DhaPhaseBulkMediaController;
 use App\Http\Controllers\DhaFileRateController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\InteractiveMapController;
 use App\Models\DhaSetting;
 use App\Models\DhaPhase;
@@ -56,6 +57,10 @@ use App\Http\Controllers\PropertyRequestController;
 use App\Http\Controllers\CmsPageController;
 use App\Http\Controllers\CareerController;
 use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\AdminBlogPostController;
+use App\Http\Controllers\AdminBlogCategoryController;
+use App\Http\Controllers\AdminBlogTagController;
+use App\Http\Controllers\AdminBlogMediaController;
 use App\Http\Controllers\AdminNotificationController;
 use App\Models\PropertyRequest;
 use App\Models\HomepageHeroSetting;
@@ -709,6 +714,22 @@ Route::get('/dha', function () {
 })->name('dha.index');
 
 Route::get('/dha-file-rates', [DhaFileRateController::class, 'show'])->name('dha-file-rates');
+
+Route::get('/blogs', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/category/{slug}', [BlogController::class, 'category'])
+    ->where('slug', '[A-Za-z0-9\-]+')
+    ->name('blog.category');
+Route::get('/tag/{slug}', [BlogController::class, 'tag'])
+    ->where('slug', '[A-Za-z0-9\-]+')
+    ->name('blog.tag');
+Route::get('/{year}/{month}/{day}/{slug}', [BlogController::class, 'show'])
+    ->where([
+        'year' => '[0-9]{4}',
+        'month' => '[0-9]{2}',
+        'day' => '[0-9]{2}',
+        'slug' => '[A-Za-z0-9\-]+',
+    ])
+    ->name('blog.show');
 
 Route::get('/dha/{phase:slug}', function (DhaPhase $phase) {
     if ($phase->status !== DhaPhase::STATUS_ACTIVE) {
@@ -1745,6 +1766,28 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/cms-pages', [CmsPageController::class, 'index'])->name('admin.cms-pages.index');
     Route::get('/admin/cms-pages/{cmsPage}/edit', [CmsPageController::class, 'edit'])->name('admin.cms-pages.edit');
     Route::put('/admin/cms-pages/{cmsPage}', [CmsPageController::class, 'update'])->name('admin.cms-pages.update');
+
+    Route::get('/admin/blog-posts', [AdminBlogPostController::class, 'index'])->name('admin.blog-posts.index');
+    Route::get('/admin/blog-posts/create', [AdminBlogPostController::class, 'create'])->name('admin.blog-posts.create');
+    Route::post('/admin/blog-posts', [AdminBlogPostController::class, 'store'])->name('admin.blog-posts.store');
+    Route::get('/admin/blog-posts/{blogPost}/edit', [AdminBlogPostController::class, 'edit'])->name('admin.blog-posts.edit');
+    Route::put('/admin/blog-posts/{blogPost}', [AdminBlogPostController::class, 'update'])->name('admin.blog-posts.update');
+    Route::delete('/admin/blog-posts/{blogPost}', [AdminBlogPostController::class, 'destroy'])->name('admin.blog-posts.destroy');
+    Route::post('/admin/blog-media/upload', [AdminBlogMediaController::class, 'upload'])->name('admin.blog-media.upload');
+
+    Route::get('/admin/blog-categories', [AdminBlogCategoryController::class, 'index'])->name('admin.blog-categories.index');
+    Route::get('/admin/blog-categories/create', [AdminBlogCategoryController::class, 'create'])->name('admin.blog-categories.create');
+    Route::post('/admin/blog-categories', [AdminBlogCategoryController::class, 'store'])->name('admin.blog-categories.store');
+    Route::get('/admin/blog-categories/{blogCategory}/edit', [AdminBlogCategoryController::class, 'edit'])->name('admin.blog-categories.edit');
+    Route::put('/admin/blog-categories/{blogCategory}', [AdminBlogCategoryController::class, 'update'])->name('admin.blog-categories.update');
+    Route::delete('/admin/blog-categories/{blogCategory}', [AdminBlogCategoryController::class, 'destroy'])->name('admin.blog-categories.destroy');
+
+    Route::get('/admin/blog-tags', [AdminBlogTagController::class, 'index'])->name('admin.blog-tags.index');
+    Route::get('/admin/blog-tags/create', [AdminBlogTagController::class, 'create'])->name('admin.blog-tags.create');
+    Route::post('/admin/blog-tags', [AdminBlogTagController::class, 'store'])->name('admin.blog-tags.store');
+    Route::get('/admin/blog-tags/{blogTag}/edit', [AdminBlogTagController::class, 'edit'])->name('admin.blog-tags.edit');
+    Route::put('/admin/blog-tags/{blogTag}', [AdminBlogTagController::class, 'update'])->name('admin.blog-tags.update');
+    Route::delete('/admin/blog-tags/{blogTag}', [AdminBlogTagController::class, 'destroy'])->name('admin.blog-tags.destroy');
 
     Route::get('/admin/careers', [CareerController::class, 'index'])->name('admin.careers.index');
     Route::get('/admin/careers/create', [CareerController::class, 'create'])->name('admin.careers.create');

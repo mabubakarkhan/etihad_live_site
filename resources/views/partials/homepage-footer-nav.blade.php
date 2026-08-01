@@ -33,4 +33,11 @@
                 <span class="footer-navigation__link-text">Our Team</span>
               </a>
             </li>
+
+            <li>
+              <a href="{{ route('blog.index') }}" class="footer-navigation__link">
+                <span class="footer-navigation__link-icon"></span>
+                <span class="footer-navigation__link-text">Blog</span>
+              </a>
+            </li>
           </ul>
