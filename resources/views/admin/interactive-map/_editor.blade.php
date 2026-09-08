@@ -19,8 +19,8 @@
 >
     <div class="interactive-map-editor__header">
         <div>
-            <h3 class="interactive-map-editor__title">Phase overlay &amp; plot cuttings</h3>
-            <p class="interactive-map-editor__lead">1) Upload the phase master-plan overlay and position it. 2) Draw plots on top. Zoom out hides plot titles; the main overlay stays visible.</p>
+            <h3 class="interactive-map-editor__title">Phase map</h3>
+            <p class="interactive-map-editor__lead"><strong>Gold box</strong> = map area. Drag the box or its corners to move/resize. Then upload a PNG to fill that area. Draw plots after.</p>
         </div>
         @if(!empty($standaloneUrl))
             <a href="{{ $standaloneUrl }}" class="interactive-map-editor__standalone-link" target="_blank" rel="noopener">Open full editor</a>
@@ -30,26 +30,32 @@
     <div class="interactive-map-editor__layout">
         <aside class="interactive-map-editor__sidebar">
             <div class="interactive-map-editor__panel">
-                <h4 class="interactive-map-editor__panel-title">Overlay image</h4>
+                <h4 class="interactive-map-editor__panel-title">1. Gold box (map area)</h4>
+                <p class="interactive-map-editor__hint" style="margin-top:0">On the map: drag the gold square to move it. Drag the corner handles to resize. It saves when you release.</p>
+                <div class="interactive-map-editor__btn-row interactive-map-editor__btn-row--wrap">
+                    <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--primary is-active" data-overlay-edit-mode>Move / resize box</button>
+                    <button type="button" class="interactive-map-editor__btn" data-plot-edit-mode>Draw plots</button>
+                </div>
+            </div>
+
+            <div class="interactive-map-editor__panel">
+                <h4 class="interactive-map-editor__panel-title">2. Overlay image (fills the gold box)</h4>
                 <div class="interactive-map-editor__overlay-preview-wrap" data-overlay-preview-wrap>
                     <img src="" alt="Overlay preview" class="interactive-map-editor__overlay-preview hidden" data-overlay-preview-img />
-                    <p class="interactive-map-editor__empty-hint" data-overlay-empty>No overlay uploaded yet.</p>
+                    <p class="interactive-map-editor__empty-hint" data-overlay-empty>No image yet — upload a PNG/SVG master plan.</p>
                 </div>
                 <label class="interactive-map-editor__file-label">
                     <span>Upload / replace PNG or SVG</span>
                     <input type="file" accept="image/png,image/svg+xml,.svg" data-overlay-input class="interactive-map-editor__file-input" />
                 </label>
-                <div class="interactive-map-editor__btn-row interactive-map-editor__btn-row--wrap">
-                    <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--primary is-active" data-overlay-edit-mode>Edit overlay</button>
-                    <button type="button" class="interactive-map-editor__btn" data-plot-edit-mode>Edit plots</button>
-                    <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--danger" data-overlay-delete disabled>Delete overlay</button>
+                <div class="interactive-map-editor__btn-row">
+                    <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--danger" data-overlay-delete disabled>Delete image</button>
                 </div>
-                <p class="interactive-map-editor__hint">Use <strong>Edit overlay</strong> to drag/reposition. Upload again to replace. <strong>Edit plots</strong> when drawing or adjusting cuttings.</p>
             </div>
 
             <div class="interactive-map-editor__panel">
-                <h4 class="interactive-map-editor__panel-title">Bounds &amp; zoom</h4>
-                <div class="interactive-map-editor__grid interactive-map-editor__grid--2">
+                <h4 class="interactive-map-editor__panel-title">Settings</h4>
+                <div class="interactive-map-editor__grid interactive-map-editor__grid--2" hidden data-bounds-fields>
                     <label class="interactive-map-editor__field">
                         <span>North</span>
                         <input type="number" step="any" data-field="north" class="interactive-map-editor__input" />
@@ -83,34 +89,30 @@
                 </div>
                 <div class="interactive-map-editor__grid interactive-map-editor__grid--2">
                     <label class="interactive-map-editor__field">
-                        <span>Overlay opacity</span>
+                        <span>Image opacity</span>
                         <input type="number" min="0" max="1" step="0.01" data-field="overlay_opacity" class="interactive-map-editor__input" />
                     </label>
                     <label class="interactive-map-editor__field">
-                        <span>Overlay from zoom</span>
-                        <input type="number" min="0" max="22" data-field="overlay_visibility_zoom" class="interactive-map-editor__input" />
+                        <span>Plot titles from zoom</span>
+                        <input type="number" min="0" max="22" data-field="show_label_from_zoom" class="interactive-map-editor__input" placeholder="16" />
                     </label>
                 </div>
-                <label class="interactive-map-editor__field">
-                    <span>Show plot titles from zoom</span>
-                    <input type="number" min="0" max="22" data-field="show_label_from_zoom" class="interactive-map-editor__input" placeholder="16" />
-                </label>
-                <p class="interactive-map-editor__hint">Zoom out below this level to hide plot headings. Phase overlay stays on the map.</p>
+                <input type="hidden" data-field="overlay_visibility_zoom" />
                 <label class="interactive-map-editor__checkbox">
                     <input type="checkbox" data-field="is_active" />
-                    <span>Active (show overlay on front-end maps)</span>
+                    <span>Show on website</span>
                 </label>
                 <div class="interactive-map-editor__btn-row">
-                    <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--primary" data-save-settings>Save settings</button>
+                    <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--primary" data-save-settings>Save</button>
                 </div>
             </div>
 
             <div class="interactive-map-editor__panel" data-section-panel>
                 <div class="interactive-map-editor__panel-head">
-                    <h4 class="interactive-map-editor__panel-title">Plot cuttings</h4>
-                    <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--sm" data-draw-cancel>Cancel draw</button>
+                    <h4 class="interactive-map-editor__panel-title">3. Plots inside the box</h4>
+                    <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--sm" data-draw-cancel>Cancel</button>
                 </div>
-                <p class="interactive-map-editor__hint">Draw polygon / rectangle / marker. Click a plot to edit vertices. Use Reset cursor to drop focus.</p>
+                <p class="interactive-map-editor__hint">Click <strong>Draw plots</strong> above first, then use a tool. Click a plot in the list to edit it.</p>
                 <div class="interactive-map-editor__btn-row interactive-map-editor__btn-row--wrap">
                     <button type="button" class="interactive-map-editor__tool-btn" data-draw-mode="polygon">Polygon</button>
                     <button type="button" class="interactive-map-editor__tool-btn" data-draw-mode="rectangle">Rectangle</button>

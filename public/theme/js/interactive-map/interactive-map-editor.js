@@ -250,10 +250,19 @@
                 });
                 self.mapManager.init();
 
+                self.mapManager.setBoundsEditHandlers({
+                    onBoundsDrag: function (bounds) {
+                        self.onGoldBoxDragging(bounds);
+                    },
+                    onBoundsChanged: function (bounds) {
+                        self.onGoldBoxChanged(bounds);
+                    },
+                });
+
                 self.overlayManager = new IM.OverlayManager({
                     map: self.mapManager.getMap(),
                     opacity: self.data.overlay_opacity,
-                    draggable: true,
+                    draggable: false,
                     onBoundsDrag: function (bounds) {
                         self.onOverlayBoundsDragging(bounds);
                     },
@@ -285,8 +294,8 @@
                 }
 
                 self.initGisModules();
-                self.setEditorMode(self.data.overlay_url ? 'overlay' : 'plots');
-                self.toolbar.setStatus('Ready — Edit overlay to drag/replace, or Edit plots to draw cuttings');
+                self.setEditorMode('overlay');
+                self.toolbar.setStatus('Drag the gold box or its corners to place the map area');
             })
             .catch(function (err) {
                 self.toolbar.setStatus(err.message || 'Map failed to load');
@@ -299,6 +308,7 @@
 
         if (this.overlayEditBtn) {
             this.overlayEditBtn.classList.toggle('is-active', this.editorMode === 'overlay');
+            this.overlayEditBtn.textContent = 'Move / resize box';
         }
         if (this.plotEditBtn) {
             this.plotEditBtn.classList.toggle('is-active', this.editorMode === 'plots');
@@ -311,8 +321,13 @@
             });
         }
 
+        if (this.mapManager && typeof this.mapManager.setBoundsEditable === 'function') {
+            this.mapManager.setBoundsEditable(this.editorMode === 'overlay');
+        }
+
         if (this.overlayManager && typeof this.overlayManager.setDraggable === 'function') {
-            this.overlayManager.setDraggable(this.editorMode === 'overlay' && !!this.data.overlay_url);
+            // Gold box edits the area; image follows the box (no separate image drag needed).
+            this.overlayManager.setDraggable(false);
         }
 
         if (this.sectionManager) {
@@ -329,8 +344,8 @@
 
         this.toolbar.setStatus(
             this.editorMode === 'overlay'
-                ? 'Overlay edit mode — drag gold area to move, upload to replace, delete to remove'
-                : 'Plot edit mode — draw or select cuttings to adjust'
+                ? 'Gold box mode — drag the square or corners. Upload image fills this box.'
+                : 'Plot mode — draw or select cuttings inside the box'
         );
     };
 
@@ -526,12 +541,58 @@
         this.toolbar.setStatus('Search ready — type a landmark to jump on the map');
     };
 
+    InteractiveMapEditor.prototype.onGoldBoxDragging = function (bounds) {
+        var normalized = normalizeDraggedBounds(bounds);
+        if (!normalized) {
+            return;
+        }
+
+        this.data.north = normalized.north;
+        this.data.south = normalized.south;
+        this.data.east = normalized.east;
+        this.data.west = normalized.west;
+        this.toolbar.write(normalized, true);
+
+        if (this.data.overlay_url && this.overlayManager) {
+            this.overlayManager.update({
+                url: this.data.overlay_url,
+                bounds: normalized,
+                opacity: this.toolbar.readField('overlay_opacity'),
+            });
+        }
+
+        this.toolbar.setStatus('Moving gold box… release to save');
+    };
+
+    InteractiveMapEditor.prototype.onGoldBoxChanged = function (bounds) {
+        var normalized = normalizeDraggedBounds(bounds);
+        if (!normalized) {
+            return;
+        }
+
+        this.data.north = normalized.north;
+        this.data.south = normalized.south;
+        this.data.east = normalized.east;
+        this.data.west = normalized.west;
+        this.toolbar.write(normalized, true);
+
+        if (this.data.overlay_url && this.overlayManager) {
+            this.overlayManager.update({
+                url: this.data.overlay_url,
+                bounds: normalized,
+                opacity: this.toolbar.readField('overlay_opacity'),
+            });
+        }
+
+        this.saveDraggedPosition();
+    };
+
     InteractiveMapEditor.prototype.onOverlayBoundsDragging = function (bounds) {
         if (!bounds || !this.mapManager) {
             return;
         }
 
-        this.mapManager.drawBoundsRectangle(bounds);
+        this.mapManager.drawBoundsRectangle(bounds, { editable: this.editorMode === 'overlay' });
         this.toolbar.setStatus('Dragging overlay… release to place');
     };
 
@@ -618,7 +679,7 @@
         var bounds = boundsFromData(form);
 
         this.mapManager.setZoomLimits(form.min_zoom || 0, form.max_zoom || 22);
-        this.mapManager.drawBoundsRectangle(bounds);
+        this.mapManager.drawBoundsRectangle(bounds, { editable: this.editorMode !== 'plots' });
 
         if (options.fit && bounds) {
             this.mapManager.fitBounds(bounds);
@@ -631,7 +692,7 @@
                 opacity: form.overlay_opacity,
             });
             if (typeof this.overlayManager.setDraggable === 'function') {
-                this.overlayManager.setDraggable(this.editorMode === 'overlay');
+                this.overlayManager.setDraggable(false);
             }
         } else {
             this.overlayManager.clear();
