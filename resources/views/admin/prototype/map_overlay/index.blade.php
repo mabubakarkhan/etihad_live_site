@@ -99,31 +99,15 @@
                                 </div>
 
                                 <div class="space-y-4">
-                                    <div class="prototype-card p-4 space-y-4">
-                                        <h3 class="font-semibold">Overlay Image</h3>
-                                        <div class="prototype-upload-zone" data-upload-zone>
-                                            <input type="file" accept="image/png" class="hidden" data-overlay-input>
-                                            <div data-overlay-empty class="{{ $selected->hasOverlayImage() ? 'hidden' : '' }}">
-                                                <p class="text-sm text-slate-500">Drop a transparent PNG or click to upload.</p>
-                                                <p class="text-xs text-slate-400 mt-1">Supports large / 8K PNG files.</p>
-                                            </div>
-                                            <img data-overlay-preview-img
-                                                 src="{{ $selected->overlayUrl() }}"
-                                                 alt="Overlay preview"
-                                                 class="prototype-overlay-preview {{ $selected->hasOverlayImage() ? '' : 'hidden' }}">
-                                            <div class="flex gap-2 mt-3">
-                                                <button type="button" data-upload-trigger class="prototype-btn prototype-btn--sm prototype-btn--primary">Upload PNG</button>
-                                                <button type="button" data-overlay-delete class="prototype-btn prototype-btn--sm {{ $selected->hasOverlayImage() ? '' : 'hidden' }}">Delete</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     <div class="prototype-card p-4 space-y-4" data-section-panel>
                                         <div class="flex items-center justify-between gap-2">
-                                            <h3 class="font-semibold">GIS Sections &amp; Slots</h3>
+                                            <div>
+                                                <p class="prototype-step-label">Step 1</p>
+                                                <h3 class="font-semibold">Plot Cuttings</h3>
+                                            </div>
                                             <button type="button" data-draw-cancel class="prototype-btn prototype-btn--sm">Cancel Draw</button>
                                         </div>
-                                        <p class="text-xs text-slate-500">Draw colored polygons, rectangles, or plot markers directly on the map.</p>
+                                        <p class="text-xs text-slate-500">Draw plots first. Click a cutting to edit vertices on the map. Use ● to hide a layer and arrows to reorder.</p>
                                         <p class="text-xs text-amber-500/90">Polygon: click corners, double-click to finish. Rectangle: click &amp; drag. Marker: single click.</p>
                                         <div class="flex flex-wrap gap-2">
                                             <button type="button" data-draw-mode="polygon" class="prototype-tool-btn">Draw Polygon</button>
@@ -135,11 +119,16 @@
                                             <label class="prototype-field"><span>Stroke</span><input type="color" value="#6c4815" data-draw-style="stroke_color"></label>
                                             <label class="prototype-field"><span>Fill Opacity</span><input type="range" min="0" max="1" step="0.05" value="0.45" data-draw-style="fill_opacity"></label>
                                         </div>
-                                        <div data-section-empty class="text-sm text-slate-500 {{ ($selected->sections ?? collect())->isNotEmpty() ? 'hidden' : '' }}">No sections drawn yet. Pick a draw tool and click on the map.</div>
-                                        <div data-section-list class="space-y-2 max-h-40 overflow-y-auto"></div>
+                                        <div data-section-empty class="text-sm text-slate-500 {{ ($selected->sections ?? collect())->isNotEmpty() ? 'hidden' : '' }}">No cuttings yet. Pick a draw tool and click on the map.</div>
+                                        <div data-section-list class="space-y-2 max-h-56 overflow-y-auto"></div>
                                         <div data-section-form hidden class="space-y-3 pt-2 border-t border-slate-700/50">
+                                            <div class="flex items-start justify-between gap-2">
+                                                <p class="text-[11px] text-cyan-400">Selected cutting is editable on the map — drag corners or move the shape, then it saves automatically.</p>
+                                                <button type="button" data-section-clear-focus class="prototype-btn prototype-btn--sm shrink-0">Reset cursor</button>
+                                            </div>
                                             <label class="prototype-field"><span>Section Title</span><input type="text" data-section-field="title"></label>
                                             <label class="prototype-field"><span>Map Label</span><input type="text" data-section-field="label" placeholder="Plot 12"></label>
+                                            <label class="prototype-field"><span>Show Title From Zoom</span><input type="number" min="0" max="22" data-section-field="show_label_from_zoom" placeholder="Use map default"></label>
                                             <div class="grid grid-cols-2 gap-2">
                                                 <label class="prototype-field"><span>Fill Color</span><input type="color" data-section-field="fill_color"></label>
                                                 <label class="prototype-field"><span>Stroke Color</span><input type="color" data-section-field="stroke_color"></label>
@@ -161,8 +150,31 @@
                                         </div>
                                     </div>
 
+                                    <div class="prototype-card p-4 space-y-4">
+                                        <div>
+                                            <p class="prototype-step-label">Step 2</p>
+                                            <h3 class="font-semibold">Full Map Overlay</h3>
+                                        </div>
+                                        <p class="text-xs text-slate-500">Upload the master-plan PNG to cover the whole map boundary after plots are cut.</p>
+                                        <div class="prototype-upload-zone" data-upload-zone>
+                                            <input type="file" accept="image/png" class="hidden" data-overlay-input>
+                                            <div data-overlay-empty class="{{ $selected->hasOverlayImage() ? 'hidden' : '' }}">
+                                                <p class="text-sm text-slate-500">Drop a transparent PNG or click to upload.</p>
+                                                <p class="text-xs text-slate-400 mt-1">Supports large / 8K PNG files.</p>
+                                            </div>
+                                            <img data-overlay-preview-img
+                                                 src="{{ $selected->overlayUrl() }}"
+                                                 alt="Overlay preview"
+                                                 class="prototype-overlay-preview {{ $selected->hasOverlayImage() ? '' : 'hidden' }}">
+                                            <div class="flex gap-2 mt-3">
+                                                <button type="button" data-upload-trigger class="prototype-btn prototype-btn--sm prototype-btn--primary">Upload PNG</button>
+                                                <button type="button" data-overlay-delete class="prototype-btn prototype-btn--sm {{ $selected->hasOverlayImage() ? '' : 'hidden' }}">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="prototype-card p-4 space-y-4" data-overlay-settings>
-                                        <h3 class="font-semibold">Map Configuration</h3>
+                                        <h3 class="font-semibold">Map Boundary &amp; Zoom</h3>
                                         <label class="prototype-field">
                                             <span>Title</span>
                                             <input type="text" name="title" value="{{ $selected->title }}" data-setting="title">
@@ -185,6 +197,16 @@
                                         <label class="prototype-field">
                                             <span>Show Overlay From Zoom</span>
                                             <input type="number" min="0" max="22" name="show_overlay_from_zoom" value="{{ $selected->show_overlay_from_zoom }}" data-setting="show_overlay_from_zoom" placeholder="Always visible">
+                                        </label>
+                                        <label class="prototype-field">
+                                            <span>Hide Overlay From Zoom</span>
+                                            <input type="number" min="0" max="22" name="hide_overlay_from_zoom" value="{{ $selected->hide_overlay_from_zoom ?? $selected->max_zoom }}" data-setting="hide_overlay_from_zoom" placeholder="{{ $selected->max_zoom }}">
+                                            <span class="text-[11px] text-slate-500 mt-1 block">At max zoom the overlay (and its printed titles) hide so plot titles stay clear.</span>
+                                        </label>
+                                        <label class="prototype-field">
+                                            <span>Show Plot Titles From Zoom</span>
+                                            <input type="number" min="0" max="22" name="show_label_from_zoom" value="{{ $selected->show_label_from_zoom ?? 16 }}" data-setting="show_label_from_zoom" placeholder="16">
+                                            <span class="text-[11px] text-slate-500 mt-1 block">Zoom in to this level to show plot titles. Zoom out to hide them.</span>
                                         </label>
                                         <label class="prototype-field">
                                             <span>Status</span>

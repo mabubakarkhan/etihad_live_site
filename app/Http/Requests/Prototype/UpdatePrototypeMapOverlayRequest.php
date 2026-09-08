@@ -27,6 +27,8 @@ class UpdatePrototypeMapOverlayRequest extends FormRequest
             'overlay_opacity' => ['sometimes', 'numeric', 'min:0', 'max:1'],
             'overlay_rotation' => ['sometimes', 'numeric', 'min:-360', 'max:360'],
             'show_overlay_from_zoom' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:22'],
+            'hide_overlay_from_zoom' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:22'],
+            'show_label_from_zoom' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:22'],
             'status' => ['sometimes', 'string', Rule::in(['draft', 'active', 'inactive'])],
         ];
     }

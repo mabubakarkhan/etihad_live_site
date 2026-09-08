@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Prototype;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StorePrototypeMapSectionRequest extends FormRequest
+class StoreInteractiveMapSectionRequest extends FormRequest
 {
     public function authorize(): bool
     {

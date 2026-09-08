@@ -31,6 +31,8 @@ return [
         'overlay_opacity' => 0.85,
         'overlay_rotation' => 0,
         'show_overlay_from_zoom' => null,
+        'hide_overlay_from_zoom' => 20,
+        'show_label_from_zoom' => 16,
         'status' => 'draft',
     ],
 

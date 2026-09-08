@@ -42,9 +42,10 @@
 
     @once('portal-interactive-map-assets')
         @push('scripts')
-            <script src="{{ asset('theme/js/interactive-map/MapManager.js') }}?v=2"></script>
-            <script src="{{ asset('theme/js/interactive-map/OverlayManager.js') }}?v=6"></script>
-            <script src="{{ asset('theme/js/interactive-map/interactive-map-front.js') }}?v=4"></script>
+            <script src="{{ asset('theme/js/interactive-map/MapManager.js') }}?v=3"></script>
+            <script src="{{ asset('theme/js/interactive-map/OverlayManager.js') }}?v=7"></script>
+            <script src="{{ asset('theme/js/interactive-map/SectionManager.js') }}?v=1"></script>
+            <script src="{{ asset('theme/js/interactive-map/interactive-map-front.js') }}?v=5"></script>
         @endpush
     @endonce
 @endif

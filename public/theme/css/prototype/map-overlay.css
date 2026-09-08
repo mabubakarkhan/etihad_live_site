@@ -314,18 +314,71 @@ html:not(.dark) .prototype-toolbar {
     border-color: rgb(226 232 240);
 }
 
+.prototype-step-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: 0.15rem;
+}
+
 .prototype-section-item {
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 0.65rem;
-    padding: 0.55rem 0.65rem;
+    gap: 0.45rem;
+    padding: 0.45rem 0.55rem;
     border-radius: 0.55rem;
     border: 1px solid transparent;
     background: rgb(15 23 42 / 0.45);
     color: inherit;
-    cursor: pointer;
+    cursor: default;
     transition: border-color 0.15s, background 0.15s;
+}
+
+.prototype-section-item.is-hidden-layer {
+    opacity: 0.55;
+}
+
+.prototype-layer-select {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+}
+
+.prototype-layer-order {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.prototype-layer-icon {
+    width: 1.4rem;
+    height: 1.25rem;
+    border-radius: 0.3rem;
+    border: 1px solid rgb(71 85 105);
+    background: rgb(30 41 59);
+    color: rgb(203 213 225);
+    font-size: 0.7rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+}
+
+.prototype-layer-icon:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.prototype-layer-icon:hover:not(:disabled) {
+    border-color: rgb(16 185 129 / 0.6);
+    background: rgb(51 65 85);
 }
 
 .prototype-section-item:hover,
@@ -344,4 +397,10 @@ html:not(.dark) .prototype-toolbar {
 
 html:not(.dark) .prototype-section-item {
     background: rgb(248 250 252);
+}
+
+html:not(.dark) .prototype-layer-icon {
+    background: rgb(255 255 255);
+    border-color: rgb(203 213 225);
+    color: rgb(51 65 85);
 }

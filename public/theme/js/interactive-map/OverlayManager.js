@@ -196,10 +196,14 @@
             this.draggable_ = !!draggable;
             this.onBoundsChange_ = typeof onBoundsChange === 'function' ? onBoundsChange : null;
             this.onBoundsDrag_ = typeof onBoundsDrag === 'function' ? onBoundsDrag : null;
+            this._teardownDragHandlers();
             this._mountToPane();
             this._ensureHitLayer();
             this._applyInteractionStyles();
-            this._bindDragHandlers();
+            if (this.draggable_) {
+                this._bindDragHandlers();
+            }
+            this.draw();
         };
 
         GeographicImageOverlay.prototype.isDragging = function () {
@@ -452,6 +456,11 @@
         if (this.overlay && typeof this.overlay.setInteraction === 'function') {
             this.overlay.setInteraction(this.draggable, this.onBoundsChange, this.onBoundsDrag);
         }
+    };
+
+    OverlayManager.prototype.setDraggable = function (enabled) {
+        this.draggable = !!enabled;
+        this._applyInteraction();
     };
 
     OverlayManager.prototype.syncBounds = function (boundsLiteral) {

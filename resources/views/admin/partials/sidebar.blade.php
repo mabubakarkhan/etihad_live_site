@@ -77,6 +77,13 @@
                     <span class="text-sm">DHA &amp; phases</span>
                 </span>
             </a>
+            <a href="{{ route('admin.dha-phase-maps.index') }}"
+               class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.dha-phase-maps.*') || (request()->routeIs('admin.dha-phases.interactive-map')) ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-amber-500/40 shadow-sm shadow-amber-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
+                <span class="flex items-center gap-3">
+                    <span class="h-6 w-6 rounded-lg bg-slate-300 dark:bg-slate-800 flex items-center justify-center text-xs {{ request()->routeIs('admin.dha-phase-maps.*') || request()->routeIs('admin.dha-phases.interactive-map') ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400' }}">M</span>
+                    <span class="text-sm">DHA Phase Maps</span>
+                </span>
+            </a>
             <a href="{{ route('admin.dha-file-rates.edit') }}"
                class="w-full flex items-center justify-between px-3 py-2 rounded-lg transition {{ request()->routeIs('admin.dha-file-rates.*') ? 'bg-slate-300 dark:bg-slate-800 text-slate-900 dark:text-slate-50 border border-emerald-500/40 shadow-sm shadow-emerald-500/20' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-300/80 dark:hover:bg-slate-800/60' }}">
                 <span class="flex items-center gap-3">

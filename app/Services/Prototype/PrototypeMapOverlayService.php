@@ -38,6 +38,8 @@ class PrototypeMapOverlayService
             'overlay_opacity' => $data['overlay_opacity'] ?? $defaults['overlay_opacity'],
             'overlay_rotation' => $data['overlay_rotation'] ?? $defaults['overlay_rotation'],
             'show_overlay_from_zoom' => $data['show_overlay_from_zoom'] ?? $defaults['show_overlay_from_zoom'],
+            'hide_overlay_from_zoom' => $data['hide_overlay_from_zoom'] ?? $defaults['hide_overlay_from_zoom'],
+            'show_label_from_zoom' => $data['show_label_from_zoom'] ?? $defaults['show_label_from_zoom'],
             'status' => $data['status'] ?? $defaults['status'],
         ]);
     }
@@ -61,6 +63,12 @@ class PrototypeMapOverlayService
             'show_overlay_from_zoom' => array_key_exists('show_overlay_from_zoom', $data)
                 ? $data['show_overlay_from_zoom']
                 : $overlay->show_overlay_from_zoom,
+            'hide_overlay_from_zoom' => array_key_exists('hide_overlay_from_zoom', $data)
+                ? $data['hide_overlay_from_zoom']
+                : $overlay->hide_overlay_from_zoom,
+            'show_label_from_zoom' => array_key_exists('show_label_from_zoom', $data)
+                ? $data['show_label_from_zoom']
+                : $overlay->show_label_from_zoom,
             'status' => $data['status'] ?? $overlay->status,
         ]);
 

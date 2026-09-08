@@ -15,12 +15,12 @@
     data-csrf="{{ csrf_token() }}"
     data-google-maps-key="{{ $googleMapsKey }}"
     data-google-maps-map-id="{{ $googleMapsMapId }}"
-    data-initial="{{ $mapPayload ? json_encode($mapPayload) : '{}' }}"
+    data-initial='@json($mapPayload ?? new \stdClass())'
 >
     <div class="interactive-map-editor__header">
         <div>
-            <h3 class="interactive-map-editor__title">Google Maps ground overlay</h3>
-            <p class="interactive-map-editor__lead">Upload a transparent PNG or SVG master plan, then drag it on the map to position it. Property markers remain independent.</p>
+            <h3 class="interactive-map-editor__title">Phase overlay &amp; plot cuttings</h3>
+            <p class="interactive-map-editor__lead">1) Upload the phase master-plan overlay and position it. 2) Draw plots on top. Zoom out hides plot titles; the main overlay stays visible.</p>
         </div>
         @if(!empty($standaloneUrl))
             <a href="{{ $standaloneUrl }}" class="interactive-map-editor__standalone-link" target="_blank" rel="noopener">Open full editor</a>
@@ -36,13 +36,15 @@
                     <p class="interactive-map-editor__empty-hint" data-overlay-empty>No overlay uploaded yet.</p>
                 </div>
                 <label class="interactive-map-editor__file-label">
-                    <span>Upload PNG or SVG</span>
+                    <span>Upload / replace PNG or SVG</span>
                     <input type="file" accept="image/png,image/svg+xml,.svg" data-overlay-input class="interactive-map-editor__file-input" />
                 </label>
-                <div class="interactive-map-editor__btn-row">
+                <div class="interactive-map-editor__btn-row interactive-map-editor__btn-row--wrap">
+                    <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--primary is-active" data-overlay-edit-mode>Edit overlay</button>
+                    <button type="button" class="interactive-map-editor__btn" data-plot-edit-mode>Edit plots</button>
                     <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--danger" data-overlay-delete disabled>Delete overlay</button>
                 </div>
-                <p class="interactive-map-editor__hint">After upload, drag the gold overlay area on the map. Position saves automatically when you release the mouse.</p>
+                <p class="interactive-map-editor__hint">Use <strong>Edit overlay</strong> to drag/reposition. Upload again to replace. <strong>Edit plots</strong> when drawing or adjusting cuttings.</p>
             </div>
 
             <div class="interactive-map-editor__panel">
@@ -85,16 +87,68 @@
                         <input type="number" min="0" max="1" step="0.01" data-field="overlay_opacity" class="interactive-map-editor__input" />
                     </label>
                     <label class="interactive-map-editor__field">
-                        <span>Visibility zoom</span>
+                        <span>Overlay from zoom</span>
                         <input type="number" min="0" max="22" data-field="overlay_visibility_zoom" class="interactive-map-editor__input" />
                     </label>
                 </div>
+                <label class="interactive-map-editor__field">
+                    <span>Show plot titles from zoom</span>
+                    <input type="number" min="0" max="22" data-field="show_label_from_zoom" class="interactive-map-editor__input" placeholder="16" />
+                </label>
+                <p class="interactive-map-editor__hint">Zoom out below this level to hide plot headings. Phase overlay stays on the map.</p>
                 <label class="interactive-map-editor__checkbox">
                     <input type="checkbox" data-field="is_active" />
                     <span>Active (show overlay on front-end maps)</span>
                 </label>
                 <div class="interactive-map-editor__btn-row">
                     <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--primary" data-save-settings>Save settings</button>
+                </div>
+            </div>
+
+            <div class="interactive-map-editor__panel" data-section-panel>
+                <div class="interactive-map-editor__panel-head">
+                    <h4 class="interactive-map-editor__panel-title">Plot cuttings</h4>
+                    <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--sm" data-draw-cancel>Cancel draw</button>
+                </div>
+                <p class="interactive-map-editor__hint">Draw polygon / rectangle / marker. Click a plot to edit vertices. Use Reset cursor to drop focus.</p>
+                <div class="interactive-map-editor__btn-row interactive-map-editor__btn-row--wrap">
+                    <button type="button" class="interactive-map-editor__tool-btn" data-draw-mode="polygon">Polygon</button>
+                    <button type="button" class="interactive-map-editor__tool-btn" data-draw-mode="rectangle">Rectangle</button>
+                    <button type="button" class="interactive-map-editor__tool-btn" data-draw-mode="marker">Marker</button>
+                </div>
+                <div class="interactive-map-editor__grid interactive-map-editor__grid--3">
+                    <label class="interactive-map-editor__field"><span>Fill</span><input type="color" value="#a9823d" data-draw-style="fill_color" class="interactive-map-editor__input"></label>
+                    <label class="interactive-map-editor__field"><span>Stroke</span><input type="color" value="#6c4815" data-draw-style="stroke_color" class="interactive-map-editor__input"></label>
+                    <label class="interactive-map-editor__field"><span>Opacity</span><input type="range" min="0" max="1" step="0.05" value="0.45" data-draw-style="fill_opacity" class="interactive-map-editor__input"></label>
+                </div>
+                <div data-section-empty class="interactive-map-editor__empty-hint">No plots yet. Pick a draw tool and click the map.</div>
+                <div data-section-list class="interactive-map-editor__section-list"></div>
+                <div data-section-form hidden class="interactive-map-editor__section-form">
+                    <div class="interactive-map-editor__btn-row">
+                        <p class="interactive-map-editor__hint" style="margin:0;flex:1">Selected plot is editable on the map.</p>
+                        <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--sm" data-section-clear-focus>Reset cursor</button>
+                    </div>
+                    <label class="interactive-map-editor__field"><span>Title</span><input type="text" data-section-field="title" class="interactive-map-editor__input"></label>
+                    <label class="interactive-map-editor__field"><span>Map label</span><input type="text" data-section-field="label" class="interactive-map-editor__input" placeholder="Plot 12"></label>
+                    <label class="interactive-map-editor__field"><span>Show title from zoom</span><input type="number" min="0" max="22" data-section-field="show_label_from_zoom" class="interactive-map-editor__input" placeholder="Map default"></label>
+                    <div class="interactive-map-editor__grid interactive-map-editor__grid--2">
+                        <label class="interactive-map-editor__field"><span>Fill</span><input type="color" data-section-field="fill_color" class="interactive-map-editor__input"></label>
+                        <label class="interactive-map-editor__field"><span>Stroke</span><input type="color" data-section-field="stroke_color" class="interactive-map-editor__input"></label>
+                    </div>
+                    <label class="interactive-map-editor__field"><span>Fill opacity</span><input type="range" min="0" max="1" step="0.05" data-section-field="fill_opacity" class="interactive-map-editor__input"></label>
+                    <label class="interactive-map-editor__field">
+                        <span>Status</span>
+                        <select data-section-field="status" class="interactive-map-editor__input">
+                            <option value="active">Active</option>
+                            <option value="draft">Draft</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </label>
+                    <label class="interactive-map-editor__field"><span>Notes</span><textarea rows="2" data-section-field="notes" class="interactive-map-editor__input"></textarea></label>
+                    <div class="interactive-map-editor__btn-row">
+                        <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--primary" data-section-save>Save plot</button>
+                        <button type="button" class="interactive-map-editor__btn interactive-map-editor__btn--danger" data-section-delete>Delete</button>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -114,6 +168,7 @@
                 </div>
                 <span class="interactive-map-editor__status" data-status>Loading map…</span>
             </div>
+            <div id="{{ $editorId }}-draw-hint" class="interactive-map-editor__draw-hint" hidden data-draw-hint></div>
             <div class="interactive-map-editor__map" data-map-canvas></div>
         </div>
     </div>

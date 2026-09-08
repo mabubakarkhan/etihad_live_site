@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class InteractiveMap extends Model
 {
@@ -21,6 +22,7 @@ class InteractiveMap extends Model
         'overlay_opacity',
         'overlay_rotation',
         'overlay_visibility_zoom',
+        'show_label_from_zoom',
         'is_active',
     ];
 
@@ -35,6 +37,7 @@ class InteractiveMap extends Model
         'overlay_opacity' => 'float',
         'overlay_rotation' => 'float',
         'overlay_visibility_zoom' => 'integer',
+        'show_label_from_zoom' => 'integer',
         'is_active' => 'boolean',
     ];
 
@@ -46,6 +49,18 @@ class InteractiveMap extends Model
     public function dhaPhase(): BelongsTo
     {
         return $this->belongsTo(DhaPhase::class);
+    }
+
+    public function sections(): HasMany
+    {
+        return $this->hasMany(InteractiveMapSection::class, 'interactive_map_id')
+            ->orderBy('sort_order')
+            ->orderBy('id');
+    }
+
+    public function activeSections(): HasMany
+    {
+        return $this->sections()->where('status', 'active');
     }
 
     public function overlayUrl(): ?string
@@ -96,6 +111,12 @@ class InteractiveMap extends Model
             'overlay_opacity' => $this->overlay_opacity,
             'overlay_rotation' => $this->overlay_rotation,
             'overlay_visibility_zoom' => $this->overlay_visibility_zoom,
+            'show_label_from_zoom' => $this->show_label_from_zoom,
+            'sections' => $this->relationLoaded('activeSections')
+                ? $this->activeSections->map->toMapConfig()->values()->all()
+                : ($this->relationLoaded('sections')
+                    ? $this->sections->where('status', 'active')->values()->map->toMapConfig()->all()
+                    : []),
         ];
     }
 
@@ -118,7 +139,11 @@ class InteractiveMap extends Model
             'overlay_opacity' => $this->overlay_opacity,
             'overlay_rotation' => $this->overlay_rotation,
             'overlay_visibility_zoom' => $this->overlay_visibility_zoom,
+            'show_label_from_zoom' => $this->show_label_from_zoom,
             'is_active' => $this->is_active,
+            'sections' => $this->relationLoaded('sections')
+                ? $this->sections->map->toEditorPayload()->values()->all()
+                : [],
         ];
     }
 }

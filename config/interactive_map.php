@@ -26,7 +26,7 @@ return [
     | Set application restriction to "None" in Google Cloud; key is not used in browser.
     | Enable legacy "Places API" (not only Places API New) for autocomplete proxy.
     */
-    'places_api_key' => env('INTERACTIVE_MAP_PLACES_API_KEY', ''),
+    'places_api_key' => env('INTERACTIVE_MAP_PLACES_API_KEY', env('GOOGLE_MAPS_API_KEY', '')),
 
     'defaults' => [
         'north' => 31.5300,
@@ -39,6 +39,7 @@ return [
         'overlay_opacity' => 0.85,
         'overlay_rotation' => 0,
         'overlay_visibility_zoom' => 14,
+        'show_label_from_zoom' => 16,
         'is_active' => true,
     ],
 

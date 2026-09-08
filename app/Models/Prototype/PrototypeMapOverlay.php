@@ -23,6 +23,8 @@ class PrototypeMapOverlay extends Model
         'overlay_opacity',
         'overlay_rotation',
         'show_overlay_from_zoom',
+        'hide_overlay_from_zoom',
+        'show_label_from_zoom',
         'status',
     ];
 
@@ -37,6 +39,8 @@ class PrototypeMapOverlay extends Model
         'overlay_opacity' => 'float',
         'overlay_rotation' => 'float',
         'show_overlay_from_zoom' => 'integer',
+        'hide_overlay_from_zoom' => 'integer',
+        'show_label_from_zoom' => 'integer',
     ];
 
     public function sections(): HasMany
@@ -106,6 +110,8 @@ class PrototypeMapOverlay extends Model
             'overlay_opacity' => $this->overlay_opacity,
             'overlay_rotation' => $this->overlay_rotation,
             'show_overlay_from_zoom' => $this->show_overlay_from_zoom,
+            'hide_overlay_from_zoom' => $this->hide_overlay_from_zoom,
+            'show_label_from_zoom' => $this->show_label_from_zoom,
             'status' => $this->status,
             'sections' => $this->relationLoaded('sections')
                 ? $this->sections->map->toMapConfig()->values()->all()
@@ -117,6 +123,10 @@ class PrototypeMapOverlay extends Model
     public function toEditorPayload(): array
     {
         return array_merge($this->toMapConfig(), [
+            'north' => $this->north,
+            'south' => $this->south,
+            'east' => $this->east,
+            'west' => $this->west,
             'has_overlay' => $this->hasOverlayImage(),
             'overlay_image' => $this->overlay_image,
             'updated_at' => $this->updated_at?->toIso8601String(),

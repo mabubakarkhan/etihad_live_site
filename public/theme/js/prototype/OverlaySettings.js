@@ -50,7 +50,7 @@
 
         if (['north', 'south', 'east', 'west', 'overlay_opacity', 'overlay_rotation'].indexOf(key) > -1) {
             value = value === '' ? null : parseFloat(value);
-        } else if (['default_zoom', 'min_zoom', 'max_zoom', 'show_overlay_from_zoom'].indexOf(key) > -1) {
+        } else if (['default_zoom', 'min_zoom', 'max_zoom', 'show_overlay_from_zoom', 'hide_overlay_from_zoom', 'show_label_from_zoom'].indexOf(key) > -1) {
             value = value === '' ? null : parseInt(value, 10);
         }
 
@@ -78,6 +78,8 @@
             overlay_opacity: this.currentData.overlay_opacity,
             overlay_rotation: this.currentData.overlay_rotation,
             show_overlay_from_zoom: this.currentData.show_overlay_from_zoom,
+            hide_overlay_from_zoom: this.currentData.hide_overlay_from_zoom,
+            show_label_from_zoom: this.currentData.show_label_from_zoom,
             status: this.currentData.status,
             default_zoom: this.currentData.default_zoom,
             min_zoom: this.currentData.min_zoom,

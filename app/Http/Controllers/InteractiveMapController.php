@@ -30,17 +30,49 @@ class InteractiveMapController extends Controller
         return $this->edit('dha-phases', (int) $dhaPhase->id);
     }
 
+    public function dhaPhasesHub(): View
+    {
+        $phases = DhaPhase::query()
+            ->with(['interactiveMap.sections'])
+            ->frontOrdered()
+            ->get();
+
+        return view('admin.interactive-map.dha-phases', [
+            'phases' => $phases,
+        ]);
+    }
+
     public function edit(string $ownerType, int $ownerId): View
     {
         $context = $this->ownerContext($ownerType, $ownerId);
         $map = $this->maps->findOrCreateForOwner($ownerType, $ownerId);
+        $map->load('sections');
+
+        $phaseList = [];
+        if ($ownerType === 'dha-phases') {
+            $phaseList = DhaPhase::query()
+                ->frontOrdered()
+                ->get(['id', 'title', 'slug', 'status', 'sort_order'])
+                ->map(fn (DhaPhase $phase) => [
+                    'id' => $phase->id,
+                    'title' => $phase->title,
+                    'slug' => $phase->slug,
+                    'status' => $phase->status,
+                    'url' => route('admin.dha-phases.interactive-map', $phase),
+                    'is_current' => (int) $phase->id === (int) $ownerId,
+                ])
+                ->values()
+                ->all();
+        }
 
         return view('admin.interactive-map.edit', [
             'ownerType' => $ownerType,
             'ownerId' => $ownerId,
             'ownerLabel' => $context['label'],
             'backUrl' => $context['back_url'],
+            'hubUrl' => $context['hub_url'] ?? null,
             'map' => $map,
+            'phaseList' => $phaseList,
         ]);
     }
 
@@ -106,7 +138,10 @@ class InteractiveMapController extends Controller
 
         $apiKey = (string) config('interactive_map.places_api_key', '');
         if ($apiKey === '') {
-            return response()->json(['message' => 'Places API key is not configured.'], 503);
+            $apiKey = (string) config('app.google_maps_api_key', '');
+        }
+        if ($apiKey === '') {
+            return response()->json(['message' => 'Places API key is not configured. Set INTERACTIVE_MAP_PLACES_API_KEY or GOOGLE_MAPS_API_KEY.'], 503);
         }
 
         $response = Http::timeout(10)->get('https://maps.googleapis.com/maps/api/place/autocomplete/json', [
@@ -143,7 +178,10 @@ class InteractiveMapController extends Controller
 
         $apiKey = (string) config('interactive_map.places_api_key', '');
         if ($apiKey === '') {
-            return response()->json(['message' => 'Places API key is not configured.'], 503);
+            $apiKey = (string) config('app.google_maps_api_key', '');
+        }
+        if ($apiKey === '') {
+            return response()->json(['message' => 'Places API key is not configured. Set INTERACTIVE_MAP_PLACES_API_KEY or GOOGLE_MAPS_API_KEY.'], 503);
         }
 
         $response = Http::timeout(10)->get('https://maps.googleapis.com/maps/api/place/details/json', [
@@ -227,7 +265,7 @@ class InteractiveMapController extends Controller
         return $payload;
     }
 
-    /** @return array{label: string, back_url: string} */
+    /** @return array{label: string, back_url: string, hub_url?: string} */
     private function ownerContext(string $ownerType, int $ownerId): array
     {
         $model = $this->owners->findModel($ownerType, $ownerId);
@@ -240,6 +278,7 @@ class InteractiveMapController extends Controller
             'dha-phases' => [
                 'label' => (string) $model->title,
                 'back_url' => route('admin.dha-phases.edit', $model),
+                'hub_url' => route('admin.dha-phase-maps.index'),
             ],
             default => [
                 'label' => 'Record #' . $ownerId,

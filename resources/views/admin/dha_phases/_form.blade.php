@@ -483,6 +483,7 @@
     @if(!empty($phase->id))
         @php
             $interactiveMap = app(\App\Services\InteractiveMap\InteractiveMapService::class)->findOrCreateForOwner('dha-phases', (int) $phase->id);
+            $interactiveMap->load('sections');
         @endphp
         <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-5 shadow-lg">
             @include('admin.interactive-map._editor', [

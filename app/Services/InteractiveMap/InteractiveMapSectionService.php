@@ -1,30 +1,30 @@
 <?php
 
-namespace App\Services\Prototype;
+namespace App\Services\InteractiveMap;
 
-use App\Models\Prototype\PrototypeMapOverlay;
-use App\Models\Prototype\PrototypeMapSection;
+use App\Models\InteractiveMap;
+use App\Models\InteractiveMapSection;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
-class PrototypeMapSectionService
+class InteractiveMapSectionService
 {
-  /** @return Collection<int, PrototypeMapSection> */
-    public function listForOverlay(PrototypeMapOverlay $overlay): Collection
+    /** @return Collection<int, InteractiveMapSection> */
+    public function listForMap(InteractiveMap $map): Collection
     {
-        return $overlay->sections()->get();
+        return $map->sections()->get();
     }
 
     /** @param array<string, mixed> $data */
-    public function create(PrototypeMapOverlay $overlay, array $data): PrototypeMapSection
+    public function create(InteractiveMap $map, array $data): InteractiveMapSection
     {
         $this->validateGeometry($data['section_type'] ?? 'polygon', $data['geometry'] ?? []);
 
-        $maxSort = (int) $overlay->sections()->max('sort_order');
+        $maxSort = (int) $map->sections()->max('sort_order');
 
-        return PrototypeMapSection::query()->create([
-            'prototype_map_overlay_id' => $overlay->id,
-            'title' => $data['title'] ?? 'Untitled Section',
+        return InteractiveMapSection::query()->create([
+            'interactive_map_id' => $map->id,
+            'title' => $data['title'] ?? 'Untitled Plot',
             'section_type' => $data['section_type'] ?? 'polygon',
             'geometry' => $data['geometry'],
             'fill_color' => $data['fill_color'] ?? '#a9823d',
@@ -41,7 +41,7 @@ class PrototypeMapSectionService
     }
 
     /** @param array<string, mixed> $data */
-    public function update(PrototypeMapSection $section, array $data): PrototypeMapSection
+    public function update(InteractiveMapSection $section, array $data): InteractiveMapSection
     {
         if (isset($data['section_type'], $data['geometry'])) {
             $this->validateGeometry($data['section_type'], $data['geometry']);
@@ -72,7 +72,7 @@ class PrototypeMapSectionService
         return $section->fresh();
     }
 
-    public function delete(PrototypeMapSection $section): void
+    public function delete(InteractiveMapSection $section): void
     {
         $section->delete();
     }

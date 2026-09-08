@@ -46,6 +46,7 @@ use App\Http\Controllers\DhaPhaseBulkMediaController;
 use App\Http\Controllers\DhaFileRateController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\InteractiveMapController;
+use App\Http\Controllers\InteractiveMapSectionController;
 use App\Models\DhaSetting;
 use App\Models\DhaPhase;
 use App\Http\Controllers\ReportController;
@@ -735,7 +736,7 @@ Route::get('/dha/{phase:slug}', function (DhaPhase $phase) {
     if ($phase->status !== DhaPhase::STATUS_ACTIVE) {
         abort(404);
     }
-    $phase->load(['projectTypes:id,name,slug', 'interactiveMap']);
+    $phase->load(['projectTypes:id,name,slug', 'interactiveMap.activeSections']);
     $projectTypes = db_safe('dha_phase.project_types', fn () => ProjectType::orderBy('name')->get(['id', 'name', 'slug']), collect());
     $dhaPhases = db_safe('dha_phase.dha_phases', fn () => DhaPhase::active()->frontOrdered()->get(['id', 'title', 'slug']), collect());
     $lahoreCityId = db_safe('dha_phase.lahore_city', fn () => City::whereRaw('LOWER(name) = ?', ['lahore'])->value('id'));
@@ -1002,7 +1003,7 @@ Route::post('/careers/job/{slug}/apply', function (Request $request, string $slu
 })->name('careers.apply');
 
 Route::get('/project/{slug}', function ($slug) {
-    $project = Project::with('projectTypes', 'interactiveMap')->where('slug', $slug)->active()->firstOrFail();
+    $project = Project::with('projectTypes', 'interactiveMap.activeSections')->where('slug', $slug)->active()->firstOrFail();
     $daily = VisitorDailyCount::firstOrCreate(
         ['date' => now()->toDateString()],
         ['count' => 0, 'count_own_listing' => 0, 'count_dealer_listing' => 0, 'count_projects' => 0]
@@ -1014,7 +1015,7 @@ Route::get('/project/{slug}', function ($slug) {
 })->name('project.show');
 
 Route::get('/project-new/{slug}', function ($slug) {
-    $project = Project::with('projectTypes', 'interactiveMap')->where('slug', $slug)->active()->firstOrFail();
+    $project = Project::with('projectTypes', 'interactiveMap.activeSections')->where('slug', $slug)->active()->firstOrFail();
     return view('project-new', compact('project'));
 })->name('project.new.show');
 
@@ -1681,6 +1682,7 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/dha-phases/{dhaPhase}/edit', [DhaPhaseController::class, 'edit'])->name('admin.dha-phases.edit');
     Route::put('/admin/dha-phases/{dhaPhase}', [DhaPhaseController::class, 'update'])->name('admin.dha-phases.update');
     Route::delete('/admin/dha-phases/{dhaPhase}', [DhaPhaseController::class, 'destroy'])->name('admin.dha-phases.destroy');
+    Route::get('/admin/dha-phase-maps', [InteractiveMapController::class, 'dhaPhasesHub'])->name('admin.dha-phase-maps.index');
     Route::get('/admin/dha-phases/{dhaPhase}/interactive-map', [InteractiveMapController::class, 'editDhaPhase'])->name('admin.dha-phases.interactive-map');
 
     Route::get('/admin/dha-file-rates', [DhaFileRateController::class, 'edit'])->name('admin.dha-file-rates.edit');
@@ -1711,6 +1713,10 @@ Route::middleware('admin')->group(function () {
             Route::delete('/overlay', [InteractiveMapController::class, 'deleteOverlay'])->name('admin.interactive-map.overlay.delete');
             Route::post('/places/autocomplete', [InteractiveMapController::class, 'placesAutocomplete'])->name('admin.interactive-map.places.autocomplete');
             Route::get('/places/{placeId}', [InteractiveMapController::class, 'placesDetails'])->where('placeId', '.+')->name('admin.interactive-map.places.details');
+            Route::get('/sections', [InteractiveMapSectionController::class, 'index'])->name('admin.interactive-map.sections.index');
+            Route::post('/sections', [InteractiveMapSectionController::class, 'store'])->name('admin.interactive-map.sections.store');
+            Route::patch('/sections/{section}', [InteractiveMapSectionController::class, 'update'])->name('admin.interactive-map.sections.update');
+            Route::delete('/sections/{section}', [InteractiveMapSectionController::class, 'destroy'])->name('admin.interactive-map.sections.destroy');
         });
 
     Route::get('/admin/dealers', [DealerController::class, 'index'])->name('admin.dealers.index');

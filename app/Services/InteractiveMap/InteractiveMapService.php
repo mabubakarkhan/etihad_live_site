@@ -36,6 +36,7 @@ class InteractiveMapService
             'overlay_opacity' => $defaults['overlay_opacity'] ?? 0.85,
             'overlay_rotation' => $defaults['overlay_rotation'] ?? 0,
             'overlay_visibility_zoom' => $defaults['overlay_visibility_zoom'] ?? null,
+            'show_label_from_zoom' => $defaults['show_label_from_zoom'] ?? 16,
             'is_active' => $defaults['is_active'] ?? true,
         ]);
     }
@@ -56,6 +57,9 @@ class InteractiveMapService
             'overlay_visibility_zoom' => array_key_exists('overlay_visibility_zoom', $data)
                 ? $data['overlay_visibility_zoom']
                 : $map->overlay_visibility_zoom,
+            'show_label_from_zoom' => array_key_exists('show_label_from_zoom', $data)
+                ? $data['show_label_from_zoom']
+                : $map->show_label_from_zoom,
             'is_active' => array_key_exists('is_active', $data)
                 ? (bool) $data['is_active']
                 : $map->is_active,
@@ -96,6 +100,8 @@ class InteractiveMapService
     /** @return array<string, mixed> */
     public function toEditorPayload(InteractiveMap $map, string $ownerType, int $ownerId): array
     {
+        $map->loadMissing('sections');
+
         return $map->toEditorArray($ownerType, $ownerId);
     }
 }

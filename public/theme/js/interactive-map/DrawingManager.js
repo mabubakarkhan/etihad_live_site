@@ -1,7 +1,7 @@
 (function (window) {
     'use strict';
 
-    var PM = window.PrototypeMap = window.PrototypeMap || {};
+    var IM = window.InteractiveMap = window.InteractiveMap || {};
 
     function DrawingManager(map, options) {
         this.map = map;
@@ -406,5 +406,5 @@
         this.map = null;
     };
 
-    PM.DrawingManager = DrawingManager;
+    IM.DrawingManager = DrawingManager;
 })(window);

@@ -1,7 +1,7 @@
 (function (window) {
     'use strict';
 
-    var PM = window.PrototypeMap = window.PrototypeMap || {};
+    var IM = window.InteractiveMap = window.InteractiveMap || {};
 
     function SectionPanel(root, options) {
         this.root = root;
@@ -471,5 +471,5 @@
             .replace(/"/g, '&quot;');
     }
 
-    PM.SectionPanel = SectionPanel;
+    IM.SectionPanel = SectionPanel;
 })(window);

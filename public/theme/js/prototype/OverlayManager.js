@@ -14,6 +14,22 @@
         };
     }
 
+    function parseZoomValue(value) {
+        if (value === null || value === undefined || value === '') {
+            return null;
+        }
+        var parsed = parseInt(value, 10);
+        return isNaN(parsed) ? null : parsed;
+    }
+
+    function resolveHideFromZoom(config) {
+        var hide = parseZoomValue(config && config.hide_overlay_from_zoom);
+        if (hide !== null) {
+            return hide;
+        }
+        return parseZoomValue(config && config.max_zoom);
+    }
+
     function ensureOverlayClass(g) {
         if (GeographicImageOverlayClass) {
             return GeographicImageOverlayClass;
@@ -27,6 +43,7 @@
             this.div_ = null;
             this.img_ = null;
             this.visibleFromZoom_ = null;
+            this.hideFromZoom_ = null;
         }
 
         GeographicImageOverlay.prototype = Object.create(g.OverlayView.prototype);
@@ -79,6 +96,10 @@
                 this.div_.style.display = 'none';
                 return;
             }
+            if (this.hideFromZoom_ !== null && zoom >= this.hideFromZoom_) {
+                this.div_.style.display = 'none';
+                return;
+            }
 
             var projection = this.getProjection();
             if (!projection) {
@@ -124,7 +145,7 @@
             this.img_ = null;
         };
 
-        GeographicImageOverlay.prototype.setConfig = function (boundsLiteral, imageUrl, opacity, rotation, visibleFromZoom) {
+        GeographicImageOverlay.prototype.setConfig = function (boundsLiteral, imageUrl, opacity, rotation, visibleFromZoom, hideFromZoom) {
             this.boundsLiteral_ = boundsLiteral;
             if (imageUrl && this.img_ && this.img_.src !== imageUrl) {
                 this.imageUrl_ = imageUrl;
@@ -143,6 +164,9 @@
             }
             if (visibleFromZoom === null || typeof visibleFromZoom === 'number') {
                 this.visibleFromZoom_ = visibleFromZoom;
+            }
+            if (hideFromZoom === null || typeof hideFromZoom === 'number') {
+                this.hideFromZoom_ = hideFromZoom;
             }
             this.draw();
         };
@@ -164,13 +188,8 @@
         }
 
         var OverlayClass = ensureOverlayClass(g);
-        var visibleFromZoom = config.show_overlay_from_zoom === null || config.show_overlay_from_zoom === ''
-            ? null
-            : parseInt(config.show_overlay_from_zoom, 10);
-
-        if (isNaN(visibleFromZoom)) {
-            visibleFromZoom = null;
-        }
+        var visibleFromZoom = parseZoomValue(config.show_overlay_from_zoom);
+        var hideFromZoom = resolveHideFromZoom(config);
 
         if (!this.overlay_) {
             this.overlay_ = new OverlayClass(
@@ -180,6 +199,7 @@
                 parseFloat(config.overlay_rotation) || 0
             );
             this.overlay_.visibleFromZoom_ = visibleFromZoom;
+            this.overlay_.hideFromZoom_ = hideFromZoom;
             this.overlay_.setMap(this.map);
         } else {
             this.overlay_.setConfig(
@@ -187,7 +207,8 @@
                 config.overlay_url,
                 parseFloat(config.overlay_opacity),
                 parseFloat(config.overlay_rotation) || 0,
-                visibleFromZoom
+                visibleFromZoom,
+                hideFromZoom
             );
         }
     };
@@ -202,10 +223,16 @@
         var opacity = partial.overlay_opacity !== undefined ? parseFloat(partial.overlay_opacity) : this.overlay_.opacity_;
         var rotation = partial.overlay_rotation !== undefined ? parseFloat(partial.overlay_rotation) : this.overlay_.rotation_;
         var visibleFromZoom = partial.show_overlay_from_zoom !== undefined
-            ? (partial.show_overlay_from_zoom === null || partial.show_overlay_from_zoom === '' ? null : parseInt(partial.show_overlay_from_zoom, 10))
+            ? parseZoomValue(partial.show_overlay_from_zoom)
             : this.overlay_.visibleFromZoom_;
+        var hideFromZoom = (partial.hide_overlay_from_zoom !== undefined || partial.max_zoom !== undefined)
+            ? resolveHideFromZoom(Object.assign({
+                hide_overlay_from_zoom: this.overlay_.hideFromZoom_,
+                max_zoom: null,
+            }, partial))
+            : this.overlay_.hideFromZoom_;
 
-        this.overlay_.setConfig(bounds, url, opacity, rotation, visibleFromZoom);
+        this.overlay_.setConfig(bounds, url, opacity, rotation, visibleFromZoom, hideFromZoom);
     };
 
     OverlayManager.prototype.hide = function () {

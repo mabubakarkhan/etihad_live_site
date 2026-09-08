@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Models\Prototype;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PrototypeMapSection extends Model
+class InteractiveMapSection extends Model
 {
-    protected $table = 'prototype_map_sections';
+    protected $table = 'interactive_map_sections';
 
     protected $fillable = [
-        'prototype_map_overlay_id',
+        'interactive_map_id',
         'title',
         'section_type',
         'geometry',
@@ -35,9 +35,9 @@ class PrototypeMapSection extends Model
         'sort_order' => 'integer',
     ];
 
-    public function overlay(): BelongsTo
+    public function map(): BelongsTo
     {
-        return $this->belongsTo(PrototypeMapOverlay::class, 'prototype_map_overlay_id');
+        return $this->belongsTo(InteractiveMap::class, 'interactive_map_id');
     }
 
     /** @return array<string, mixed> */
@@ -65,7 +65,6 @@ class PrototypeMapSection extends Model
     {
         return array_merge($this->toMapConfig(), [
             'notes' => $this->notes,
-            'sort_order' => $this->sort_order,
             'updated_at' => $this->updated_at?->toIso8601String(),
         ]);
     }

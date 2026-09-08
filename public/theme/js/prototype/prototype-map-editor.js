@@ -293,6 +293,10 @@
             if (self.overlayManager && self.overlayManager.overlay_) {
                 self.overlayManager.overlay_.draw();
             }
+            self.refreshPlotLabels();
+        });
+        this.mapManager.on('idle', function () {
+            self.refreshPlotLabels();
         });
     };
 
@@ -364,6 +368,30 @@
         this.initGisModules();
     };
 
+    PrototypeMapEditor.prototype.refreshPlotLabels = function () {
+        if (!this.sectionManager) {
+            return;
+        }
+        var map = this.mapManager && this.mapManager.getMap();
+        this.sectionManager.applyLabelVisibility(map ? map.getZoom() : undefined);
+    };
+
+    PrototypeMapEditor.prototype.queueGeometrySave = function (id, geometry) {
+        var self = this;
+        clearTimeout(this.geometrySaveTimer_);
+        this.geometrySaveTimer_ = setTimeout(function () {
+            var key = String(id);
+            var serialized = JSON.stringify(geometry);
+            if (self.lastSavedGeometry_[key] === serialized) {
+                return;
+            }
+            self.lastSavedGeometry_[key] = serialized;
+            if (self.sectionPanel && self.sectionPanel.saveGeometry) {
+                self.sectionPanel.saveGeometry(id, geometry);
+            }
+        }, 450);
+    };
+
     PrototypeMapEditor.prototype.initGisModules = function () {
         var self = this;
         var sectionPanelRoot = this.root.querySelector('[data-section-panel]');
@@ -372,9 +400,15 @@
         }
 
         try {
+            this.geometrySaveTimer_ = null;
+            this.lastSavedGeometry_ = {};
+
             this.drawingManager = new PM.DrawingManager(this.mapManager.getMap(), {
                 hintEl: document.getElementById('prototype-draw-hint'),
                 onComplete: function (payload) {
+                    if (self.sectionManager) {
+                        self.sectionManager.setInteractive(true);
+                    }
                     self.sectionPanel.handleDrawComplete(payload);
                     self.drawingManager.cancel();
                     sectionPanelRoot.querySelectorAll('[data-draw-mode]').forEach(function (b) {
@@ -390,11 +424,20 @@
 
             this.sectionManager = new PM.SectionManager(this.mapManager.getMap(), {
                 onSelect: function (section) {
-                    if (self.sectionPanel && section) {
+                    if (!self.sectionPanel) {
+                        return;
+                    }
+                    if (section) {
                         self.sectionPanel.selectSection(section.id);
+                    } else {
+                        self.sectionPanel.selectSection(null);
                     }
                 },
+                onGeometryChange: function (id, geometry) {
+                    self.queueGeometrySave(id, geometry);
+                },
             });
+            this.sectionManager.setDefaultLabelZoom(this.data.show_label_from_zoom);
             this.sectionManager.load(this.data.sections || []);
 
             this.sectionPanel = new PM.SectionPanel(sectionPanelRoot, {
@@ -407,12 +450,18 @@
                         showAlert('Drawing tools are not ready yet.', 'error');
                         return;
                     }
+                    if (self.sectionManager) {
+                        self.sectionManager.setInteractive(false);
+                    }
                     self.drawingManager.setStyle(self.sectionPanel.getDrawStyle());
                     self.drawingManager.setMode(mode);
                 },
                 onDrawCancel: function () {
                     if (self.drawingManager) {
                         self.drawingManager.cancel();
+                    }
+                    if (self.sectionManager) {
+                        self.sectionManager.setInteractive(true);
                     }
                 },
                 onDrawStyleChange: function (style) {
@@ -423,14 +472,38 @@
                 onSectionSelect: function (section) {
                     self.sectionManager.select(section.id);
                 },
+                onClearFocus: function () {
+                    if (self.drawingManager) {
+                        self.drawingManager.cancel();
+                    }
+                    if (self.sectionManager) {
+                        self.sectionManager.clearSelection();
+                    }
+                    var map = self.mapManager && self.mapManager.getMap();
+                    if (map) {
+                        map.setOptions({
+                            draggable: true,
+                            doubleClickZoom: true,
+                            draggableCursor: null,
+                            draggingCursor: null,
+                        });
+                    }
+                },
+                onToggleVisibility: function (id, hidden) {
+                    self.sectionManager.setHidden(id, hidden);
+                },
                 onSectionsChange: function (sections, section, action) {
                     if (action === 'delete') {
                         self.sectionManager.remove(section.id);
+                    } else if (action === 'geometry') {
+                        self.sectionManager.syncData(section);
                     } else {
                         self.sectionManager.upsert(section);
+                        self.refreshPlotLabels();
                     }
                 },
             });
+            this.refreshPlotLabels();
         } catch (err) {
             showAlert('GIS drawing tools could not load: ' + err.message, 'error');
         }
@@ -451,6 +524,10 @@
             this.overlayManager.show(overlayConfig);
         } else if (overlayConfig.bounds) {
             this.overlayManager.updateLive(overlayConfig);
+        }
+
+        if (config.show_label_from_zoom !== undefined && this.sectionManager) {
+            this.sectionManager.setDefaultLabelZoom(config.show_label_from_zoom);
         }
     };
 
@@ -474,6 +551,10 @@
             this.overlayManager.show(data);
         } else {
             this.overlayManager.hide();
+        }
+
+        if (this.sectionManager) {
+            this.sectionManager.setDefaultLabelZoom(data.show_label_from_zoom);
         }
     };
 

@@ -95,7 +95,31 @@
                     opacity: config.overlay_opacity,
                 });
 
+                var sectionManager = null;
+                if (IM.SectionManager && config.sections && config.sections.length) {
+                    sectionManager = new IM.SectionManager(mapManager.getMap());
+                    sectionManager.setInteractive(false);
+                    sectionManager.setDefaultLabelZoom(config.show_label_from_zoom);
+                    sectionManager.load(config.sections);
+                }
+
+                function refreshFrontLabels() {
+                    if (!sectionManager) {
+                        return;
+                    }
+                    var map = mapManager.getMap();
+                    sectionManager.applyLabelVisibility(map ? map.getZoom() : undefined);
+                }
+
+                var map = mapManager.getMap();
+                var g = window.google && window.google.maps;
+                if (map && g && g.event) {
+                    g.event.addListener(map, 'zoom_changed', refreshFrontLabels);
+                    g.event.addListener(map, 'idle', refreshFrontLabels);
+                }
+
                 mapManager.fitBounds(config.bounds);
+                refreshFrontLabels();
             })
             .catch(function () {
                 el.classList.add('portal-map-section__map-canvas--error');

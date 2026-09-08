@@ -1001,6 +1001,7 @@
     @if(!empty($project?->id))
         @php
             $interactiveMap = app(\App\Services\InteractiveMap\InteractiveMapService::class)->findOrCreateForOwner('projects', (int) $project->id);
+            $interactiveMap->load('sections');
         @endphp
         @include('admin.interactive-map._editor', [
             'ownerType' => 'projects',

@@ -92,10 +92,13 @@
         this.previewImg = root.querySelector('[data-overlay-preview-img]');
         this.previewEmpty = root.querySelector('[data-overlay-empty]');
         this.deleteBtn = root.querySelector('[data-overlay-delete]');
+        this.overlayEditBtn = root.querySelector('[data-overlay-edit-mode]');
+        this.plotEditBtn = root.querySelector('[data-plot-edit-mode]');
         this.fileInput = root.querySelector('[data-overlay-input]');
         this.saveBtn = root.querySelector('[data-save-settings]');
         this.searchInput = root.querySelector('[data-map-search]');
         this.searchManager = null;
+        this.editorMode = 'overlay';
         this.callbackName = 'initInteractiveMapEditor_' + root.id.replace(/[^a-zA-Z0-9_]/g, '_');
 
         try {
@@ -201,10 +204,30 @@
         }
 
         if (this.deleteBtn) {
-            this.deleteBtn.addEventListener('click', function () {
-                if (confirm('Remove the overlay image?')) {
+            this.deleteBtn.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!self.data.overlay_url && !self.data.overlay_image_path) {
+                    self.toolbar.showToast('No overlay to delete.', 'error');
+                    return;
+                }
+                if (confirm('Remove the overlay image? You can upload a new one after.')) {
                     self.deleteOverlay();
                 }
+            });
+        }
+
+        if (this.overlayEditBtn) {
+            this.overlayEditBtn.addEventListener('click', function (event) {
+                event.preventDefault();
+                self.setEditorMode('overlay');
+            });
+        }
+
+        if (this.plotEditBtn) {
+            this.plotEditBtn.addEventListener('click', function (event) {
+                event.preventDefault();
+                self.setEditorMode('plots');
             });
         }
     };
@@ -239,7 +262,7 @@
                     },
                 });
 
-                self.applyLivePreview();
+                self.applyLivePreview({ fit: true });
 
                 if (bounds) {
                     self.mapManager.fitBounds(bounds);
@@ -251,16 +274,211 @@
                     g.event.addListenerOnce(map, 'idle', function () {
                         self.initSearch();
                     });
+                    g.event.addListener(map, 'zoom_changed', function () {
+                        self.refreshPlotLabels();
+                    });
+                    g.event.addListener(map, 'idle', function () {
+                        self.refreshPlotLabels();
+                    });
                 } else {
                     self.initSearch();
                 }
 
-                self.toolbar.setStatus('Live preview ready — drag overlay to position, then save');
+                self.initGisModules();
+                self.setEditorMode(self.data.overlay_url ? 'overlay' : 'plots');
+                self.toolbar.setStatus('Ready — Edit overlay to drag/replace, or Edit plots to draw cuttings');
             })
             .catch(function (err) {
                 self.toolbar.setStatus(err.message || 'Map failed to load');
                 self.toolbar.showToast(err.message || 'Map failed to load', 'error');
             });
+    };
+
+    InteractiveMapEditor.prototype.setEditorMode = function (mode) {
+        this.editorMode = mode === 'plots' ? 'plots' : 'overlay';
+
+        if (this.overlayEditBtn) {
+            this.overlayEditBtn.classList.toggle('is-active', this.editorMode === 'overlay');
+        }
+        if (this.plotEditBtn) {
+            this.plotEditBtn.classList.toggle('is-active', this.editorMode === 'plots');
+        }
+
+        if (this.drawingManager && this.editorMode === 'overlay') {
+            this.drawingManager.cancel();
+            this.root.querySelectorAll('[data-draw-mode]').forEach(function (b) {
+                b.classList.remove('is-active');
+            });
+        }
+
+        if (this.overlayManager && typeof this.overlayManager.setDraggable === 'function') {
+            this.overlayManager.setDraggable(this.editorMode === 'overlay' && !!this.data.overlay_url);
+        }
+
+        if (this.sectionManager) {
+            if (this.editorMode === 'plots') {
+                this.sectionManager.setInteractive(true);
+            } else {
+                this.sectionManager.clearSelection();
+                this.sectionManager.setInteractive(false);
+                if (this.sectionPanel) {
+                    this.sectionPanel.selectSection(null);
+                }
+            }
+        }
+
+        this.toolbar.setStatus(
+            this.editorMode === 'overlay'
+                ? 'Overlay edit mode — drag gold area to move, upload to replace, delete to remove'
+                : 'Plot edit mode — draw or select cuttings to adjust'
+        );
+    };
+
+    InteractiveMapEditor.prototype.refreshPlotLabels = function () {
+        if (!this.sectionManager) {
+            return;
+        }
+        var map = this.mapManager && this.mapManager.getMap();
+        this.sectionManager.applyLabelVisibility(map ? map.getZoom() : undefined);
+    };
+
+    InteractiveMapEditor.prototype.queueGeometrySave = function (id, geometry) {
+        var self = this;
+        clearTimeout(this.geometrySaveTimer_);
+        this.geometrySaveTimer_ = setTimeout(function () {
+            var key = String(id);
+            var serialized = JSON.stringify(geometry);
+            if (self.lastSavedGeometry_[key] === serialized) {
+                return;
+            }
+            self.lastSavedGeometry_[key] = serialized;
+            if (self.sectionPanel && self.sectionPanel.saveGeometry) {
+                self.sectionPanel.saveGeometry(id, geometry);
+            }
+        }, 450);
+    };
+
+    InteractiveMapEditor.prototype.initGisModules = function () {
+        var self = this;
+        var sectionPanelRoot = this.root.querySelector('[data-section-panel]');
+        if (!sectionPanelRoot || !IM.SectionManager || !IM.DrawingManager || !IM.SectionPanel) {
+            return;
+        }
+
+        if (this.drawingManager || this.sectionManager || this.sectionPanel) {
+            return;
+        }
+
+        try {
+            this.geometrySaveTimer_ = null;
+            this.lastSavedGeometry_ = {};
+
+            this.drawingManager = new IM.DrawingManager(this.mapManager.getMap(), {
+                hintEl: this.root.querySelector('[data-draw-hint]'),
+                onComplete: function (payload) {
+                    self.setEditorMode('plots');
+                    self.sectionPanel.handleDrawComplete(payload);
+                    self.drawingManager.cancel();
+                    sectionPanelRoot.querySelectorAll('[data-draw-mode]').forEach(function (b) {
+                        b.classList.remove('is-active');
+                    });
+                },
+            });
+
+            if (!this.drawingManager.init()) {
+                this.toolbar.showToast('Drawing tools could not initialize.', 'error');
+                return;
+            }
+
+            this.sectionManager = new IM.SectionManager(this.mapManager.getMap(), {
+                onSelect: function (section) {
+                    if (!self.sectionPanel) {
+                        return;
+                    }
+                    if (section) {
+                        self.sectionPanel.selectSection(section.id);
+                    } else {
+                        self.sectionPanel.selectSection(null);
+                    }
+                },
+                onGeometryChange: function (id, geometry) {
+                    self.queueGeometrySave(id, geometry);
+                },
+            });
+            this.sectionManager.setDefaultLabelZoom(this.data.show_label_from_zoom);
+            this.sectionManager.load(this.data.sections || []);
+
+            this.sectionPanel = new IM.SectionPanel(sectionPanelRoot, {
+                csrf: this.csrf,
+                sections: this.data.sections || [],
+                routes: {
+                    store: this.apiBase + '/sections',
+                    update: this.apiBase + '/sections/__SECTION__',
+                    destroy: this.apiBase + '/sections/__SECTION__',
+                },
+                onAlert: function (message, type) {
+                    self.toolbar.showToast(message, type === 'error' ? 'error' : 'success');
+                },
+                onDrawMode: function (mode) {
+                    self.setEditorMode('plots');
+                    if (self.sectionManager) {
+                        self.sectionManager.setInteractive(false);
+                    }
+                    self.drawingManager.setStyle(self.sectionPanel.getDrawStyle());
+                    self.drawingManager.setMode(mode);
+                },
+                onDrawCancel: function () {
+                    if (self.drawingManager) {
+                        self.drawingManager.cancel();
+                    }
+                    self.setEditorMode('plots');
+                },
+                onDrawStyleChange: function (style) {
+                    if (self.drawingManager) {
+                        self.drawingManager.setStyle(style);
+                    }
+                },
+                onSectionSelect: function (section) {
+                    self.setEditorMode('plots');
+                    self.sectionManager.select(section.id);
+                },
+                onClearFocus: function () {
+                    if (self.drawingManager) {
+                        self.drawingManager.cancel();
+                    }
+                    if (self.sectionManager) {
+                        self.sectionManager.clearSelection();
+                    }
+                    var map = self.mapManager && self.mapManager.getMap();
+                    if (map) {
+                        map.setOptions({
+                            draggable: true,
+                            doubleClickZoom: true,
+                            draggableCursor: null,
+                            draggingCursor: null,
+                        });
+                    }
+                    self.setEditorMode('overlay');
+                },
+                onToggleVisibility: function (id, hidden) {
+                    self.sectionManager.setHidden(id, hidden);
+                },
+                onSectionsChange: function (sections, section, action) {
+                    self.data.sections = sections;
+                    if (action === 'delete') {
+                        self.sectionManager.remove(section.id);
+                    } else if (action === 'geometry') {
+                        self.sectionManager.syncData(section);
+                    } else {
+                        self.sectionManager.upsert(section);
+                        self.refreshPlotLabels();
+                    }
+                },
+            });
+            this.refreshPlotLabels();
+        } catch (err) {
+            this.toolbar.showToast('Plot tools failed: ' + (err.message || 'unknown error'), 'error');
+        }
     };
 
     InteractiveMapEditor.prototype.initSearch = function () {
@@ -269,6 +487,12 @@
         }
 
         if (this.searchManager) {
+            return;
+        }
+
+        if (!window.EtihadPlacesAutocomplete) {
+            this.toolbar.setStatus('Map ready (search script missing)');
+            this.toolbar.showToast('Search script failed to load.', 'error');
             return;
         }
 
@@ -294,8 +518,12 @@
         });
 
         if (!this.searchManager.init()) {
-            this.toolbar.setStatus('Map ready (shared Places search unavailable)');
+            this.toolbar.setStatus('Map ready (search unavailable)');
+            this.toolbar.showToast('Location search could not start. Check Places API key.', 'error');
+            return;
         }
+
+        this.toolbar.setStatus('Search ready — type a landmark to jump on the map');
     };
 
     InteractiveMapEditor.prototype.onOverlayBoundsDragging = function (bounds) {
@@ -376,7 +604,8 @@
         }, 250);
     };
 
-    InteractiveMapEditor.prototype.applyLivePreview = function () {
+    InteractiveMapEditor.prototype.applyLivePreview = function (options) {
+        options = options || {};
         if (!this.mapManager || !this.overlayManager) {
             return;
         }
@@ -391,7 +620,7 @@
         this.mapManager.setZoomLimits(form.min_zoom || 0, form.max_zoom || 22);
         this.mapManager.drawBoundsRectangle(bounds);
 
-        if (bounds) {
+        if (options.fit && bounds) {
             this.mapManager.fitBounds(bounds);
         }
 
@@ -401,8 +630,15 @@
                 bounds: bounds,
                 opacity: form.overlay_opacity,
             });
+            if (typeof this.overlayManager.setDraggable === 'function') {
+                this.overlayManager.setDraggable(this.editorMode === 'overlay');
+            }
         } else {
             this.overlayManager.clear();
+        }
+
+        if (this.sectionManager && form.show_label_from_zoom !== undefined) {
+            this.sectionManager.setDefaultLabelZoom(form.show_label_from_zoom);
         }
     };
 
@@ -442,7 +678,15 @@
             body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
             credentials: 'same-origin',
         }).then(function (response) {
-            return response.json().then(function (json) {
+            return response.text().then(function (text) {
+                var json = {};
+                if (text) {
+                    try {
+                        json = JSON.parse(text);
+                    } catch (e) {
+                        throw new Error(response.ok ? 'Invalid server response.' : 'Request failed.');
+                    }
+                }
                 if (!response.ok) {
                     var message = json.message || 'Request failed';
                     if (json.errors) {
@@ -456,10 +700,18 @@
     };
 
     InteractiveMapEditor.prototype.mergeData = function (payload) {
+        var previousSections = this.data.sections;
         this.data = payload || this.data;
+        if (!this.data.sections && previousSections) {
+            this.data.sections = previousSections;
+        }
         this.toolbar.write(this.data);
         this.updatePreview(this.data.overlay_url);
         this.applyLivePreview();
+        if (this.sectionManager) {
+            this.sectionManager.setDefaultLabelZoom(this.data.show_label_from_zoom);
+            this.refreshPlotLabels();
+        }
     };
 
     InteractiveMapEditor.prototype.saveSettings = function () {
@@ -488,9 +740,12 @@
 
         this.request('POST', '/overlay', formData, true)
             .then(function (json) {
-                self.fileInput.value = '';
+                if (self.fileInput) {
+                    self.fileInput.value = '';
+                }
                 self.mergeData(json.data);
-                self.toolbar.setStatus('Overlay uploaded');
+                self.setEditorMode('overlay');
+                self.toolbar.setStatus('Overlay uploaded — drag to position');
                 self.toolbar.showToast(json.message || 'Overlay uploaded', 'success');
             })
             .catch(function (err) {
@@ -505,8 +760,16 @@
 
         this.request('DELETE', '/overlay')
             .then(function (json) {
-                self.mergeData(json.data);
-                self.toolbar.setStatus('Overlay removed');
+                var payload = json.data || {};
+                payload.overlay_url = null;
+                payload.overlay_image_path = null;
+                self.mergeData(payload);
+                if (self.overlayManager) {
+                    self.overlayManager.clear();
+                }
+                self.updatePreview(null);
+                self.setEditorMode('plots');
+                self.toolbar.setStatus('Overlay removed — upload a new file to recreate');
                 self.toolbar.showToast(json.message || 'Overlay removed', 'success');
             })
             .catch(function (err) {

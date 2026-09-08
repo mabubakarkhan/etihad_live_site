@@ -97,32 +97,32 @@
                 var overlayManager = new PM.OverlayManager(mapManager.getMap());
                 var sectionManager = null;
 
-                if (overlayData && overlayData.overlay_url && bounds && overlayData.status === 'active') {
+                if (overlayData && overlayData.overlay_url && bounds) {
                     overlayManager.show(overlayData);
                 } else if (!overlayData) {
                     showStatus('No overlay selected.');
-                } else if (overlayData.status !== 'active') {
-                    showStatus('This overlay is not active.');
                 } else if (!overlayData.overlay_url) {
-                    showStatus('No overlay image uploaded.');
+                    showStatus('No overlay image uploaded yet — plot cuttings still show.');
                 }
 
                 if (PM.SectionManager && overlayData && overlayData.sections && overlayData.sections.length) {
                     sectionManager = new PM.SectionManager(mapManager.getMap());
+                    sectionManager.setDefaultLabelZoom(overlayData.show_label_from_zoom);
                     sectionManager.load(overlayData.sections);
                 }
 
-                mapManager.on('zoom_changed', function () {
+                function refreshViewerLayers() {
                     if (overlayManager.overlay_) {
                         overlayManager.overlay_.draw();
                     }
-                });
+                    if (sectionManager) {
+                        var map = mapManager.getMap();
+                        sectionManager.applyLabelVisibility(map ? map.getZoom() : undefined);
+                    }
+                }
 
-                mapManager.on('idle', function () {
-                    if (overlayManager.overlay_) {
-                        overlayManager.overlay_.draw();
-                    }
-                });
+                mapManager.on('zoom_changed', refreshViewerLayers);
+                mapManager.on('idle', refreshViewerLayers);
             })
             .catch(function (err) {
                 showStatus(err.message);

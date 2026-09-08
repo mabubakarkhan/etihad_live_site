@@ -25,6 +25,7 @@ class UpdateInteractiveMapRequest extends FormRequest
             'overlay_opacity' => ['required', 'numeric', 'min:0', 'max:1'],
             'overlay_rotation' => ['nullable', 'numeric', 'min:-360', 'max:360'],
             'overlay_visibility_zoom' => ['nullable', 'integer', 'min:0', 'max:22'],
+            'show_label_from_zoom' => ['nullable', 'integer', 'min:0', 'max:22'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }
