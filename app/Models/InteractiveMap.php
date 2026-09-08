@@ -16,6 +16,7 @@ class InteractiveMap extends Model
         'south',
         'east',
         'west',
+        'overlay_path',
         'default_zoom',
         'min_zoom',
         'max_zoom',
@@ -31,6 +32,7 @@ class InteractiveMap extends Model
         'south' => 'float',
         'east' => 'float',
         'west' => 'float',
+        'overlay_path' => 'array',
         'default_zoom' => 'integer',
         'min_zoom' => 'integer',
         'max_zoom' => 'integer',
@@ -92,6 +94,29 @@ class InteractiveMap extends Model
         ];
     }
 
+    /** @return list<array{lat: float, lng: float}>|null */
+    public function overlayPathArray(): ?array
+    {
+        if (! is_array($this->overlay_path) || count($this->overlay_path) < 3) {
+            return null;
+        }
+
+        $points = [];
+        foreach ($this->overlay_path as $point) {
+            if (! is_array($point)) {
+                continue;
+            }
+            $lat = isset($point['lat']) ? (float) $point['lat'] : null;
+            $lng = isset($point['lng']) ? (float) $point['lng'] : null;
+            if ($lat === null || $lng === null) {
+                continue;
+            }
+            $points[] = ['lat' => $lat, 'lng' => $lng];
+        }
+
+        return count($points) >= 3 ? $points : null;
+    }
+
     public function isReadyForFront(): bool
     {
         return (bool) $this->is_active
@@ -133,6 +158,7 @@ class InteractiveMap extends Model
             'south' => $this->south,
             'east' => $this->east,
             'west' => $this->west,
+            'overlay_path' => $this->overlayPathArray(),
             'default_zoom' => $this->default_zoom,
             'min_zoom' => $this->min_zoom,
             'max_zoom' => $this->max_zoom,

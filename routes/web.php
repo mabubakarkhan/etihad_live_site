@@ -1716,7 +1716,9 @@ Route::middleware('admin')->group(function () {
             Route::get('/sections', [InteractiveMapSectionController::class, 'index'])->name('admin.interactive-map.sections.index');
             Route::post('/sections', [InteractiveMapSectionController::class, 'store'])->name('admin.interactive-map.sections.store');
             Route::patch('/sections/{section}', [InteractiveMapSectionController::class, 'update'])->name('admin.interactive-map.sections.update');
+            Route::post('/sections/{section}/update', [InteractiveMapSectionController::class, 'update'])->name('admin.interactive-map.sections.update.post');
             Route::delete('/sections/{section}', [InteractiveMapSectionController::class, 'destroy'])->name('admin.interactive-map.sections.destroy');
+            Route::post('/sections/{section}/delete', [InteractiveMapSectionController::class, 'destroy'])->name('admin.interactive-map.sections.destroy.post');
         });
 
     Route::get('/admin/dealers', [DealerController::class, 'index'])->name('admin.dealers.index');

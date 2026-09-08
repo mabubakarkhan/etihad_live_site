@@ -69,6 +69,38 @@
         return { north: north, south: south, east: east, west: west };
     }
 
+    function pathFromData(data) {
+        if (!data || !Array.isArray(data.overlay_path) || data.overlay_path.length < 3) {
+            return null;
+        }
+        var path = [];
+        for (var i = 0; i < data.overlay_path.length; i += 1) {
+            var point = data.overlay_path[i];
+            if (!point) {
+                continue;
+            }
+            var lat = parseFloat(point.lat);
+            var lng = parseFloat(point.lng);
+            if (isNaN(lat) || isNaN(lng)) {
+                continue;
+            }
+            path.push({ lat: lat, lng: lng });
+        }
+        return path.length >= 3 ? path : null;
+    }
+
+    function normalizePathPoints(path) {
+        if (!Array.isArray(path) || path.length < 3) {
+            return null;
+        }
+        return path.map(function (point) {
+            return {
+                lat: roundCoord(point.lat),
+                lng: roundCoord(point.lng),
+            };
+        });
+    }
+
     function centerFromBounds(bounds) {
         if (!bounds) {
             return { lat: 31.5204, lng: 74.3587 };
@@ -254,11 +286,11 @@
                 self.mapManager.init();
 
                 self.mapManager.setBoundsEditHandlers({
-                    onBoundsDrag: function (bounds) {
-                        self.onGoldBoxDragging(bounds);
+                    onBoundsDrag: function (bounds, path) {
+                        self.onGoldBoxDragging(bounds, path);
                     },
-                    onBoundsChanged: function (bounds) {
-                        self.onGoldBoxChanged(bounds);
+                    onBoundsChanged: function (bounds, path) {
+                        self.onGoldBoxChanged(bounds, path);
                     },
                 });
 
@@ -298,7 +330,7 @@
 
                 self.initGisModules();
                 self.setEditorMode('overlay');
-                self.toolbar.setStatus('Drag the gold box or its corners to place the map area');
+                self.toolbar.setStatus('Drag gold polygon corners or edge midpoints to reshape the map area');
             })
             .catch(function (err) {
                 self.toolbar.setStatus(err.message || 'Map failed to load');
@@ -311,7 +343,7 @@
 
         if (this.overlayEditBtn) {
             this.overlayEditBtn.classList.toggle('is-active', this.editorMode === 'overlay');
-            this.overlayEditBtn.textContent = 'Move / resize box';
+            this.overlayEditBtn.textContent = 'Reshape area';
         }
         if (this.plotEditBtn) {
             this.plotEditBtn.classList.toggle('is-active', this.editorMode === 'plots');
@@ -347,8 +379,8 @@
 
         this.toolbar.setStatus(
             this.editorMode === 'overlay'
-                ? 'Gold box mode — drag the square or corners. Upload image fills this box.'
-                : 'Plot mode — draw or select cuttings inside the box'
+                ? 'Area mode — drag corners or edge midpoints to reshape the gold polygon.'
+                : 'Plot mode — draw or select cuttings; tools stay in the small side panel.'
         );
     };
 
@@ -399,6 +431,14 @@
                     self.root.querySelectorAll('[data-draw-mode]').forEach(function (b) {
                         b.classList.remove('is-active');
                     });
+                    if (self.sectionPanel && self.sectionPanel.setDraftPoints) {
+                        self.sectionPanel.setDraftPoints([]);
+                    }
+                },
+                onPointsChange: function (points) {
+                    if (self.sectionPanel && self.sectionPanel.setDraftPoints) {
+                        self.sectionPanel.setDraftPoints(points || []);
+                    }
                 },
             });
 
@@ -420,6 +460,12 @@
                 },
                 onGeometryChange: function (id, geometry) {
                     self.queueGeometrySave(id, geometry);
+                    if (self.sectionPanel && self.sectionPanel.selected
+                        && String(self.sectionPanel.selected.id) === String(id)
+                        && self.sectionPanel.refreshVerticesFromSelected) {
+                        self.sectionPanel.selected.geometry = geometry;
+                        self.sectionPanel.refreshVerticesFromSelected();
+                    }
                 },
             });
             this.sectionManager.setDefaultLabelZoom(this.data.show_label_from_zoom);
@@ -428,10 +474,52 @@
             this.sectionPanel = new IM.SectionPanel(this.root, {
                 csrf: this.csrf,
                 sections: this.data.sections || [],
+                drawerStorageKey: 'ime-plot-drawer:' + (this.data.owner_type || 'map') + ':' + (this.data.owner_id || this.root.id),
                 routes: {
                     store: this.apiBase + '/sections',
                     update: this.apiBase + '/sections/__SECTION__',
+                    updatePost: this.apiBase + '/sections/__SECTION__/update',
                     destroy: this.apiBase + '/sections/__SECTION__',
+                    destroyPost: this.apiBase + '/sections/__SECTION__/delete',
+                },
+                getVertices: function (id) {
+                    return self.sectionManager && self.sectionManager.getVertices
+                        ? self.sectionManager.getVertices(id)
+                        : [];
+                },
+                getLiveGeometry: function (id) {
+                    return self.sectionManager && self.sectionManager.getGeometryFromShape
+                        ? self.sectionManager.getGeometryFromShape(id)
+                        : null;
+                },
+                onVertexFocus: function (id, index) {
+                    if (self.sectionManager && self.sectionManager.focusVertex) {
+                        self.sectionManager.focusVertex(id, index);
+                    }
+                },
+                onVertexDelete: function (id, index) {
+                    if (!self.sectionManager || !self.sectionManager.removeVertexAt) {
+                        return { ok: false, message: 'Point tools unavailable.' };
+                    }
+                    return self.sectionManager.removeVertexAt(id, index);
+                },
+                onDraftVertexDelete: function (index) {
+                    if (self.drawingManager && self.drawingManager.removeDraftPointAt) {
+                        self.drawingManager.removeDraftPointAt(index);
+                    }
+                },
+                onDraftVertexFocus: function (index, point) {
+                    if (!point || !self.mapManager || !self.mapManager.getMap) {
+                        return;
+                    }
+                    var map = self.mapManager.getMap();
+                    if (map) {
+                        map.panTo({ lat: point.lat, lng: point.lng });
+                    }
+                },
+                hasActiveDraft: function () {
+                    return !!(self.drawingManager && self.drawingManager.mode === 'polygon'
+                        && self.drawingManager.polygonPath_ && self.drawingManager.polygonPath_.length);
                 },
                 onAlert: function (message, type) {
                     self.toolbar.showToast(message, type === 'error' ? 'error' : 'success');
@@ -497,6 +585,7 @@
                     self.data.sections = sections;
                     if (action === 'delete') {
                         self.sectionManager.remove(section.id);
+                        self.sectionManager.clearSelection();
                     } else if (action === 'geometry') {
                         self.sectionManager.syncData(section);
                     } else {
@@ -556,16 +645,20 @@
         this.toolbar.setStatus('Search ready — type a landmark to jump on the map');
     };
 
-    InteractiveMapEditor.prototype.onGoldBoxDragging = function (bounds) {
+    InteractiveMapEditor.prototype.applyGoldPathUpdate_ = function (bounds, path, statusMessage) {
         var normalized = normalizeDraggedBounds(bounds);
         if (!normalized) {
-            return;
+            return null;
         }
 
+        var normalizedPath = normalizePathPoints(path);
         this.data.north = normalized.north;
         this.data.south = normalized.south;
         this.data.east = normalized.east;
         this.data.west = normalized.west;
+        if (normalizedPath) {
+            this.data.overlay_path = normalizedPath;
+        }
         this.toolbar.write(normalized, true);
 
         if (this.data.overlay_url && this.overlayManager) {
@@ -576,29 +669,21 @@
             });
         }
 
-        this.toolbar.setStatus('Moving gold box… release to save');
+        if (statusMessage) {
+            this.toolbar.setStatus(statusMessage);
+        }
+
+        return normalized;
     };
 
-    InteractiveMapEditor.prototype.onGoldBoxChanged = function (bounds) {
-        var normalized = normalizeDraggedBounds(bounds);
-        if (!normalized) {
+    InteractiveMapEditor.prototype.onGoldBoxDragging = function (bounds, path) {
+        this.applyGoldPathUpdate_(bounds, path, 'Reshaping gold outline… release to save');
+    };
+
+    InteractiveMapEditor.prototype.onGoldBoxChanged = function (bounds, path) {
+        if (!this.applyGoldPathUpdate_(bounds, path)) {
             return;
         }
-
-        this.data.north = normalized.north;
-        this.data.south = normalized.south;
-        this.data.east = normalized.east;
-        this.data.west = normalized.west;
-        this.toolbar.write(normalized, true);
-
-        if (this.data.overlay_url && this.overlayManager) {
-            this.overlayManager.update({
-                url: this.data.overlay_url,
-                bounds: normalized,
-                opacity: this.toolbar.readField('overlay_opacity'),
-            });
-        }
-
         this.saveDraggedPosition();
     };
 
@@ -646,7 +731,9 @@
         this.toolbar.write(normalized, true);
 
         if (this.mapManager) {
-            this.mapManager.drawBoundsRectangle(normalized);
+            this.mapManager.drawBoundsRectangle(this.data.overlay_path || normalized, {
+                editable: this.editorMode === 'overlay',
+            });
         }
 
         if (this.overlayManager && typeof this.overlayManager.syncBounds === 'function') {
@@ -662,6 +749,11 @@
 
         this._saveDragTimer = setTimeout(function () {
             var payload = self.toolbar.readAll();
+            if (self.data.overlay_path) {
+                payload.overlay_path = self.data.overlay_path;
+            } else if (self.mapManager && typeof self.mapManager.getPathLiteral === 'function') {
+                payload.overlay_path = self.mapManager.getPathLiteral();
+            }
             self.toolbar.setStatus('Saving position…');
 
             self.request('PUT', '', payload)
@@ -692,9 +784,10 @@
 
         var form = this.toolbar.readAll();
         var bounds = boundsFromData(form);
+        var path = pathFromData(this.data) || pathFromData(form);
 
         this.mapManager.setZoomLimits(form.min_zoom || 0, form.max_zoom || 22);
-        this.mapManager.drawBoundsRectangle(bounds, { editable: this.editorMode !== 'plots' });
+        this.mapManager.drawBoundsRectangle(path || bounds, { editable: this.editorMode !== 'plots' });
 
         if (options.fit && bounds) {
             this.mapManager.fitBounds(bounds);
@@ -793,6 +886,11 @@
     InteractiveMapEditor.prototype.saveSettings = function () {
         var self = this;
         var payload = this.toolbar.readAll();
+        if (this.data.overlay_path) {
+            payload.overlay_path = this.data.overlay_path;
+        } else if (this.mapManager && typeof this.mapManager.getPathLiteral === 'function') {
+            payload.overlay_path = this.mapManager.getPathLiteral();
+        }
         this.toolbar.setStatus('Saving…');
 
         this.request('PUT', '', payload)

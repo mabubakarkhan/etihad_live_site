@@ -8,6 +8,7 @@
         this.options = options || {};
         this.mode = null;
         this.onComplete = typeof options.onComplete === 'function' ? options.onComplete : function () {};
+        this.onPointsChange = typeof options.onPointsChange === 'function' ? options.onPointsChange : function () {};
         this.listeners_ = [];
         this.googleListeners_ = [];
         this.manualListeners_ = [];
@@ -105,10 +106,7 @@
             this.manualListeners_.push(g.event.addListener(this.map, 'click', function (e) {
                 self.addPolygonPoint(e.latLng);
             }));
-            this.manualListeners_.push(g.event.addListener(this.map, 'dblclick', function (e) {
-                e.stop();
-                self.finishPolygon();
-            }));
+            // Finish only via "Draw plot" — no accidental double-click close.
         } else if (mode === 'rectangle') {
             // Two-click rectangle (drag is unreliable with map gestures).
             this.rectStart_ = null;
@@ -155,18 +153,26 @@
         var g = window.google.maps;
         this.polygonPath_.push(latLng);
 
+        var n = this.polygonPath_.length;
         var marker = new g.Marker({
             position: latLng,
             map: this.map,
             clickable: false,
+            label: {
+                text: String(n),
+                color: '#ffffff',
+                fontSize: '11px',
+                fontWeight: '700',
+            },
             icon: {
                 path: g.SymbolPath.CIRCLE,
-                scale: 5,
+                scale: 10,
                 fillColor: this.options.strokeColor || '#6c4815',
                 fillOpacity: 1,
                 strokeColor: '#ffffff',
-                strokeWeight: 1,
+                strokeWeight: 2,
             },
+            zIndex: 50 + n,
         });
         this.tempShapes_.push(marker);
 
@@ -183,7 +189,7 @@
                 clickable: false,
                 fillColor: polyOpts.fillColor,
                 strokeColor: polyOpts.strokeColor,
-                fillOpacity: polyOpts.fillOpacity,
+                fillOpacity: polyOpts.fillOpacity * 0.55,
                 strokeOpacity: polyOpts.strokeOpacity,
                 strokeWeight: polyOpts.strokeWeight,
                 editable: false,
@@ -191,7 +197,61 @@
             });
         }
 
-        this.setHint('Polygon: click corners. Use Undo last point if wrong. Finish when ready (' + this.polygonPath_.length + ' points)');
+        var ready = this.polygonPath_.length >= 3;
+        this.setHint(
+            ready
+                ? ('Points placed: ' + n + '. Click Draw plot or Save plot when ready.')
+                : ('Place points on map (' + n + ' so far). Need at least 3, then Save plot.')
+        );
+        this.emitPointsChange_();
+    };
+
+    DrawingManager.prototype.getDraftPoints = function () {
+        if (this.mode !== 'polygon') {
+            return [];
+        }
+        return this.polygonPath_.map(function (latLng, index) {
+            return {
+                index: index,
+                lat: latLng.lat(),
+                lng: latLng.lng(),
+                label: 'Point ' + (index + 1),
+                draft: true,
+            };
+        });
+    };
+
+    DrawingManager.prototype.emitPointsChange_ = function () {
+        this.onPointsChange(this.getDraftPoints(), this.mode);
+    };
+
+    DrawingManager.prototype.removeDraftPointAt = function (index) {
+        if (this.mode !== 'polygon' || index < 0 || index >= this.polygonPath_.length) {
+            return false;
+        }
+        this.polygonPath_.splice(index, 1);
+        // Rebuild markers/preview from remaining path.
+        this.tempShapes_.forEach(function (shape) {
+            if (shape && shape.setMap) {
+                shape.setMap(null);
+            }
+        });
+        this.tempShapes_ = [];
+        if (this.polygonPreview_) {
+            this.polygonPreview_.setMap(null);
+            this.polygonPreview_ = null;
+        }
+        var remaining = this.polygonPath_.slice();
+        this.polygonPath_ = [];
+        var self = this;
+        remaining.forEach(function (latLng) {
+            self.addPolygonPoint(latLng);
+        });
+        if (!remaining.length) {
+            this.emitPointsChange_();
+            this.setHint('Place points on the map, then click Save plot.');
+        }
+        return true;
     };
 
     DrawingManager.prototype.undoLastPoint = function () {
@@ -242,9 +302,10 @@
 
         this.setHint(
             this.polygonPath_.length
-                ? 'Polygon: click corners. Undo removed last point (' + this.polygonPath_.length + ' left).'
-                : 'Polygon: click first corner on the map.'
+                ? ('Points left: ' + this.polygonPath_.length + '. Click Draw plot or Save plot (min 3).')
+                : 'Place points on the map, then click Save plot.'
         );
+        this.emitPointsChange_();
         return true;
     };
 
@@ -258,7 +319,7 @@
 
     DrawingManager.prototype.finishPolygon = function () {
         if (this.polygonPath_.length < 3) {
-            this.setHint('Need at least 3 points. Keep clicking, or Undo last point.');
+            this.setHint('Need at least 3 points. Keep placing points, then click Draw plot.');
             return;
         }
 
@@ -418,6 +479,7 @@
         if (this.googleDrawing_) {
             this.googleDrawing_.setDrawingMode(null);
         }
+        this.emitPointsChange_();
     };
 
     DrawingManager.prototype.teardownManualListeners = function () {
@@ -451,7 +513,7 @@
 
     DrawingManager.prototype.hintForMode = function (mode) {
         if (mode === 'polygon') {
-            return 'Polygon: click corners on map. Undo last point if wrong. Then Finish shape.';
+            return 'Polygon / points: click corners (3+), then Draw plot. Undo removes last point.';
         }
         if (mode === 'rectangle') {
             return 'Rectangle: click first corner, then opposite corner.';

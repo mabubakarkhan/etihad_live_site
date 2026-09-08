@@ -203,7 +203,7 @@
     border-radius: 0.75rem;
     overflow: visible;
     background: var(--ime-panel);
-    min-height: 480px;
+    min-height: 720px;
     display: flex;
     flex-direction: column;
 }
@@ -301,7 +301,8 @@
 
 .interactive-map-editor__map {
     flex: 1;
-    min-height: 440px;
+    min-height: 680px;
+    height: min(72vh, 860px);
 }
 
 .interactive-map-editor__toast {
@@ -401,21 +402,88 @@
 }
 
 .interactive-map-plot-drawer {
-    position: absolute;
-    top: 4.25rem;
-    right: 0.75rem;
-    bottom: 0.75rem;
-    width: min(340px, calc(100% - 1.5rem));
-    z-index: 20;
+    position: fixed;
+    top: 72px;
+    right: 16px;
+    bottom: auto;
+    left: auto;
+    width: min(300px, calc(100vw - 24px));
+    max-height: min(78vh, 620px);
+    z-index: 10050;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
     overflow: auto;
-    padding: 0.85rem;
-    border-radius: 0.85rem;
-    border: 1px solid var(--ime-border);
-    background: var(--ime-panel);
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22);
+    padding: 0.8rem 0.85rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(180, 140, 70, 0.35);
+    background: linear-gradient(165deg, #fffaf3 0%, #ffffff 42%, #f7f3eb 100%);
+    color: #1f2937;
+    box-shadow:
+        0 18px 40px rgba(28, 25, 23, 0.18),
+        0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+    font-size: 0.8rem;
+}
+
+.interactive-map-plot-drawer.is-dragged {
+    right: auto;
+}
+
+.interactive-map-plot-drawer__head[data-plot-drawer-drag] {
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.interactive-map-plot-drawer__head[data-plot-drawer-drag]:active {
+    cursor: grabbing;
+}
+
+.interactive-map-plot-drawer__drag-hint {
+    margin-left: 0.35rem;
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 600;
+    color: #92400e;
+    opacity: 0.85;
+}
+
+.interactive-map-plot-drawer .interactive-map-editor__hint {
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: #6b7280;
+}
+
+.interactive-map-plot-drawer .interactive-map-editor__field span {
+    font-size: 0.68rem;
+    color: #4b5563;
+}
+
+.interactive-map-plot-drawer .interactive-map-editor__input,
+.interactive-map-plot-drawer .interactive-map-editor__btn,
+.interactive-map-plot-drawer .interactive-map-editor__tool-btn {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.5rem;
+    color: #1f2937;
+    background: #ffffff;
+    border-color: rgba(148, 163, 184, 0.55);
+}
+
+.interactive-map-plot-drawer .interactive-map-editor__btn--primary,
+.interactive-map-plot-drawer .interactive-map-editor__tool-btn.is-active {
+    background: #a9823d;
+    border-color: #a9823d;
+    color: #ffffff;
+}
+
+.interactive-map-plot-drawer .interactive-map-editor__btn--danger {
+    background: #fff1f2;
+    border-color: rgba(225, 29, 72, 0.35);
+    color: #be123c;
+}
+
+.interactive-map-plot-drawer .interactive-map-editor__btn-row {
+    gap: 0.35rem;
 }
 
 .interactive-map-plot-drawer[hidden] {
@@ -442,6 +510,7 @@
     margin: 0.2rem 0 0;
     font-size: 0.95rem;
     font-weight: 600;
+    color: #111827;
 }
 
 .interactive-map-plot-drawer__section {
@@ -449,7 +518,79 @@
     flex-direction: column;
     gap: 0.55rem;
     padding-top: 0.65rem;
-    border-top: 1px solid var(--ime-border);
+    border-top: 1px solid rgba(180, 140, 70, 0.22);
+}
+
+.interactive-map-plot-drawer__vertices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.55rem;
+    border-radius: 0.7rem;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(180, 140, 70, 0.2);
+}
+
+.interactive-map-plot-drawer__vertex-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-height: 180px;
+    overflow: auto;
+}
+
+.interactive-map-plot-drawer__vertex-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.35rem;
+    border-radius: 0.5rem;
+    background: #fff;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.interactive-map-plot-drawer__vertex-focus {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 0;
+    color: inherit;
+}
+
+.interactive-map-plot-drawer__vertex-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #92400e;
+}
+
+.interactive-map-plot-drawer__vertex-coords {
+    display: block;
+    font-size: 0.65rem;
+    color: #6b7280;
+    font-variant-numeric: tabular-nums;
+}
+
+.interactive-map-plot-drawer__plot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    max-height: 160px;
+    overflow: auto;
+}
+
+.interactive-map-plot-drawer .prototype-section-item {
+    background: #ffffff;
+    border-color: rgba(148, 163, 184, 0.4);
+    color: #1f2937;
+}
+
+.interactive-map-plot-drawer .prototype-section-item.is-active {
+    border-color: rgba(169, 130, 61, 0.7);
+    background: #fff7ed;
 }
 
 .prototype-layer-icon--danger {

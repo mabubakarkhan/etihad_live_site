@@ -49,6 +49,9 @@ class InteractiveMapService
             'south' => $data['south'] ?? $map->south,
             'east' => $data['east'] ?? $map->east,
             'west' => $data['west'] ?? $map->west,
+            'overlay_path' => array_key_exists('overlay_path', $data)
+                ? $data['overlay_path']
+                : $map->overlay_path,
             'default_zoom' => $data['default_zoom'] ?? $map->default_zoom,
             'min_zoom' => $data['min_zoom'] ?? $map->min_zoom,
             'max_zoom' => $data['max_zoom'] ?? $map->max_zoom,

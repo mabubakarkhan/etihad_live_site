@@ -29,11 +29,12 @@ return [
     'places_api_key' => env('INTERACTIVE_MAP_PLACES_API_KEY', env('GOOGLE_MAPS_API_KEY', '')),
 
     'defaults' => [
-        'north' => 31.5300,
-        'south' => 31.5100,
-        'east' => 74.3700,
-        'west' => 74.3400,
-        'default_zoom' => 15,
+        // Default starter box near DHA Phase 1, Lahore
+        'north' => 31.4857,
+        'south' => 31.4677,
+        'east' => 74.3951,
+        'west' => 74.3731,
+        'default_zoom' => 14,
         'min_zoom' => 10,
         'max_zoom' => 20,
         'overlay_opacity' => 0.85,

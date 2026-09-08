@@ -112,7 +112,7 @@
             self.select(section.id);
         });
         this.listeners_.push(clickListener);
-        this.shapes_[section.id] = shape;
+        this.shapes_[String(section.id)] = shape;
 
         if (String(this.selectedId) === String(section.id)) {
             this.applySelectionStyle(section.id);
@@ -219,7 +219,7 @@
             },
         });
 
-        this.labels_[section.id] = label;
+        this.labels_[String(section.id)] = label;
     };
 
     SectionManager.prototype.getSectionCenter = function (section) {
@@ -329,17 +329,18 @@
 
     SectionManager.prototype.setEditing = function (id) {
         this.stopEditing();
-        if (!id || !this.interactive_ || this.hidden_[id]) {
+        if (!id || !this.interactive_ || this.hidden_[id] || this.hidden_[String(id)]) {
             return;
         }
 
-        var shape = this.shapes_[id];
-        var section = this.sections.find(function (s) { return String(s.id) === String(id); });
+        var key = String(id);
+        var shape = this.shapes_[key] || this.shapes_[id];
+        var section = this.sections.find(function (s) { return String(s.id) === key; });
         if (!shape || !section) {
             return;
         }
 
-        this.editingId_ = id;
+        this.editingId_ = key;
 
         if (section.section_type === 'polygon' || section.section_type === 'rectangle') {
             shape.setOptions({ editable: true, draggable: true });
@@ -409,9 +410,126 @@
         this.geometryListeners_ = [];
     };
 
+    SectionManager.prototype.getVertices = function (id) {
+        var key = String(id);
+        var section = this.sections.find(function (s) { return String(s.id) === key; });
+        if (!section || !section.geometry) {
+            return [];
+        }
+
+        if (section.section_type === 'polygon' && Array.isArray(section.geometry.paths)) {
+            return section.geometry.paths.map(function (point, index) {
+                return {
+                    index: index,
+                    lat: parseFloat(point.lat),
+                    lng: parseFloat(point.lng),
+                    label: 'Point ' + (index + 1),
+                };
+            }).filter(function (point) {
+                return !isNaN(point.lat) && !isNaN(point.lng);
+            });
+        }
+
+        if (section.section_type === 'rectangle' && section.geometry.bounds) {
+            var b = section.geometry.bounds;
+            return [
+                { index: 0, lat: parseFloat(b.north), lng: parseFloat(b.west), label: 'NW' },
+                { index: 1, lat: parseFloat(b.north), lng: parseFloat(b.east), label: 'NE' },
+                { index: 2, lat: parseFloat(b.south), lng: parseFloat(b.east), label: 'SE' },
+                { index: 3, lat: parseFloat(b.south), lng: parseFloat(b.west), label: 'SW' },
+            ];
+        }
+
+        if (section.section_type === 'marker' && section.geometry.position) {
+            return [{
+                index: 0,
+                lat: parseFloat(section.geometry.position.lat),
+                lng: parseFloat(section.geometry.position.lng),
+                label: 'Marker',
+            }];
+        }
+
+        return [];
+    };
+
+    SectionManager.prototype.focusVertex = function (id, index) {
+        var vertices = this.getVertices(id);
+        var point = vertices[index];
+        if (!point || !this.map) {
+            return;
+        }
+        this.map.panTo({ lat: point.lat, lng: point.lng });
+        this.select(id);
+        this.pulseVertexHint_(point);
+    };
+
+    SectionManager.prototype.pulseVertexHint_ = function (point) {
+        var g = window.google && window.google.maps;
+        if (!g || !this.map || !point) {
+            return;
+        }
+        if (this._vertexHint_) {
+            this._vertexHint_.setMap(null);
+            this._vertexHint_ = null;
+        }
+        this._vertexHint_ = new g.Marker({
+            map: this.map,
+            position: { lat: point.lat, lng: point.lng },
+            clickable: false,
+            zIndex: 999,
+            icon: {
+                path: g.SymbolPath.CIRCLE,
+                scale: 9,
+                fillColor: '#0ea5e9',
+                fillOpacity: 0.95,
+                strokeColor: '#ffffff',
+                strokeWeight: 2,
+            },
+        });
+        var self = this;
+        clearTimeout(this._vertexHintTimer_);
+        this._vertexHintTimer_ = setTimeout(function () {
+            if (self._vertexHint_) {
+                self._vertexHint_.setMap(null);
+                self._vertexHint_ = null;
+            }
+        }, 1600);
+    };
+
+    SectionManager.prototype.removeVertexAt = function (id, index) {
+        var key = String(id);
+        var section = this.sections.find(function (s) { return String(s.id) === key; });
+        var shape = this.shapes_[key] || this.shapes_[id];
+        if (!section || !shape) {
+            return { ok: false, message: 'Plot not found.' };
+        }
+
+        if (section.section_type !== 'polygon' || !shape.getPath) {
+            return { ok: false, message: 'Only polygon points can be deleted from the list.' };
+        }
+
+        var path = shape.getPath();
+        if (path.getLength() <= 3) {
+            return { ok: false, message: 'A polygon needs at least 3 points.' };
+        }
+        if (index < 0 || index >= path.getLength()) {
+            return { ok: false, message: 'Point not found.' };
+        }
+
+        path.removeAt(index);
+        this.select(key);
+        var geometry = this.getGeometryFromShape(key);
+        if (geometry) {
+            this.syncGeometry(key, geometry);
+            this.onGeometryChange(key, geometry);
+        }
+        return { ok: true, geometry: geometry };
+    };
+
     SectionManager.prototype.getGeometryFromShape = function (id) {
-        var shape = this.shapes_[id];
-        var section = this.sections.find(function (s) { return String(s.id) === String(id); });
+        var key = String(id);
+        var shape = this.shapes_[key] || this.shapes_[id];
+        var section = this.sections.find(function (s) { return String(s.id) === key; });
         if (!shape || !section) {
             return null;
         }
@@ -500,28 +618,34 @@
     };
 
     SectionManager.prototype.remove = function (id) {
-        this.sections = this.sections.filter(function (s) { return String(s.id) !== String(id); });
-        this.removeShape(id);
-        this.removeLabel(id);
+        var key = String(id);
+        this.stopEditing();
+        this.sections = this.sections.filter(function (s) { return String(s.id) !== key; });
+        this.removeShape(key);
+        this.removeLabel(key);
+        delete this.hidden_[key];
         delete this.hidden_[id];
-        if (String(this.selectedId) === String(id)) {
+        if (String(this.selectedId) === key) {
             this.selectedId = null;
-        }
-        if (String(this.editingId_) === String(id)) {
-            this.stopEditing();
         }
     };
 
     SectionManager.prototype.removeShape = function (id) {
-        if (this.shapes_[id]) {
-            this.shapes_[id].setMap(null);
+        var key = String(id);
+        var shape = this.shapes_[key] || this.shapes_[id];
+        if (shape) {
+            shape.setMap(null);
+            delete this.shapes_[key];
             delete this.shapes_[id];
         }
     };
 
     SectionManager.prototype.removeLabel = function (id) {
-        if (this.labels_[id]) {
-            this.labels_[id].setMap(null);
+        var key = String(id);
+        var label = this.labels_[key] || this.labels_[id];
+        if (label) {
+            label.setMap(null);
+            delete this.labels_[key];
             delete this.labels_[id];
         }
     };
