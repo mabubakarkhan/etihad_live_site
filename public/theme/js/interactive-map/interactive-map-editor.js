@@ -228,6 +228,9 @@
             this.plotEditBtn.addEventListener('click', function (event) {
                 event.preventDefault();
                 self.setEditorMode('plots');
+                if (self.sectionPanel && self.sectionPanel.openDrawer) {
+                    self.sectionPanel.openDrawer('Add or edit plot');
+                }
             });
         }
     };
@@ -375,8 +378,7 @@
 
     InteractiveMapEditor.prototype.initGisModules = function () {
         var self = this;
-        var sectionPanelRoot = this.root.querySelector('[data-section-panel]');
-        if (!sectionPanelRoot || !IM.SectionManager || !IM.DrawingManager || !IM.SectionPanel) {
+        if (!IM.SectionManager || !IM.DrawingManager || !IM.SectionPanel) {
             return;
         }
 
@@ -394,7 +396,7 @@
                     self.setEditorMode('plots');
                     self.sectionPanel.handleDrawComplete(payload);
                     self.drawingManager.cancel();
-                    sectionPanelRoot.querySelectorAll('[data-draw-mode]').forEach(function (b) {
+                    self.root.querySelectorAll('[data-draw-mode]').forEach(function (b) {
                         b.classList.remove('is-active');
                     });
                 },
@@ -423,7 +425,7 @@
             this.sectionManager.setDefaultLabelZoom(this.data.show_label_from_zoom);
             this.sectionManager.load(this.data.sections || []);
 
-            this.sectionPanel = new IM.SectionPanel(sectionPanelRoot, {
+            this.sectionPanel = new IM.SectionPanel(this.root, {
                 csrf: this.csrf,
                 sections: this.data.sections || [],
                 routes: {
@@ -433,6 +435,9 @@
                 },
                 onAlert: function (message, type) {
                     self.toolbar.showToast(message, type === 'error' ? 'error' : 'success');
+                },
+                onOpenDrawer: function () {
+                    self.setEditorMode('plots');
                 },
                 onDrawMode: function (mode) {
                     self.setEditorMode('plots');
@@ -447,6 +452,16 @@
                         self.drawingManager.cancel();
                     }
                     self.setEditorMode('plots');
+                },
+                onDrawUndo: function () {
+                    if (self.drawingManager && self.drawingManager.undoLastPoint) {
+                        self.drawingManager.undoLastPoint();
+                    }
+                },
+                onDrawFinish: function () {
+                    if (self.drawingManager && self.drawingManager.finishCurrent) {
+                        self.drawingManager.finishCurrent();
+                    }
                 },
                 onDrawStyleChange: function (style) {
                     if (self.drawingManager) {

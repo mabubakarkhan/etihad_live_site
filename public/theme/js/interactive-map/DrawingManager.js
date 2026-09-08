@@ -110,15 +110,16 @@
                 self.finishPolygon();
             }));
         } else if (mode === 'rectangle') {
-            this.backupMapInteraction({ draggable: false, doubleClickZoom: false });
-            this.manualListeners_.push(g.event.addListener(this.map, 'mousedown', function (e) {
-                self.beginRectangle(e.latLng);
+            // Two-click rectangle (drag is unreliable with map gestures).
+            this.rectStart_ = null;
+            this.backupMapInteraction({ draggable: true, doubleClickZoom: false });
+            this.manualListeners_.push(g.event.addListener(this.map, 'click', function (e) {
+                self.handleRectangleClick(e.latLng);
             }));
             this.manualListeners_.push(g.event.addListener(this.map, 'mousemove', function (e) {
-                self.updateRectangle(e.latLng);
-            }));
-            this.manualListeners_.push(g.event.addListener(this.map, 'mouseup', function (e) {
-                self.finishRectangle(e.latLng);
+                if (self.rectStart_) {
+                    self.updateRectangle(e.latLng);
+                }
             }));
         } else if (mode === 'marker') {
             this.backupMapInteraction({ draggable: true, doubleClickZoom: true });
@@ -190,12 +191,74 @@
             });
         }
 
-        this.setHint('Polygon: click to add points, double-click to finish (' + this.polygonPath_.length + ' points)');
+        this.setHint('Polygon: click corners. Use Undo last point if wrong. Finish when ready (' + this.polygonPath_.length + ' points)');
+    };
+
+    DrawingManager.prototype.undoLastPoint = function () {
+        if (this.mode === 'rectangle') {
+            this.rectStart_ = null;
+            if (this.rectPreview_) {
+                this.rectPreview_.setMap(null);
+                this.rectPreview_ = null;
+            }
+            this.tempShapes_ = this.tempShapes_.filter(function (shape) {
+                return shape && shape.getMap && shape.getMap();
+            });
+            this.setHint('Rectangle: click first corner, then opposite corner.');
+            return true;
+        }
+
+        if (this.mode !== 'polygon' || !this.polygonPath_.length) {
+            return false;
+        }
+
+        this.polygonPath_.pop();
+        var marker = this.tempShapes_.pop();
+        if (marker && marker.setMap) {
+            marker.setMap(null);
+        }
+
+        if (this.polygonPreview_) {
+            this.polygonPreview_.setMap(null);
+            this.polygonPreview_ = null;
+        }
+
+        if (this.polygonPath_.length >= 2) {
+            var g = window.google.maps;
+            var polyOpts = this.shapeOptions();
+            this.polygonPreview_ = new g.Polygon({
+                paths: this.polygonPath_,
+                map: this.map,
+                clickable: false,
+                fillColor: polyOpts.fillColor,
+                strokeColor: polyOpts.strokeColor,
+                fillOpacity: polyOpts.fillOpacity,
+                strokeOpacity: polyOpts.strokeOpacity,
+                strokeWeight: polyOpts.strokeWeight,
+                editable: false,
+                draggable: false,
+            });
+        }
+
+        this.setHint(
+            this.polygonPath_.length
+                ? 'Polygon: click corners. Undo removed last point (' + this.polygonPath_.length + ' left).'
+                : 'Polygon: click first corner on the map.'
+        );
+        return true;
+    };
+
+    DrawingManager.prototype.finishCurrent = function () {
+        if (this.mode === 'polygon') {
+            this.finishPolygon();
+            return true;
+        }
+        return false;
     };
 
     DrawingManager.prototype.finishPolygon = function () {
         if (this.polygonPath_.length < 3) {
-            this.setHint('Polygon needs at least 3 points. Keep clicking.');
+            this.setHint('Need at least 3 points. Keep clicking, or Undo last point.');
             return;
         }
 
@@ -211,6 +274,16 @@
 
     DrawingManager.prototype.beginRectangle = function (latLng) {
         this.rectStart_ = latLng;
+    };
+
+    DrawingManager.prototype.handleRectangleClick = function (latLng) {
+        if (!this.rectStart_) {
+            this.rectStart_ = latLng;
+            this.setHint('Rectangle: now click the opposite corner.');
+            return;
+        }
+
+        this.finishRectangle(latLng);
     };
 
     DrawingManager.prototype.updateRectangle = function (latLng) {
@@ -378,13 +451,13 @@
 
     DrawingManager.prototype.hintForMode = function (mode) {
         if (mode === 'polygon') {
-            return 'Polygon mode: click map to add corners, double-click to finish.';
+            return 'Polygon: click corners on map. Undo last point if wrong. Then Finish shape.';
         }
         if (mode === 'rectangle') {
-            return 'Rectangle mode: click and drag on the map to draw a box.';
+            return 'Rectangle: click first corner, then opposite corner.';
         }
         if (mode === 'marker') {
-            return 'Marker mode: click on the map to drop a plot marker.';
+            return 'Marker: click once on the map to drop a pin.';
         }
         return '';
     };

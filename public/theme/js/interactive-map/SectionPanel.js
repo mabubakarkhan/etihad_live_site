@@ -16,6 +16,8 @@
         this.listEl = root.querySelector('[data-section-list]');
         this.formEl = root.querySelector('[data-section-form]');
         this.emptyEl = root.querySelector('[data-section-empty]');
+        this.drawerEl = root.querySelector('[data-plot-drawer]');
+        this.drawerTitleEl = root.querySelector('[data-plot-drawer-title]');
         this.bindEvents();
         this.renderList();
     }
@@ -34,6 +36,7 @@
 
         this.root.querySelectorAll('[data-draw-mode]').forEach(function (btn) {
             btn.addEventListener('click', function () {
+                self.openDrawer('Drawing plot');
                 if (self.options.onDrawMode) {
                     self.options.onDrawMode(btn.getAttribute('data-draw-mode'));
                 }
@@ -42,6 +45,26 @@
                 });
             });
         });
+
+        var openDrawerBtn = this.root.querySelector('[data-open-plot-drawer]');
+        if (openDrawerBtn) {
+            openDrawerBtn.addEventListener('click', function () {
+                self.openDrawer(self.selected ? 'Edit plot' : 'Add plot');
+                if (self.options.onOpenDrawer) {
+                    self.options.onOpenDrawer();
+                }
+            });
+        }
+
+        var closeDrawerBtn = this.root.querySelector('[data-close-plot-drawer]');
+        if (closeDrawerBtn) {
+            closeDrawerBtn.addEventListener('click', function () {
+                self.closeDrawer();
+                if (self.options.onDrawCancel) {
+                    self.options.onDrawCancel();
+                }
+            });
+        }
 
         var cancelBtn = this.root.querySelector('[data-draw-cancel]');
         if (cancelBtn) {
@@ -52,6 +75,24 @@
                 self.root.querySelectorAll('[data-draw-mode]').forEach(function (b) {
                     b.classList.remove('is-active');
                 });
+            });
+        }
+
+        var undoBtn = this.root.querySelector('[data-draw-undo]');
+        if (undoBtn) {
+            undoBtn.addEventListener('click', function () {
+                if (self.options.onDrawUndo) {
+                    self.options.onDrawUndo();
+                }
+            });
+        }
+
+        var finishBtn = this.root.querySelector('[data-draw-finish]');
+        if (finishBtn) {
+            finishBtn.addEventListener('click', function () {
+                if (self.options.onDrawFinish) {
+                    self.options.onDrawFinish();
+                }
             });
         }
 
@@ -91,28 +132,24 @@
 
         if (this.listEl) {
             this.listEl.addEventListener('click', function (e) {
+                var deleteBtn = e.target.closest('[data-layer-delete]');
                 var visBtn = e.target.closest('[data-layer-vis]');
-                var upBtn = e.target.closest('[data-layer-up]');
-                var downBtn = e.target.closest('[data-layer-down]');
                 var selectBtn = e.target.closest('[data-layer-select]');
                 var row = e.target.closest('[data-section-id]');
                 if (!row) {
                     return;
                 }
                 var id = row.getAttribute('data-section-id');
+                if (deleteBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.selectSection(id);
+                    self.deleteSelected();
+                    return;
+                }
                 if (visBtn) {
                     e.preventDefault();
                     self.toggleVisibility(id);
-                    return;
-                }
-                if (upBtn) {
-                    e.preventDefault();
-                    self.moveSection(id, -1);
-                    return;
-                }
-                if (downBtn) {
-                    e.preventDefault();
-                    self.moveSection(id, 1);
                     return;
                 }
                 if (selectBtn || row) {
@@ -124,6 +161,24 @@
                 }
             });
         }
+    };
+
+    SectionPanel.prototype.openDrawer = function (title) {
+        if (this.drawerEl) {
+            this.drawerEl.hidden = false;
+        }
+        if (this.drawerTitleEl) {
+            this.drawerTitleEl.textContent = title || 'Plot tools';
+        }
+    };
+
+    SectionPanel.prototype.closeDrawer = function () {
+        if (this.drawerEl) {
+            this.drawerEl.hidden = true;
+        }
+        this.root.querySelectorAll('[data-draw-mode]').forEach(function (b) {
+            b.classList.remove('is-active');
+        });
     };
 
     SectionPanel.prototype.emitDrawStyle = function () {
@@ -156,7 +211,6 @@
             if (this.emptyEl) {
                 this.emptyEl.hidden = false;
             }
-            this.toggleForm(false);
             return;
         }
 
@@ -164,23 +218,20 @@
             this.emptyEl.hidden = true;
         }
 
-        this.sections.forEach(function (section, index) {
+        this.sections.forEach(function (section) {
             var hidden = !!self.hiddenIds[section.id];
             var active = self.selected && String(self.selected.id) === String(section.id);
             var row = document.createElement('div');
             row.className = 'prototype-section-item' + (active ? ' is-active' : '') + (hidden ? ' is-hidden-layer' : '');
             row.setAttribute('data-section-id', section.id);
             row.innerHTML =
-                '<button type="button" class="prototype-layer-icon" data-layer-vis title="' + (hidden ? 'Show layer' : 'Hide layer') + '">' + (hidden ? '○' : '●') + '</button>' +
+                '<button type="button" class="prototype-layer-icon" data-layer-vis title="' + (hidden ? 'Show' : 'Hide') + '">' + (hidden ? '○' : '●') + '</button>' +
                 '<span class="prototype-section-swatch" style="background:' + (section.fill_color || '#a9823d') + '"></span>' +
                 '<button type="button" class="prototype-layer-select" data-layer-select>' +
                     '<span class="block text-sm font-medium truncate">' + escapeHtml(section.title) + '</span>' +
                     '<span class="block text-[11px] text-slate-500">' + escapeHtml(section.section_type) + (section.label ? ' · ' + escapeHtml(section.label) : '') + '</span>' +
                 '</button>' +
-                '<span class="prototype-layer-order">' +
-                    '<button type="button" class="prototype-layer-icon" data-layer-up title="Move up"' + (index === 0 ? ' disabled' : '') + '>↑</button>' +
-                    '<button type="button" class="prototype-layer-icon" data-layer-down title="Move down"' + (index === self.sections.length - 1 ? ' disabled' : '') + '>↓</button>' +
-                '</span>';
+                '<button type="button" class="prototype-layer-icon prototype-layer-icon--danger" data-layer-delete title="Delete plot">✕</button>';
             self.listEl.appendChild(row);
         });
     };
@@ -191,6 +242,9 @@
             : (this.sections.find(function (s) { return String(s.id) === String(id); }) || null);
         this.renderList();
         this.populateForm();
+        if (this.selected) {
+            this.openDrawer('Edit plot');
+        }
     };
 
     SectionPanel.prototype.clearFocus = function () {
@@ -203,6 +257,7 @@
         if (this.options.onClearFocus) {
             this.options.onClearFocus();
         }
+        this.closeDrawer();
     };
 
     SectionPanel.prototype.populateForm = function () {
@@ -243,56 +298,13 @@
         }
     };
 
-    SectionPanel.prototype.moveSection = function (id, direction) {
-        var index = this.sections.findIndex(function (s) { return String(s.id) === String(id); });
-        var next = index + direction;
-        if (index < 0 || next < 0 || next >= this.sections.length) {
-            return;
-        }
-
-        var current = this.sections[index];
-        var swap = this.sections[next];
-        var currentOrder = parseInt(current.sort_order, 10) || index;
-        var swapOrder = parseInt(swap.sort_order, 10) || next;
-
-        if (currentOrder === swapOrder) {
-            currentOrder = index;
-            swapOrder = next;
-        }
-
-        var self = this;
-        Promise.all([
-            this.patchSection(current.id, { sort_order: swapOrder }),
-            this.patchSection(swap.id, { sort_order: currentOrder }),
-        ]).then(function (updated) {
-            updated.forEach(function (section) {
-                var i = self.sections.findIndex(function (s) { return String(s.id) === String(section.id); });
-                if (i > -1) {
-                    self.sections[i] = section;
-                }
-                self.onSectionsChange(self.sections, section, 'update');
-            });
-            self.sections.sort(compareSort);
-            if (self.selected) {
-                self.selected = self.sections.find(function (s) { return String(s.id) === String(self.selected.id); }) || self.selected;
-            }
-            self.renderList();
-        }).catch(function (err) {
-            self.options.onAlert && self.options.onAlert(err.message || 'Could not reorder layer.', 'error');
-        });
-    };
-
     SectionPanel.prototype.handleDrawComplete = function (payload) {
         var nextIndex = this.sections.length + 1;
-        var title = prompt('Plot / cutting name:', 'Plot ' + nextIndex);
-        if (!title || !title.trim()) {
-            return;
-        }
-
+        var title = 'Plot ' + nextIndex;
         var style = this.getDrawStyle();
         var body = Object.assign({}, payload, {
-            title: title.trim(),
-            label: title.trim(),
+            title: title,
+            label: title,
             fill_color: style.fillColor,
             stroke_color: style.strokeColor,
             fill_opacity: style.fillOpacity,
@@ -327,8 +339,9 @@
                 self.sections.push(data.section);
                 self.selectSection(data.section.id);
                 self.renderList();
+                self.openDrawer('Edit plot');
                 self.onSectionsChange(self.sections, data.section, 'create');
-                self.options.onAlert && self.options.onAlert(data.message, 'success');
+                self.options.onAlert && self.options.onAlert('Plot added — fix shape or rename in the panel.', 'success');
                 if (self.options.onSectionSelect) {
                     self.options.onSectionSelect(data.section);
                 }
@@ -367,7 +380,7 @@
                 self.selected = section;
                 self.renderList();
                 self.onSectionsChange(self.sections, section, 'update');
-                self.options.onAlert && self.options.onAlert('Section saved.', 'success');
+                self.options.onAlert && self.options.onAlert('Plot saved.', 'success');
             })
             .catch(function (err) {
                 self.options.onAlert && self.options.onAlert(err.message, 'error');
@@ -394,7 +407,6 @@
     };
 
     SectionPanel.prototype.patchSection = function (id, payload) {
-        var self = this;
         return fetch(this.routes.update.replace('__SECTION__', id), {
             method: 'PATCH',
             headers: {
@@ -414,7 +426,7 @@
     };
 
     SectionPanel.prototype.deleteSelected = function () {
-        if (!this.selected || !confirm('Delete this plot cutting?')) {
+        if (!this.selected || !confirm('Delete this plot?')) {
             return;
         }
 
@@ -443,7 +455,8 @@
                 self.renderList();
                 self.toggleForm(false);
                 self.onSectionsChange(self.sections, { id: id }, 'delete');
-                self.options.onAlert && self.options.onAlert(data.message, 'success');
+                self.options.onAlert && self.options.onAlert(data.message || 'Plot deleted.', 'success');
+                self.openDrawer('Add plot');
             })
             .catch(function (err) {
                 self.options.onAlert && self.options.onAlert(err.message, 'error');
