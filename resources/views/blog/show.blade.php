@@ -32,7 +32,7 @@
 @endpush
 
 @push('styles')
-<link type="text/css" rel="stylesheet" href="{{ asset('theme/css/pages/blog.css') }}">
+<link type="text/css" rel="stylesheet" href="{{ asset('theme/css/pages/blog.css') }}?v=2">
 @endpush
 
 @section('content')
@@ -78,7 +78,7 @@
                             </header>
 
                             <div class="blog-single__content blog-content">
-                                {!! $post->content !!}
+                                {!! $postContentHtml !!}
                             </div>
 
                             @if ($post->tags->isNotEmpty())

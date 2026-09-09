@@ -36,8 +36,8 @@
         </div>
         <div class="space-y-1.5">
             <label class="block text-sm text-slate-700 dark:text-slate-300">Content</label>
-            <p class="text-xs text-slate-500 mb-2">Use the image button in the toolbar to upload images into the article.</p>
-            <div class="richtext-wrap bg-slate-50 dark:bg-slate-950/60 rounded-lg border border-slate-300 dark:border-slate-700 min-h-[280px]">
+            <p class="text-xs text-slate-500 mb-2">Use the toolbar for formatting. Image button uploads into the article. Linking another blog post URL on the frontend shows its banner + caption.</p>
+            <div class="richtext-wrap blog-richtext-wrap bg-slate-50 dark:bg-slate-950/60 rounded-lg border border-slate-300 dark:border-slate-700">
                 <textarea name="content" id="blog_content" rows="10" class="richtext hidden">{{ old('content', $post->content) }}</textarea>
             </div>
         </div>
@@ -193,12 +193,53 @@
 
 @push('scripts')
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+    .blog-richtext-wrap .ql-toolbar.ql-snow {
+        border-color: #cbd5e1;
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .blog-richtext-wrap .ql-container.ql-snow {
+        border-color: #cbd5e1;
+        border-bottom-left-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+        height: 600px;
+    }
+    .blog-richtext-wrap .ql-editor {
+        height: 600px;
+        min-height: 600px;
+        max-height: 600px;
+        overflow-y: auto;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+</style>
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
 (function () {
     var uploadUrl = @json(route('admin.blog-media.upload'));
     var csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
         || @json(csrf_token());
+
+    function pad2(n) { return String(n).padStart(2, '0'); }
+    function nowLocalDatetimeValue() {
+        var d = new Date();
+        return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate())
+            + 'T' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+    }
+
+    var statusEl = document.getElementById('status');
+    var publishedAtEl = document.getElementById('published_at');
+    if (statusEl && publishedAtEl) {
+        var lastStatus = statusEl.value;
+        statusEl.addEventListener('change', function () {
+            if (statusEl.value === 'published' && lastStatus !== 'published') {
+                publishedAtEl.value = nowLocalDatetimeValue();
+            }
+            lastStatus = statusEl.value;
+        });
+    }
 
     function uploadImage(file) {
         var fd = new FormData();
@@ -220,7 +261,6 @@
     if (!ta || typeof Quill === 'undefined') return;
     var wrap = ta.closest('.richtext-wrap');
     var div = document.createElement('div');
-    div.style.minHeight = '260px';
     wrap.insertBefore(div, ta);
 
     var quill = new Quill(div, {
@@ -228,10 +268,16 @@
         modules: {
             toolbar: {
                 container: [
-                    [{ header: [2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'link'],
-                    [{ list: 'ordered' }, { list: 'bullet' }],
-                    ['blockquote', 'image'],
+                    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+                    [{ font: [] }],
+                    [{ size: ['small', false, 'large', 'huge'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ color: [] }, { background: [] }],
+                    [{ script: 'sub' }, { script: 'super' }],
+                    ['blockquote', 'code-block'],
+                    [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+                    [{ direction: 'rtl' }, { align: [] }],
+                    ['link', 'image', 'video'],
                     ['clean']
                 ],
                 handlers: {

@@ -16,8 +16,8 @@ class AdminBlogPostController extends Controller
     {
         $query = BlogPost::query()
             ->with(['categories:id,name', 'author:id,name'])
-            ->orderByDesc('published_at')
-            ->orderByDesc('id');
+            ->orderByDesc('id')
+            ->orderByDesc('published_at');
 
         if ($request->filled('status')) {
             $query->where('status', $request->string('status'));
@@ -46,6 +46,7 @@ class AdminBlogPostController extends Controller
         $validated = $this->validatePost($request);
         $validated = $this->applySlug($validated);
         $validated['author_id'] = optional(admin_user())->id;
+        $validated = $this->applyPublishedAt($validated, null);
         $validated = $this->applyFeaturedMedia($request, $validated, null);
         $validated = $this->applySeoMedia($request, $validated);
 
@@ -76,6 +77,7 @@ class AdminBlogPostController extends Controller
     {
         $validated = $this->validatePost($request, $blogPost);
         $validated = $this->applySlug($validated, $blogPost);
+        $validated = $this->applyPublishedAt($validated, $blogPost);
         $validated = $this->applyFeaturedMedia($request, $validated, $blogPost);
         $validated = $this->applySeoMedia($request, $validated);
 
@@ -168,6 +170,24 @@ class AdminBlogPostController extends Controller
                 $i++;
             }
             $validated['slug'] = $slug;
+        }
+
+        return $validated;
+    }
+
+    /**
+     * When status becomes published, stamp published_at to now.
+     */
+    private function applyPublishedAt(array $validated, ?BlogPost $post): array
+    {
+        $status = (string) ($validated['status'] ?? '');
+        if ($status !== BlogPost::STATUS_PUBLISHED) {
+            return $validated;
+        }
+
+        $wasPublished = $post && $post->status === BlogPost::STATUS_PUBLISHED;
+        if (! $wasPublished) {
+            $validated['published_at'] = now();
         }
 
         return $validated;

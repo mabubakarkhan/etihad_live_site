@@ -33,7 +33,8 @@
             "app/Helpers/contact.php",
             "app/Helpers/homepage.php",
             "app/Helpers/migration.php",
-            "app/Helpers/storage.php"
+            "app/Helpers/storage.php",
+            "app/Helpers/blog.php"
         ]
     },
     "autoload-dev": {

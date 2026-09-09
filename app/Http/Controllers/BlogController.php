@@ -17,8 +17,8 @@ class BlogController extends Controller
         $posts = BlogPost::query()
             ->published()
             ->with(['categories:id,name,slug', 'author:id,name'])
-            ->orderByDesc('published_at')
             ->orderByDesc('id')
+            ->orderByDesc('published_at')
             ->paginate(9)
             ->appends($request->except('ajax'));
 
@@ -60,14 +60,15 @@ class BlogController extends Controller
                 fn ($q) => $q
             )
             ->with(['categories:id,name,slug'])
-            ->orderByDesc('published_at')
             ->orderByDesc('id')
+            ->orderByDesc('published_at')
             ->limit(5)
             ->get();
 
         $sidebarCategories = $this->categoriesForSidebar();
+        $postContentHtml = blog_enrich_internal_links($post->content, (int) $post->id);
 
-        return view('blog.show', compact('post', 'recentInCategory', 'sidebarCategories'));
+        return view('blog.show', compact('post', 'recentInCategory', 'sidebarCategories', 'postContentHtml'));
     }
 
     public function category(Request $request, string $slug): View|JsonResponse
@@ -78,8 +79,8 @@ class BlogController extends Controller
             ->published()
             ->whereHas('categories', fn ($q) => $q->where('blog_categories.id', $category->id))
             ->with(['categories:id,name,slug', 'author:id,name'])
-            ->orderByDesc('published_at')
             ->orderByDesc('id')
+            ->orderByDesc('published_at')
             ->paginate(9)
             ->appends($request->except('ajax'));
 
@@ -101,8 +102,8 @@ class BlogController extends Controller
             ->published()
             ->whereHas('tags', fn ($q) => $q->where('blog_tags.id', $tag->id))
             ->with(['categories:id,name,slug', 'author:id,name'])
-            ->orderByDesc('published_at')
             ->orderByDesc('id')
+            ->orderByDesc('published_at')
             ->paginate(9)
             ->appends($request->except('ajax'));
 
