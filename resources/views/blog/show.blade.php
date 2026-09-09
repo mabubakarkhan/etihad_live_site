@@ -32,7 +32,7 @@
 @endpush
 
 @push('styles')
-<link type="text/css" rel="stylesheet" href="{{ asset('theme/css/pages/blog.css') }}?v=2">
+<link type="text/css" rel="stylesheet" href="{{ asset('theme/css/pages/blog.css') }}?v=3">
 @endpush
 
 @section('content')

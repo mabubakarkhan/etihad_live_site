@@ -32,7 +32,7 @@ if (! function_exists('blog_enrich_internal_links')) {
                 $caption = trim(html_entity_decode(strip_tags($inner), ENT_QUOTES | ENT_HTML5));
 
                 $post = blog_resolve_internal_post_from_url($href);
-                if (! $post || ($excludePostId !== null && (int) $post->id === (int) $excludePostId)) {
+                if (! $post) {
                     return $matches[0];
                 }
 
@@ -41,10 +41,16 @@ if (! function_exists('blog_enrich_internal_links')) {
                     return $matches[0];
                 }
 
+                // Skip if this anchor is already inside our generated card markup.
+                if (str_contains($matches[0], 'blog-internal-link-card')) {
+                    return $matches[0];
+                }
+
                 $url = e($post->url());
                 $title = e($post->title);
-                $image = e($post->displayImage());
-                $label = $caption !== '' ? e($caption) : $title;
+                $image = e(blog_post_banner($post));
+                // Prefer linked post title as caption; fall back to link text if title empty.
+                $label = $title !== '' ? $title : ($caption !== '' ? e($caption) : $title);
 
                 return '<figure class="blog-internal-link-card">'
                     . '<a class="blog-internal-link-card__media" href="' . $url . '" title="' . $title . '">'
@@ -59,6 +65,51 @@ if (! function_exists('blog_enrich_internal_links')) {
             },
             $html
         );
+    }
+}
+
+if (! function_exists('blog_post_banner')) {
+    /** Prefer the post featured/banner image for internal link cards. */
+    function blog_post_banner(BlogPost $post): string
+    {
+        if (! empty($post->featured_image)) {
+            return str_starts_with((string) $post->featured_image, 'http')
+                ? (string) $post->featured_image
+                : (public_storage_url(ltrim((string) $post->featured_image, '/'))
+                    ?: asset('storage/' . ltrim((string) $post->featured_image, '/')));
+        }
+
+        if (! empty($post->featured_image_source)) {
+            return (string) $post->featured_image_source;
+        }
+
+        return $post->displayImage();
+    }
+}
+
+if (! function_exists('blog_is_own_site_host')) {
+    function blog_is_own_site_host(string $host): bool
+    {
+        $host = strtolower(trim($host));
+        if ($host === '') {
+            return false;
+        }
+
+        // Strip leading www. for comparison.
+        $normalized = preg_replace('/^www\./', '', $host) ?: $host;
+
+        $allowed = [
+            'etihadmarketing.co',
+        ];
+
+        $appHost = strtolower((string) parse_url((string) config('app.url'), PHP_URL_HOST));
+        if ($appHost !== '') {
+            $allowed[] = preg_replace('/^www\./', '', $appHost) ?: $appHost;
+        }
+
+        $allowed = array_values(array_unique(array_filter($allowed)));
+
+        return in_array($normalized, $allowed, true);
     }
 }
 
@@ -77,9 +128,8 @@ if (! function_exists('blog_resolve_internal_post_from_url')) {
                 return null;
             }
 
-            $appHost = strtolower((string) parse_url((string) config('app.url'), PHP_URL_HOST));
             $linkHost = strtolower((string) ($parts['host'] ?? ''));
-            if ($appHost !== '' && $linkHost !== '' && $appHost !== $linkHost) {
+            if ($linkHost !== '' && ! blog_is_own_site_host($linkHost)) {
                 return null;
             }
 
@@ -90,13 +140,11 @@ if (! function_exists('blog_resolve_internal_post_from_url')) {
         $path = preg_replace('#/+#', '/', $path) ?: $path;
 
         // Match /{Y}/{m}/{d}/{slug} optionally with a subdirectory prefix (e.g. /etihad/public/...).
-        if (! preg_match('#(?:^|/)(\d{4})/(\d{2})/(\d{2})/([A-Za-z0-9\-_]+)/?(?:[?#].*)?$#', $path, $m)) {
+        // Use ~ delimiter so literal # in query/hash does not break the pattern.
+        if (! preg_match('~(?:^|/)(\d{4})/(\d{2})/(\d{2})/([A-Za-z0-9\-_]+)/?(?:[?#].*)?$~', $path, $m)) {
             return null;
         }
 
-        $year = $m[1];
-        $month = $m[2];
-        $day = $m[3];
         $slug = $m[4];
 
         $post = BlogPost::query()
@@ -104,19 +152,6 @@ if (! function_exists('blog_resolve_internal_post_from_url')) {
             ->where('slug', $slug)
             ->first();
 
-        if (! $post || ! $post->published_at) {
-            return null;
-        }
-
-        if (
-            $post->published_at->format('Y') !== $year
-            || $post->published_at->format('m') !== $month
-            || $post->published_at->format('d') !== $day
-        ) {
-            // Still accept slug match if date in URL is stale but post exists.
-            return $post;
-        }
-
-        return $post;
+        return $post ?: null;
     }
 }
