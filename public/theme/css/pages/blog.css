@@ -536,10 +536,64 @@
     overflow-x: auto;
     overflow-wrap: anywhere;
     word-break: break-word;
+    /* Theme body is center-aligned; article copy defaults left and keeps editor styles. */
+    text-align: left;
 }
 
 .blog-single__content * {
     max-width: 100%;
+}
+
+.blog-single__content h1,
+.blog-single__content h2,
+.blog-single__content h3,
+.blog-single__content h4,
+.blog-single__content h5,
+.blog-single__content h6,
+.blog-single__content p,
+.blog-single__content ul,
+.blog-single__content ol,
+.blog-single__content li,
+.blog-single__content blockquote,
+.blog-single__content figcaption,
+.blog-single__content td,
+.blog-single__content th,
+.blog-single__content div {
+    text-align: inherit;
+}
+
+/* Honor editor / WordPress alignment choices */
+.blog-single__content [style*="text-align: center"],
+.blog-single__content [style*="text-align:center"],
+.blog-single__content [align="center"],
+.blog-single__content .aligncenter,
+.blog-single__content .text-center,
+.blog-single__content .has-text-align-center {
+    text-align: center !important;
+}
+
+.blog-single__content [style*="text-align: right"],
+.blog-single__content [style*="text-align:right"],
+.blog-single__content [align="right"],
+.blog-single__content .alignright,
+.blog-single__content .text-right,
+.blog-single__content .has-text-align-right {
+    text-align: right !important;
+}
+
+.blog-single__content [style*="text-align: justify"],
+.blog-single__content [style*="text-align:justify"],
+.blog-single__content .has-text-align-justify {
+    text-align: justify !important;
+}
+
+.blog-single__content [style*="text-align: left"],
+.blog-single__content [style*="text-align:left"],
+.blog-single__content [align="left"],
+.blog-single__content .alignleft,
+.blog-single__content .text-left,
+.blog-single__content .has-text-align-left {
+    text-align: left !important;
 }
 
 .blog-single__content h2,
@@ -641,8 +695,33 @@
 
 .blog-single__content ul,
 .blog-single__content ol {
-    margin: 0 0 1.1em 1.25em;
-    padding-left: 0.25em;
+    margin: 0 0 1.1em 1.4em;
+    padding-left: 1.1em;
+    list-style-position: outside;
+}
+
+.blog-single__content ul {
+    list-style-type: disc;
+}
+
+.blog-single__content ol {
+    list-style-type: decimal;
+}
+
+.blog-single__content ul ul {
+    list-style-type: circle;
+    margin-top: 0.4em;
+    margin-bottom: 0.4em;
+}
+
+.blog-single__content ul ul ul {
+    list-style-type: square;
+}
+
+.blog-single__content li {
+    display: list-item;
+    margin-bottom: 0.35em;
+    padding-left: 0.15em;
 }
 
 .blog-single .tagcloud_single {
