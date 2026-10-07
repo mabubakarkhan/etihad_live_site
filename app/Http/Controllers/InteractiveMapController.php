@@ -144,27 +144,36 @@ class InteractiveMapController extends Controller
             return response()->json(['message' => 'Places API key is not configured. Set INTERACTIVE_MAP_PLACES_API_KEY or GOOGLE_MAPS_API_KEY.'], 503);
         }
 
-        $response = Http::timeout(10)->get('https://maps.googleapis.com/maps/api/place/autocomplete/json', [
-            'input' => $validated['input'],
-            'key' => $apiKey,
-            'components' => 'country:pk',
-            'location' => '31.5204,74.3587',
-            'radius' => 50000,
-        ]);
+        // Places API (New) — legacy Place Autocomplete is unavailable on many new Google Cloud projects.
+        $response = Http::timeout(10)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'X-Goog-Api-Key' => $apiKey,
+            ])
+            ->post('https://places.googleapis.com/v1/places:autocomplete', [
+                'input' => $validated['input'],
+                'includedRegionCodes' => ['pk'],
+                'locationBias' => [
+                    'circle' => [
+                        'center' => [
+                            'latitude' => 31.5204,
+                            'longitude' => 74.3587,
+                        ],
+                        'radius' => 50000.0,
+                    ],
+                ],
+            ]);
 
         $data = $response->json();
-        if (! is_array($data)) {
-            return response()->json(['message' => 'Places search failed.'], 502);
+        if (! $response->successful() || ! is_array($data)) {
+            $message = is_array($data)
+                ? (string) (data_get($data, 'error.message') ?: data_get($data, 'error.status') ?: 'Places search failed.')
+                : 'Places search failed.';
+
+            return response()->json(['message' => $message], $response->status() === 403 ? 403 : 502);
         }
 
-        $status = (string) ($data['status'] ?? '');
-        if (! in_array($status, ['OK', 'ZERO_RESULTS'], true)) {
-            return response()->json([
-                'message' => (string) ($data['error_message'] ?? 'Places search failed.'),
-            ], $status === 'REQUEST_DENIED' ? 403 : 502);
-        }
-
-        return response()->json($this->legacyAutocompletePayload($data));
+        return response()->json($this->newAutocompletePayload($data));
     }
 
     public function placesDetails(string $ownerType, int $ownerId, string $placeId): JsonResponse
@@ -184,42 +193,61 @@ class InteractiveMapController extends Controller
             return response()->json(['message' => 'Places API key is not configured. Set INTERACTIVE_MAP_PLACES_API_KEY or GOOGLE_MAPS_API_KEY.'], 503);
         }
 
-        $response = Http::timeout(10)->get('https://maps.googleapis.com/maps/api/place/details/json', [
-            'place_id' => $normalizedId,
-            'key' => $apiKey,
-            'fields' => 'place_id,name,formatted_address,geometry',
-        ]);
+        $response = Http::timeout(10)
+            ->withHeaders([
+                'X-Goog-Api-Key' => $apiKey,
+                'X-Goog-FieldMask' => 'id,displayName,formattedAddress,location,viewport',
+            ])
+            ->get('https://places.googleapis.com/v1/places/' . rawurlencode($normalizedId));
 
         $data = $response->json();
-        if (! is_array($data)) {
-            return response()->json(['message' => 'Place details failed.'], 502);
+        if (! $response->successful() || ! is_array($data)) {
+            $message = is_array($data)
+                ? (string) (data_get($data, 'error.message') ?: data_get($data, 'error.status') ?: 'Place details failed.')
+                : 'Place details failed.';
+
+            return response()->json(['message' => $message], $response->status() === 403 ? 403 : 502);
         }
 
-        $status = (string) ($data['status'] ?? '');
-        if ($status !== 'OK') {
-            return response()->json([
-                'message' => (string) ($data['error_message'] ?? 'Place details failed.'),
-            ], $status === 'REQUEST_DENIED' ? 403 : 502);
-        }
-
-        return response()->json($this->legacyPlaceDetailsPayload($data));
+        return response()->json($this->newPlaceDetailsPayload($data));
     }
 
     /** @param array<string, mixed> $data */
-    private function legacyAutocompletePayload(array $data): array
+    private function newAutocompletePayload(array $data): array
     {
         $suggestions = [];
 
-        foreach ($data['predictions'] ?? [] as $prediction) {
-            if (! is_array($prediction) || empty($prediction['place_id'])) {
+        foreach ($data['suggestions'] ?? [] as $suggestion) {
+            if (! is_array($suggestion)) {
                 continue;
             }
 
+            $prediction = is_array($suggestion['placePrediction'] ?? null)
+                ? $suggestion['placePrediction']
+                : null;
+
+            if (! $prediction) {
+                continue;
+            }
+
+            $placeId = (string) ($prediction['placeId'] ?? '');
+            if ($placeId === '' && ! empty($prediction['place'])) {
+                $placeId = (string) preg_replace('/^places\//', '', (string) $prediction['place']);
+            }
+
+            if ($placeId === '') {
+                continue;
+            }
+
+            $text = is_array($prediction['text'] ?? null)
+                ? (string) ($prediction['text']['text'] ?? $placeId)
+                : $placeId;
+
             $suggestions[] = [
                 'placePrediction' => [
-                    'placeId' => (string) $prediction['place_id'],
+                    'placeId' => $placeId,
                     'text' => [
-                        'text' => (string) ($prediction['description'] ?? $prediction['place_id']),
+                        'text' => $text,
                     ],
                 ],
             ];
@@ -229,35 +257,34 @@ class InteractiveMapController extends Controller
     }
 
     /** @param array<string, mixed> $data */
-    private function legacyPlaceDetailsPayload(array $data): array
+    private function newPlaceDetailsPayload(array $data): array
     {
-        $result = is_array($data['result'] ?? null) ? $data['result'] : [];
-        $geometry = is_array($result['geometry'] ?? null) ? $result['geometry'] : [];
-        $location = is_array($geometry['location'] ?? null) ? $geometry['location'] : [];
-        $viewport = is_array($geometry['viewport'] ?? null) ? $geometry['viewport'] : null;
+        $displayName = is_array($data['displayName'] ?? null) ? $data['displayName'] : [];
+        $location = is_array($data['location'] ?? null) ? $data['location'] : [];
+        $viewport = is_array($data['viewport'] ?? null) ? $data['viewport'] : null;
 
         $payload = [
             'displayName' => [
-                'text' => (string) ($result['name'] ?? ''),
+                'text' => (string) ($displayName['text'] ?? ''),
             ],
-            'formattedAddress' => (string) ($result['formatted_address'] ?? ''),
+            'formattedAddress' => (string) ($data['formattedAddress'] ?? ''),
             'location' => [
-                'latitude' => (float) ($location['lat'] ?? 0),
-                'longitude' => (float) ($location['lng'] ?? 0),
+                'latitude' => (float) ($location['latitude'] ?? 0),
+                'longitude' => (float) ($location['longitude'] ?? 0),
             ],
         ];
 
         if (is_array($viewport)
-            && is_array($viewport['southwest'] ?? null)
-            && is_array($viewport['northeast'] ?? null)) {
+            && is_array($viewport['low'] ?? null)
+            && is_array($viewport['high'] ?? null)) {
             $payload['viewport'] = [
                 'low' => [
-                    'latitude' => (float) $viewport['southwest']['lat'],
-                    'longitude' => (float) $viewport['southwest']['lng'],
+                    'latitude' => (float) ($viewport['low']['latitude'] ?? 0),
+                    'longitude' => (float) ($viewport['low']['longitude'] ?? 0),
                 ],
                 'high' => [
-                    'latitude' => (float) $viewport['northeast']['lat'],
-                    'longitude' => (float) $viewport['northeast']['lng'],
+                    'latitude' => (float) ($viewport['high']['latitude'] ?? 0),
+                    'longitude' => (float) ($viewport['high']['longitude'] ?? 0),
                 ],
             ];
         }
