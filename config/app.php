@@ -17,8 +17,8 @@ return [
 
     'currency' => env('APP_CURRENCY', 'PKR'),
 
-    'google_maps_api_key' => env('GOOGLE_MAPS_API_KEY', ''),
-    'google_maps_map_id' => env('GOOGLE_MAPS_MAP_ID', 'DEMO_MAP_ID'),
+    'google_maps_api_key' => env('GOOGLE_MAPS_API_KEY', 'AIzaSyAhIh6BCCoSU05v6M49y7y4AwGp6yps10Y'),
+    'google_maps_map_id' => env('GOOGLE_MAPS_MAP_ID', '37fa98e3acfb9bf5a55caa50'),
 
     /*
     |--------------------------------------------------------------------------

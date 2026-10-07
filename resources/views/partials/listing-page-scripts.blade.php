@@ -3,7 +3,7 @@
     $defaultDhaPhaseId = $defaultDhaPhaseId ?? null;
     $listingResultsLabel = $listingResultsLabel ?? 'Listings';
     $dhaPhaseUrls = $dhaPhaseUrls ?? [];
-    $googleMapsKey = $googleMapsKey ?? 'AIzaSyAUJRbRPd-O8U1B4fIfdfq8jRAUVcbn1-Q';
+    $googleMapsKey = $googleMapsKey ?? config('app.google_maps_api_key');
     $googleMapsMapId = $googleMapsMapId ?? config('app.google_maps_map_id', 'DEMO_MAP_ID');
     $listingCs = \App\Models\ContactSetting::instance();
     $listingWaRaw = trim((string) ($listingCs->whatsapp ?? '')) ?: trim((string) ($listingCs->phone ?? ''));

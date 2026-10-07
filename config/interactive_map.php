@@ -26,7 +26,7 @@ return [
     | Set application restriction to "None" in Google Cloud; key is not used in browser.
     | Enable legacy "Places API" (not only Places API New) for autocomplete proxy.
     */
-    'places_api_key' => env('INTERACTIVE_MAP_PLACES_API_KEY', env('GOOGLE_MAPS_API_KEY', '')),
+    'places_api_key' => env('INTERACTIVE_MAP_PLACES_API_KEY', env('GOOGLE_MAPS_API_KEY', 'AIzaSyBm9QxLshImCTDlDGb1Hx5oA4pIjSUadSc')),
 
     'defaults' => [
         // Default starter box near DHA Phase 1, Lahore
